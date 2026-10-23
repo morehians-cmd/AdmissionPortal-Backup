@@ -763,7 +763,7 @@ function home(){
   const cards=dcard('c2',I.home,'Enrollment Status',esc(s.EnrollStatus||'Not Enrolled'),'Current status','#16a34a','','',1)+dcard('c1',I.adm,'Grade &amp; Section',esc(gs||'Not set yet'),esc(tc(s.Department||'')),'#2563eb','nav','sp',1)+dcard('c3',I.rep,'Requirements',done+' / '+rq.length,'<em class="mbar"><u style="width:'+pr+'%"></u></em>','','nav','rq')+dcard('c4',I.cal,'School Year',esc(s.SchoolYear||'-'),esc(s.Classification||''),'#7c3aed','','',1);
   $('view').innerHTML=dhero(tc(s.FirstName||S.user.FullName||'Student'),'Here&rsquo;s your enrollment progress at a glance.',cards)+`<div class="dash hm"><div class="dmain">
   ${holdBanner(s)}<div class="card"><h3>Enrollment guide</h3><div id="guidebox" class="pvs">${GUIDE0}</div></div>
-  <div class="card"><h3>Important Reminders</h3><ul style="line-height:1.9;margin:0;padding-left:20px"><li><b>Office Hours:</b> Mon&ndash;Fri: 8:00 AM &ndash; 5:00 PM | Sat: 8:00 AM &ndash; 3:00 PM.</li><li><b>Enrollment Cancellation / Withdrawal:</b> &#8369;1,000.00 processing fee applies to cancellations/withdrawals on or before June 30. Requests made after June 30 will be recalculated by the Principal's and Accounting Offices based on elapsed class days and applied discounts/incentives.</li><li><b>Contact Information:</b> Ground Floor, Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City | Mobile: 0961 876 6886 | Email: morehians@gmail.com</li></ul></div>${helpbar()}</div>
+  <div class="card"><h3>Important Reminders</h3></ul></div>${polCard()}${helpbar()}</div><ul style="line-height:1.9;margin:0;padding-left:20px"><li><b>Office Hours:</b> Mon&ndash;Fri: 8:00 AM &ndash; 5:00 PM | Sat: 8:00 AM &ndash; 3:00 PM.</li><li><b>Enrollment Cancellation / Withdrawal:</b> &#8369;1,000.00 processing fee applies to cancellations/withdrawals on or before June 30. Requests made after June 30 will be recalculated by the Principal's and Accounting Offices based on elapsed class days and applied discounts/incentives.</li><li><b>Contact Information:</b> Ground Floor, Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City | Mobile: 0961 876 6886 | Email: morehians@gmail.com</li></ul></div>${helpbar()}</div>
   <div class="dside"><div class="card"><div class="ch"><h3>Quick Actions</h3></div><div class="qas">${qa('c1',I.adm,'Student Profile','nav','sp')}${qa('c3',I.rep,'School Requirements','nav','rq')}${qa('c4',I.rep,'Print Consent Form','pconsent')}${qa('c2',I.rep,'Data Privacy Policy','nav','pp')}${qa('c5',I.sch,'Scholarships','nav','sch')}${qa('c1',I.tf,'Schedule of Fees','nav','tf')}</div></div>${evSide()}${actCard()}</div></div>`;renderAct();homeEvents()})}}
 
 const RGROUPS=['Preschool','Elementary','Junior High School','Senior High \u2013 Grade 11','Senior High \u2013 Grade 12'],RGC=['#db2777','#16a34a','#2563eb','#7c3aed','#d97706'];
@@ -1329,7 +1329,7 @@ const CF=['Tuition Fees','Miscellaneous Fees','School Uniform','P.E. Shirt','Sch
 const RF=['Tuition Fee','Miscellaneous Fee','Others'];
 const cxOpts=()=>({date:$('cdt').value,reason:$('crs').value.toUpperCase(),fees:CF.map((x,i)=>[x==='Others'&&$('cod').value?'Others: '+$('cod').value.toUpperCase():x,parseFloat($('cf'+i).value)||0]),refunds:RF.map((x,i)=>[x==='Others'&&$('rod').value?'Others: '+$('rod').value.toUpperCase():x,parseFloat($('rf'+i).value)||0])});
 function cancelModal(r){const C=S.cfg,m=document.createElement('div');m.className='mod';m.id='cm';S.cr=r;
- m.innerHTML=`<div><div class="bd"><h3 style="margin:0 0 4px;color:var(--navy)">Cancellation of Enrollment</h3><p style="color:var(--mut);margin:0 0 14px">Edit the details and fee amounts before printing or downloading. For requests after June 30, enter the amounts recalculated by the Principal\u2019s and Accounting Offices.</p><div class="g"><div class="f"><label>Date of cancellation</label><input id="cdt" type="date" value="${esc(r.CancelDate||today())}"></div><div class="f"><label>Reason</label><input id="crs" value="${esc(cxReason(r))}"></div><div class="sec" style="grid-column:1/-1;margin:6px 0 0">STUDENT ACCOUNT SUMMARY</div>${CF.map((x,i)=>`<div class="f"><label>${x} (PHP)</label><input id="cf${i}" inputmode="decimal" value="${x==='Processing Fee'?Number(C.fee):0}"></div>`).join('')}<div class="f" style="grid-column:1/-1"><label>Others \u2013 description</label><input id="cod"></div><div class="sec" style="grid-column:1/-1;margin:6px 0 0">REFUNDABLE FEES</div>${RF.map((x,i)=>`<div class="f"><label>${x} (PHP)</label><input id="rf${i}" inputmode="decimal" value="0"></div>`).join('')}<div class="f" style="grid-column:1/-1"><label>Refundable Others \u2013 description</label><input id="rod"></div></div></div><div class="ft"><button class="btn alt" data-act="ccl">Close</button><button class="btn alt" data-act="cprint">Print form</button><button class="btn" data-act="cpdf">Download PDF</button></div></div>`;document.body.appendChild(m)}
+ m.innerHTML=`<div><div class="bd"><h3 style="margin:0 0 4px;color:var(--navy)">Cancellation of Enrollment</h3><p style="color:var(--mut);margin:0 0 14px">Edit the details and fee amounts before printing or downloading. For requests after June 30, enter the amounts recalculated by the Principal\u2019s and Accounting Offices.</p><div class="g">${cxPolicy(r)}<div class="f"><label>Date of cancellation</label><input id="cdt" type="date" value="${esc(r.CancelDate||today())}"></div><div class="f"><label>Reason</label><input id="crs" value="${esc(cxReason(r))}"></div><div class="sec" style="grid-column:1/-1;margin:6px 0 0">STUDENT ACCOUNT SUMMARY</div>${CF.map((x,i)=>`<div class="f"><label>${x} (PHP)</label><input id="cf${i}" inputmode="decimal" value="${x==='Processing Fee'?Number(C.fee):0}"></div>`).join('')}<div class="f" style="grid-column:1/-1"><label>Others \u2013 description</label><input id="cod"></div><div class="sec" style="grid-column:1/-1;margin:6px 0 0">REFUNDABLE FEES</div>${RF.map((x,i)=>`<div class="f"><label>${x} (PHP)</label><input id="rf${i}" inputmode="decimal" value="0"></div>`).join('')}<div class="f" style="grid-column:1/-1"><label>Refundable Others \u2013 description</label><input id="rod"></div></div></div><div class="ft"><button class="btn alt" data-act="ccl">Close</button><button class="btn alt" data-act="cprint">Print form</button><button class="btn" data-act="cpdf">Download PDF</button></div></div>`;document.body.appendChild(m)}
 function printCancel(r,o){printHTML(cancelHTML(r,o),true,fileName(r,'Cancellation'))}
 const CX_CSS=`<style>
 .ef .cxl{font-size:9.5pt;line-height:4.3mm;color:#1f3159}
@@ -1345,7 +1345,9 @@ function cancelHTML(r,o){const C=S.cfg;o=o||{date:r.CancelDate||today(),reason:c
   .concat([0,1,2,3,4].map(i=>i<4?(st[i]?money(st[i][0],st[i][1]):''):money('Total to be Settled',totS,1)));
  const feeRows=cells.map((c,i)=>`<div class="rw" style="gap:1.2mm"><div style="flex:none;width:29.5mm;height:100%">${i===0?chip('Refundable Fees'):i===4?chip('Settleable Fees'):''}</div>${c||'<div class="v"></div>'}</div>`).join('');
  const SN={ReqSF9:'SF9 / Report Card',ReqF137:'Form 137',ReqBirth:'Birth Certificate',ReqMoral:'Good Moral Certificate',ReqJHS:'JHS Completion Cert.',ReqPhoto:'2x2 ID Photo',ReqTransferee:'Transferee Certification',ReqConsent:'Parental Consent Form'};
- const Q=S.fields.filter(f=>f[0]==='req'&&f[3]!=='auto'&&f[3]!=='date'&&f[1]!=='ReqRemarks'&&r[f[1]]&&r[f[1]]!=='None').map(f=>[SN[f[1]]||f[2],r[f[1]]]);
+const Q=r.EnrollStatus==='Transferred Out'
+  ? releaseDocs(r).map(x=>[x[1],'For release'])
+  : S.fields.filter(f=>f[0]==='req'&&f[3]!=='auto'&&f[3]!=='date'&&f[1]!=='ReqRemarks'&&r[f[1]]&&r[f[1]]!=='None').map(f=>[SN[f[1]]||f[2],r[f[1]]]);
  const rqRows=[0,1,2,3,4,5,6,7,8].map(i=>{const q=Q[i]||['',''];return `<div class="rw" style="gap:1.4mm"><label class="dname" style="width:35.9mm">${esc(q[0])}</label><div class="v s">${esc(q[1])}</div></div>`}).join('');
  const ln=(t,w)=>`<span style="display:inline-block;min-width:${w}mm;border-bottom:.25mm solid #1f3159;text-align:center;font-weight:700">${t?esc(t):'&nbsp;'}</span>`;
  const dest=[r.DestSchool,r.DestType?'('+r.DestType+')':''].filter(Boolean).join(' ');
@@ -1404,7 +1406,7 @@ function secFields(s,t){let fs=S.fields.filter(f=>f[0]===s);
  if(s==='req')return reqTable(t);
  if(s==='personal'){const b=fs.find(f=>f[1]==='BirthPlace');if(b&&fs.some(f=>f[1]==='Age')){fs=fs.filter(f=>f!==b);fs.splice(fs.findIndex(f=>f[1]==='Age')+1,0,b)}}
  if(s==='family')return ['Father','Mother'].map(p=>`<div style="grid-column:1/-1"><div class="sec">${p.toUpperCase()}'S DATA</div><div class="g">${fs.filter(f=>f[1].startsWith(p)).map(f=>fld(f,t)).join('')}</div></div>`).join('');
-if(s!=='academic')return (s==='personal'?ageNotice(t.rec):'')+fs.map(f=>fld(f,t)).join('');
+if(s!=='academic')return (s==='personal'?ageNotice(t.rec):s==='cancel'?cxPolicy(t.rec):'')+fs.map(f=>fld(f,t)).join('');
  const c=fs.find(f=>f[1]==='CertNo');if(c){fs=fs.filter(f=>f!==c);fs.splice(fs.findIndex(f=>f[1]==='Category')+1,0,c)}
  let o='',d=false;fs.forEach(f=>{if(NAMEK.includes(f[1])){if(!d){d=true;o+=`<div class="name4">${fs.filter(x=>NAMEK.includes(x[1])).map(x=>fld(x,t)).join('')}</div>`}}else{o+=fld(f,t);if(f[1]==='CertNo')o+=schBox(t.rec)}});return o}
 const CONS=`<ol><li><b>Accuracy of Information:</b> All information provided in this application and attached documents are true, complete, and correct to the best of my knowledge. I understand that providing false, fraudulent, or misleading information will result in the disqualification of my application or immediate cancellation of admission/enrollment.</li><li><b>Explicit Consent:</b> I have read and understood this Data Privacy Statement and voluntarily give my explicit consent to Moreh Academy and Moreh College to collect, store, process, and share my personal information and sensitive personal information in accordance with RA 10173 for admission and enrollment processing.</li><li><b>Parent / Legal Guardian Consent (For Minors below 18 years old):</b> If the applicant is below 18 years of age, I certify that I am the parent/legal guardian granting authorization on behalf of the minor data subject.</li></ol>`;
@@ -2993,4 +2995,43 @@ act.acopen = id => call('getAdvisee', [T(), id], r => {
   m.innerHTML = `<div style="max-width:980px"><div class="bd"><h3 style="color:var(--navy);margin:0 0 4px">${esc(tc(rec.FullName || ''))}</h3><p style="color:var(--mut);margin:0 0 6px">${esc(rec.StudentID)} \u00b7 Read-only advisory view. Please keep this information confidential.</p>${acRec(rec)}</div><div class="ft"><button class="btn alt" data-act="acx2">Close</button></div></div>`;
   document.body.appendChild(m)
 });
+
+/* ===== Transfer Out / Cancellation policies ===== */
+const POL = {
+  transfer: {
+    title: 'Transferring Out',
+    def: 'Applies to learners who were officially enrolled and completed the previous school year.',
+    docs: ['SF9 / Report Card (original copy)', 'Good Moral Certificate (original copy)',
+           'Voucher Certificate (Senior High School learners only)', 'ESC Certificate (ESC grantees only)', 'TLC Transfer Form (TLC scholars only)']
+  },
+  cancel: {
+    title: 'Cancellation of Enrollment',
+    def: 'Applies to newly registered learners who have no official academic record in the school system yet, other than their initial registration.',
+    docs: ['All admission and enrollment requirements previously submitted by the learner']
+  }
+};
+
+/** Documents to release for THIS learner. Returns [full label, short label for the printed slip]. */
+function releaseDocs(r) {
+  if (r.EnrollStatus === 'Cancelled') return [['All submitted admission and enrollment requirements', 'All submitted requirements']];
+  const d = [['SF9 / Report Card (original copy)', 'SF9 / Report Card (Orig.)'], ['Good Moral Certificate (original copy)', 'Good Moral Cert. (Orig.)']];
+  if (r.Department === 'Senior High School') d.push(['Voucher Certificate', 'Voucher Certificate']);   // narrow to voucher categories if you prefer
+  if (r.Category === 'ESC') d.push(['ESC Certificate', 'ESC Certificate']);
+  if (['TLC', 'TLC-OVAP'].includes(r.Category)) d.push(['TLC Transfer Form', 'TLC Transfer Form']);
+  return d;
+}
+
+/** Notice shown in Step 5 and in the cancellation pop-up. Soft warnings only; nothing is blocked. */
+function cxPolicy(r) {
+  if (!cxOn(r)) return '';
+  const t = r.EnrollStatus === 'Transferred Out', P = t ? POL.transfer : POL.cancel, hist = (r.History || []).length > 0;
+  let warn = '';
+  if (t && r.Classification === 'New' && !hist) warn = 'This looks like a new registration with no completed school year. If so, use <b>Cancelled</b> instead.';
+  if (!t && (r.Classification === 'Old' || hist)) warn = 'This learner has an earlier school year on record. If they completed it, use <b>Transferred Out</b> instead.';
+  return `<div class="scn" style="grid-column:1/-1">${SICO.info}<div><b>${P.title} policy.</b> ${esc(P.def)}<br><b>Documents to release:</b>${ul(releaseDocs(r).map(x => esc(x[0])))}${warn ? `<div style="margin-top:8px"><b>Check:</b> ${warn}</div>` : ''}</div></div>`;
+}
+
+/** Student-facing card (Home). */
+const polCard = () => `<div class="card"><h3>Transfer Out &amp; Cancellation Policies</h3>
+ ${[POL.transfer, POL.cancel].map(P => `<div class="fpm"><div class="fpmt"><span class="ao c3">${SICO.info}</span><b>${P.title}</b></div><p style="margin:4px 0 6px;color:var(--mut)">${esc(P.def)}</p><b style="font-size:13px;color:var(--navy)">Documents to release</b>${ul(P.docs.map(esc))}</div>`).join('')}</div>`;
 </script></body></html>

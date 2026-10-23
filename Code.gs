@@ -836,7 +836,7 @@ const CAREER_KEYS = ['ASSH', 'BE', 'STEM', 'ICT', 'HT'];
 /** Incoming Grade 11 = a Grade 11 record in the ACTIVE school year that is not cancelled / transferred out.
  *  The main administrator (Clearance 'Full') also has access, to maintain the content. */
 function careerAllowed_(u) {
-  if (u.Role === 'admin') return u.Clearance === 'isFull_(u)';
+  if (u.Role === 'admin') return isFull_(u);
   const hit = findRow_('S', 'StudentID', u.StudentID), s = hit && hit.o;
   if (!s) return false;
   if (s.EnrollStatus === 'Cancelled' || s.EnrollStatus === 'Transferred Out') return false;
