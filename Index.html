@@ -618,6 +618,214 @@ aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
  #load i{animation-duration:1s!important;animation-iteration-count:infinite!important}
 }
 </style>
+<!-- ============================================================
+  MOREH ACADEMY PORTAL - MODERN UI THEME (CSS only)
+  INSTALL: paste this whole <style> block in Index.html, in <head>, AFTER the last existing </style> and before </head>.
+  It only restyles. No JS, no DOM ids, no data-act / data-k hooks, no backend call is touched.
+  Everything is inside @media screen, so printed forms, slips, ID cards and reports are unchanged.
+============================================================ -->
+<style id="modern-ui">
+@media screen{
+/* ---------- 1. Design tokens (same names the JS already uses in inline styles) ---------- */
+:root{
+ --navy:#0f1f3d;--blue:#2563eb;--blue2:#1d4ed8;--soft:#eef4ff;--cream:#f3f5f9;--line:#e3e8ef;
+ --txt:#0f172a;--mut:#475569;--hero1:#eaf1ff;--hero2:#f7faff;--heroline:#d6e2fb;
+ --sb:#0b1730;--sbd:#0f1f3d;--sbh:#1b2f5c;
+ --ok:#15803d;--okbg:#dcfce7;--warn:#92400e;--warnbg:#fef3c7;--bad:#b91c1c;--badbg:#fee2e2;
+ --r:14px;--r2:10px;
+ --sh:0 1px 2px #0f172a0f,0 4px 16px #0f172a0a;--sh2:0 10px 30px #0f172a22;
+ --ring:0 0 0 3px #2563eb33;
+}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--cream);color:var(--txt)}
+h1,h2,h3,h4{letter-spacing:-.01em}
+a{color:var(--blue)}
+::selection{background:#2563eb33}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;border:2px solid transparent;background-clip:content-box}::-webkit-scrollbar-thumb:hover{background:#94a3b8;background-clip:content-box;border:2px solid transparent}
+
+/* ---------- 2. Sign-in page ---------- */
+#login{background:#fff}
+.hero{background:radial-gradient(900px 500px at 15% 10%,#2b4fa8aa,transparent 60%),radial-gradient(700px 500px at 90% 95%,#1e3a8a99,transparent 60%),linear-gradient(160deg,#0b1730,#12275a 60%,#1a3a86)}
+.hero img{border:4px solid #ffffff33;box-shadow:0 18px 50px #0007}
+.hero h1{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.lf{max-width:400px}
+.lf h1{font-weight:800;letter-spacing:-.02em}
+.lf input{height:48px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;transition:border-color .15s,box-shadow .15s}
+.lf input:hover{border-color:#94a3b8}
+.lf input:focus{outline:0;border-color:var(--blue);box-shadow:var(--ring)}
+.lf .sec{margin:0 0 2px;color:var(--mut)}
+.lf .btn{width:100%;height:48px;font-size:15px}
+.lf a{text-decoration:none}.lf a:hover{text-decoration:underline}
+#regbox{margin-top:18px;padding:18px;background:#f8fafc;border:1px solid var(--line);border-radius:var(--r)}
+
+/* ---------- 3. Sidebar ---------- */
+aside{background:linear-gradient(180deg,#0e1d3b 0%,#0a1428 100%)!important;box-shadow:1px 0 0 #ffffff0d}
+.brand b{font-weight:800}
+.nav{border-radius:10px;margin:1px 8px;width:calc(100% - 16px);padding:10px 12px;color:#cbd5e8;transition:background .15s,color .15s}
+.nav:hover{background:#ffffff14;color:#fff}
+.nav.on,.ngh.has,.ng.fly>.ngh{background:linear-gradient(90deg,#2563eb,#3b73e8)!important;color:#fff;box-shadow:0 6px 16px #2563eb55!important}
+.nav.sub{margin:0;width:100%;border-radius:0}
+.nav.sub.on{background:#1e3a8a!important;box-shadow:none!important}
+.nlabel{color:#8da2c6;letter-spacing:.08em;font-size:11.5px}
+.nsrch{border-bottom:1px solid #ffffff2e}
+.ns{border-radius:12px;box-shadow:var(--sh2);border:1px solid #ffffff14;background:#0f1f3d}
+.nb2{box-shadow:0 0 0 2px #0a1428}
+.me{border-top:1px solid #ffffff1f}
+
+/* ---------- 4. Top bar & layout ---------- */
+main{max-width:1520px}
+.top{background:#ffffffee;backdrop-filter:saturate(1.4) blur(10px);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
+.top h1{font-size:19px;font-weight:800;color:var(--navy)}
+.top p{color:var(--mut)}
+.av{border:1px solid var(--line)!important;box-shadow:var(--sh);transition:transform .12s,box-shadow .15s}
+.av:hover{transform:translateY(-1px);box-shadow:var(--sh2)}
+#menu{border-radius:10px;transition:background .15s}#menu:hover{background:var(--soft)}
+#gs{border:1px solid transparent!important;background-color:#f1f5f9!important;border-radius:12px!important;transition:border-color .15s,box-shadow .15s,background-color .15s}
+#gs:hover{background-color:#e9eef5!important}
+#gs:focus{background-color:#fff!important;border-color:var(--blue)!important;box-shadow:var(--ring)}
+.gsr{border-radius:var(--r);box-shadow:var(--sh2)}
+.gsi{border-radius:10px}
+.rbd{background:var(--soft);border:1px solid var(--heroline)}
+.dd{border-radius:var(--r);box-shadow:var(--sh2);border:1px solid var(--line)}
+.dd button{transition:background .12s}
+.ftr{border-top:1px solid var(--line)}
+
+/* ---------- 5. Cards & panels ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);padding:24px;transition:box-shadow .2s}
+.card h3{font-size:16.5px;font-weight:700;color:var(--navy)}
+.ch h3{margin:0}
+.ch a{font-weight:600}
+.sec{letter-spacing:.07em;font-size:11.5px;color:var(--mut)}
+.hm .card .ch h3:before,.hm .card>h3:before,.wpane .card>h3:before{background:linear-gradient(180deg,#3b82f6,#1d4ed8)}
+
+/* ---------- 6. Hero banners & KPI tiles ---------- */
+.shero{background:linear-gradient(120deg,var(--hero1),var(--hero2) 70%);border:1px solid var(--heroline);border-radius:18px;box-shadow:var(--sh)}
+.sht h2{font-weight:800;letter-spacing:-.02em}
+.shbtn{background:linear-gradient(180deg,#3b82f6,#2563eb);border-radius:10px;box-shadow:0 4px 12px #2563eb40;transition:transform .12s,box-shadow .15s}
+.shbtn:hover{background:linear-gradient(180deg,#2f76f0,#1d4ed8);transform:translateY(-1px);box-shadow:0 8px 18px #2563eb50}
+.shbtn:active{transform:translateY(0)}
+.shc{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh)}
+.shc:hover{border-color:#bcd0f7;box-shadow:var(--sh2)}
+.shc.nc:hover{border-color:var(--line);box-shadow:var(--sh)}
+.shv{color:var(--navy);letter-spacing:-.02em}
+.ki{border-radius:12px}
+.kpi{border:1px solid var(--line);border-radius:14px}
+.shchip{background:#fff;border:1px solid var(--heroline);color:var(--navy)}
+.qa{border:1px solid transparent;border-radius:14px}
+.qa:hover{border-color:#ffffffaa;box-shadow:var(--sh2)}
+.qa:active{transform:translateY(0)}
+.helpbar{background:linear-gradient(120deg,#e8f0fe,#f1f6ff);border:1px solid var(--heroline);border-radius:var(--r)}
+.pl,.lv,.gct{border-radius:12px}
+.pl:hover,.lv:hover{border-color:#cbd5e1}
+
+/* ---------- 7. Buttons ---------- */
+.btn{background:linear-gradient(180deg,#3b82f6,#2563eb);color:#fff;border:1px solid #1d4ed8;border-radius:10px;padding:10px 18px;font:600 14px Inter,system-ui,sans-serif;box-shadow:0 1px 2px #1e3a8a40;transition:background .15s,box-shadow .15s,transform .1s,border-color .15s}
+.btn:hover{background:linear-gradient(180deg,#2f76f0,#1d4ed8);box-shadow:0 6px 16px #2563eb40}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.alt{background:#fff;color:var(--navy);border:1px solid #cbd5e1;box-shadow:0 1px 2px #0f172a0d}
+.btn.alt:hover{background:#f8fafc;border-color:#94a3b8;box-shadow:var(--sh)}
+.btn.red{background:#fff;color:var(--bad);border:1px solid #fecaca;box-shadow:none}
+.btn.red:hover{background:var(--badbg);border-color:#fca5a5}
+.btn:disabled,.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.pill{border:1px solid #cbd5e1;font:600 13px Inter,sans-serif;transition:background .12s,border-color .12s,color .12s}
+.pill:hover{background:var(--soft);border-color:#93b4f5}
+.pill.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.vb{border-radius:10px}
+.act.acb,.rhd,.sbar{border-radius:var(--r)}
+.act.acb{border:1px solid var(--line)}
+
+/* ---------- 8. Forms ---------- */
+.f label{font-size:12.5px;font-weight:600;color:#334155;margin-bottom:6px}
+.f input,.f select,.f textarea,.sb input{border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:var(--txt);transition:border-color .15s,box-shadow .15s,background .15s}
+.f input:hover:not(:disabled),.f select:hover:not(:disabled),.f textarea:hover:not(:disabled){border-color:#94a3b8}
+.f input:focus,.f select:focus,.f textarea:focus,.sb input:focus{outline:0;border-color:var(--blue);box-shadow:var(--ring)}
+.f input:disabled,.f select:disabled,.f textarea:disabled{background:#f1f5f9;border-color:#e2e8f0;color:#1e293b;-webkit-text-fill-color:#1e293b}
+.f.bad input,.f.bad select{border-color:#dc2626;box-shadow:0 0 0 3px #dc262622}
+.sb input{border-radius:999px;padding-left:18px}
+.rad label{border:1px solid #cbd5e1;border-radius:10px;transition:border-color .12s,background .12s}
+.rad label:hover{border-color:#93b4f5;background:#f8fbff}
+.rad label:has(input:checked){border-color:var(--blue);background:var(--soft);box-shadow:inset 0 0 0 1px var(--blue)}
+.hint{color:#b45309}
+.eye{border-radius:8px}
+
+/* ---------- 9. Wizard steps & tabs ---------- */
+.wst{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:none;transition:border-color .15s,box-shadow .15s,transform .12s}
+.wst:hover{border-color:#93b4f5;box-shadow:var(--sh);transform:translateY(-1px)}
+.wst.on{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-color:#1d4ed8;box-shadow:0 8px 20px #2563eb44}
+.wnav{border-top:1px solid var(--line)}
+.tabs{background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px}
+.tab{border-radius:9px;color:var(--mut);transition:background .12s,color .12s}
+.tab:hover{background:var(--soft);color:var(--navy)}
+.tab.on{background:var(--blue);color:#fff;box-shadow:0 3px 10px #2563eb40}
+
+/* ---------- 10. Tables, chips & status ---------- */
+table{border-collapse:separate;border-spacing:0}
+.at th,.rt th{background:#f1f5f9;color:#475569;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:11px 14px}
+.rt th{color:#fff;text-transform:none;letter-spacing:0;font-size:12px}
+.at td,.rt td,td{padding:13px 14px}
+.at tbody tr,.rt tbody tr{transition:background .12s}
+.at tbody tr:hover,.rt tbody tr:hover,tbody tr:hover{background:#f6f9ff}
+.at tbody tr:last-child td{border-bottom:0}
+.rt tr.tt td{background:#eef3fb}
+.tw{border-radius:12px}
+.chip{background:var(--soft);color:#1e3a8a;border:1px solid #dbe6fb;font-weight:600}
+.chip.ok{background:var(--okbg);color:var(--ok);border-color:#bbf7d0}
+.chip.no{background:var(--badbg);color:var(--bad);border-color:#fecaca}
+.chip.warn{background:var(--warnbg);color:var(--warn);border-color:#fde68a}
+.rb.g{background:var(--okbg);color:var(--ok)}.rb.r{background:var(--badbg);color:var(--bad)}.rb.y{background:var(--warnbg);color:var(--warn)}
+.stsel{border:1px solid transparent;transition:box-shadow .12s}.stsel:hover:not(:disabled){box-shadow:0 0 0 2px #2563eb33}
+.stsel.ok{background:var(--okbg);color:var(--ok)}.stsel.no{background:var(--badbg);color:var(--bad)}.stsel.warn{background:var(--warnbg);color:var(--warn)}
+.av2{background:linear-gradient(135deg,#dbeafe,#e0e7ff);color:#1e3a8a}
+.bkb{background:#f5f8ff;border:1px solid #dbe6fb;border-radius:12px}
+.aemp{color:var(--mut)}
+.scn{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;color:#92400e}
+.ai,.gi{transition:background .12s}
+.ai{border-radius:10px}
+.ai:hover{background:#f1f6ff}
+
+/* ---------- 11. Dialogs, toast, loader ---------- */
+.mod{background:#0b1730b3;backdrop-filter:blur(3px);animation:mfade .15s ease-out}
+.mod>div{border-radius:20px;box-shadow:0 30px 80px #0b173066;border:1px solid #ffffff22;animation:mrise .18s ease-out}
+.mod .ft{background:#f8fafc;border-radius:0 0 20px 20px}
+#nm>div{background:var(--cream)}
+.nmh{background:#fff}
+#toast{border-radius:12px;box-shadow:var(--sh2);font-weight:600;padding:13px 22px;animation:mrise .2s ease-out}
+#load{background:#f3f5f9cc;backdrop-filter:blur(2px)}
+#load i{width:44px;height:44px;border:4px solid #dbe4f3;border-top-color:var(--blue)}
+.galsk{border-radius:10px}
+@keyframes mfade{from{opacity:0}to{opacity:1}}
+@keyframes mrise{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+
+/* ---------- 12. Content pages (guides, schools, events, fees) ---------- */
+.sprow{border-radius:14px;transition:box-shadow .15s,border-color .15s,transform .12s}
+.sprow:hover{transform:translateY(-1px)}
+.evc{border-radius:14px}
+.evcc i{box-shadow:var(--sh)}
+.fpc,.scs{border-radius:var(--r)}
+.fpch,.sch{background:linear-gradient(90deg,#f4f8ff,#fff)}
+.sci>i{box-shadow:0 0 0 3px #dcfce7}
+.galc{border-radius:14px;box-shadow:var(--sh);transition:box-shadow .15s,transform .12s}
+.galc:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.clc,.hbc,.abc,.alc{border-radius:var(--r)}
+
+/* ---------- 13. Keyboard focus (accessibility) ---------- */
+:where(a,button,input,select,textarea,summary,[tabindex],[role=button]):focus-visible{outline:3px solid #2563eb;outline-offset:2px;border-radius:8px}
+aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
+
+/* ---------- 14. Responsive polish ---------- */
+@media(max-width:1023px){main{padding:18px 16px 56px}.top{padding:10px 14px}}
+@media(max-width:767px){
+ .card{padding:18px;border-radius:12px}
+ .shero{padding:16px 16px}
+ .sht h2{font-size:21px}
+ .btn{padding:10px 16px}
+ .mod>div{border-radius:16px}
+ #bnav{border-radius:16px 16px 0 0;box-shadow:0 -6px 24px #0f172a1f}
+ #bnav button.on{background:var(--soft);color:var(--blue)}
+}
+@media(prefers-reduced-motion:reduce){.mod,.mod>div,#toast{animation:none!important}.btn,.shc,.wst,.galc,.sprow{transition:none!important}}
+}
+</style>
 </head>
 <body>
 <div id="login"><div class="hero"><img src="https://i.imgur.com/roCMSYf.jpeg" alt=""><h1>Moreh Academy</h1><p style="opacity:.8">Admission &amp; Student Portal</p></div>
@@ -3034,4 +3242,619 @@ function cxPolicy(r) {
 /** Student-facing card (Home). */
 const polCard = () => `<div class="card"><h3>Transfer Out &amp; Cancellation Policies</h3>
  ${[POL.transfer, POL.cancel].map(P => `<div class="fpm"><div class="fpmt"><span class="ao c3">${SICO.info}</span><b>${P.title}</b></div><p style="margin:4px 0 6px;color:var(--mut)">${esc(P.def)}</p><b style="font-size:13px;color:var(--navy)">Documents to release</b>${ul(P.docs.map(esc))}</div>`).join('')}</div>`;
+
+ /* ===== Student dashboard v3: profile-card layout (paste at the very END of the main script) ===== */
+(function(){const s=document.createElement('style');s.textContent=`
+/* --- sidebar + window (students only, class added in boot) --- */
+body.stu{--sb:#1a62f0;--sbd:#154fc4;--sbh:#ffffff2e}
+body.stu aside{background:#1a62f0}
+body.stu .brand img{border:3px solid #fff}
+.stprem{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;border:0;background:#ffa31a;color:#12204a;padding:16px 2px;cursor:pointer;font:800 9.5px Inter,sans-serif;letter-spacing:.02em;text-transform:uppercase;white-space:nowrap}
+.stprem:hover{background:#ffb13d}
+.stpi{width:40px;height:40px;border-radius:50%;background:#12204a;color:#ffc928;display:flex;align-items:center;justify-content:center}
+.stpi svg{width:20px;height:20px}
+@media(min-width:1024px){
+ body.stu{--sbw:96px;background:#1a62f0}
+ body.stu #menu{display:none}
+ body.stu .brand{justify-content:center;padding:16px 0 12px}
+ body.stu .brand>div,body.stu .nsrch,body.stu .nlabel,body.stu .me #who,body.stu .ngh .chev,body.stu .ns .nsh{display:none}
+ body.stu #nav>.nav,body.stu .ngh,body.stu .me .nav{flex-direction:column;gap:6px;padding:14px 4px;font-size:11.5px;font-weight:600;line-height:1.2;text-align:center;justify-content:center}
+ body.stu .nav svg{width:24px;height:24px}
+ body.stu .ns .nav.sub{flex-direction:row;justify-content:flex-start;text-align:left;padding:11px 16px;font-size:14px;font-weight:400;gap:10px}
+ body.stu .ns .nav.sub svg{width:15px;height:15px}
+ body.stu .me{padding:0;border-top:0}
+ body.stu main{margin:14px 14px 14px calc(var(--sbw) + 4px);min-height:calc(100vh - 28px);border-radius:26px;background:#f1f5ff;padding:20px 26px 28px}
+}
+/* --- cover --- */
+.sv-cv{position:relative;min-height:230px;border-radius:20px;overflow:hidden;color:#fff;padding:24px 28px;background:linear-gradient(115deg,#1a62f0,#4d8dff 55%,#22b8ff)}
+.sv-cv:before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(115deg,#ffffff12 0 2px,transparent 2px 10px)}
+.sv-cv:after{content:'';position:absolute;right:-50px;top:-50px;width:320px;height:320px;border-radius:50%;background:var(--lg) center/cover;opacity:.14}
+.sv-cv>*{position:relative;z-index:1}
+.sv-cv small{display:block;font-size:15px;font-weight:600;opacity:.95}
+.sv-cv h2{font:800 28px/1.15 Inter,sans-serif;margin:2px 0 6px}
+.sv-cv p{margin:0;max-width:420px;opacity:.95}
+.sv-bar{position:absolute!important;right:18px;bottom:14px;max-width:calc(100% - 340px);display:flex;gap:8px 18px;flex-wrap:wrap;align-items:center;background:#ffffffeb;color:var(--navy);border-radius:14px;padding:9px 16px;font:600 13px Inter,sans-serif;box-shadow:0 6px 18px #0b2a5b26}
+.sv-bar span{display:inline-flex;gap:6px;align-items:center}
+.sv-bar svg{width:16px;height:16px;color:var(--blue)}
+.sv-so{gap:8px!important}
+.sv-so a{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.sv-so a:hover{background:var(--soft)}
+/* --- layout --- */
+.sv{display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;margin-top:-96px;position:relative;z-index:2;align-items:start}
+.sv-l{position:sticky;top:var(--tbh)}
+.sv-r{padding-top:112px;min-width:0;display:grid;gap:20px}
+.sv-r .card,.sv-r .scn{margin:0}
+.sv-pc{display:flow-root;position:relative;z-index:2;background:#fff;border-radius:22px;padding:0 18px 20px;text-align:center;box-shadow:var(--sh)}
+.sv-av{position:relative;width:120px;height:120px;margin:-60px auto 6px}
+.sv-ph{position:absolute;left:8px;top:8px;width:104px;height:104px;border-radius:50%;background:#dbe7ff center/cover no-repeat;display:flex;align-items:center;justify-content:center;font:800 30px Inter,sans-serif;color:var(--navy)}
+.sv-av>i{position:absolute;right:8px;bottom:12px;width:18px;height:18px;border-radius:50%;background:var(--dc);border:3px solid #fff}
+.sv-pc h2{font:800 20px/1.2 Inter,sans-serif;color:var(--navy);margin:0 0 4px}
+.sv-pc p{margin:0;color:var(--mut);font-size:13px;line-height:1.5}
+.sv-st{display:grid;grid-template-columns:1fr 1px 1fr;gap:6px;align-items:center;margin:16px 0}
+.sv-st i{height:34px;background:var(--line)}
+.sv-st b{display:block;font:800 22px Inter,sans-serif;color:var(--navy)}.sv-st small{color:var(--mut);font-size:12px}
+.sv-bt{display:flex;gap:10px}
+.sv-bt .btn{flex:1;justify-content:center;border-radius:999px;padding:11px 8px}
+.sv-jc{background:#b9d3ff;border-radius:0 0 22px 22px;margin-top:-26px;padding:42px 14px 14px;position:relative;z-index:1}
+.sv-jc h4{margin:0 0 10px;text-align:center;color:#fff;font:800 16px Inter,sans-serif;text-shadow:0 1px 2px #0b2a5b55}
+.sv-job{display:flex;gap:12px;align-items:center;background:#fff;border-radius:14px;padding:10px 12px}
+.sv-job img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none}
+.sv-job b{display:block;color:var(--navy);font-size:14px}.sv-job small{color:var(--mut);font-size:12px}
+.sv-job svg{margin-left:auto;color:#f5b301;fill:#f5b301;width:20px;height:20px}
+/* --- right column --- */
+.sv-r1{display:grid;grid-template-columns:minmax(230px,.8fr) minmax(0,1.2fr);gap:20px;align-items:stretch}
+.sv-or{position:relative;overflow:hidden;background:#ffa31a;color:#12204a;border-radius:20px;padding:22px;min-height:250px}
+.sv-or h3{display:flex;gap:10px;align-items:center;margin:0 0 14px;font-size:16px;color:#12204a}
+.sv-or h3 span{width:32px;height:32px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;color:#1a62f0}
+.sv-or h3 svg{width:18px;height:18px}
+.sv-or p{margin:0 0 12px;font-size:13.5px;line-height:1.55;max-width:230px}
+.sv-or p b{display:block;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+.sv-or>svg{position:absolute;right:-18px;bottom:-18px;width:120px;height:120px;color:#fff;opacity:.55}
+.sv-k{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;border:0;background:#f5f8ff;border-radius:14px;padding:14px 16px;font:inherit;color:inherit}
+button.sv-k{cursor:pointer}button.sv-k:hover{background:var(--soft)}
+.sv-k b{color:var(--navy);font-size:14px}.sv-k small{color:var(--mut);font-size:12.5px}
+.sv-sr{display:flex;gap:2px}
+.sv-s{fill:#d5dcec}.sv-s.on{fill:#f5b301}
+.sv-kg{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:12px}
+@media(min-width:1001px){.sv-cv{padding-left:350px}}{.sv-bar{position:static!important;max-width:none;margin-top:16px}.sv-cv{min-height:0}}
+@media(max-width:1000px){.sv{grid-template-columns:1fr;margin-top:-40px}.sv-l{position:static}.sv-r{padding-top:0}}
+@media(max-width:700px){.sv-r1{grid-template-columns:1fr}.sv-cv h2{font-size:22px}}
+`;document.head.appendChild(s)})();
+
+/* students: blue theme class, no collapsed rail, amber Scholarships block */
+new MutationObserver(()=>{const b=document.body;if(b.classList.contains('stu')&&b.classList.contains('sbc'))b.classList.remove('sbc')}).observe(document.body,{attributes:true,attributeFilter:['class']});
+const _bootSv=boot;
+boot=function(){const stu=!A();document.body.classList.toggle('stu',stu);_bootSv();
+ if(stu){const me=document.querySelector('#side .me');
+  if(me&&!me.querySelector('.stprem'))me.insertAdjacentHTML('afterbegin','<button class="stprem" data-act="nav" data-v="sch"><span class="stpi">'+I.star+'</span><span>Scholarships</span></button>')}};
+
+/* ---------- pieces ---------- */
+const SVSTAR=on=>`<svg viewBox="0 0 24 24" width="20" height="20" class="sv-s${on?' on':''}" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+const svStars=n=>{n=Math.max(0,Math.min(5,n));return `<span class="sv-sr" role="img" aria-label="${n} of 5 stars">${[1,2,3,4,5].map(i=>SVSTAR(i<=n)).join('')}</span>`};
+function svRing(st,photo,ini,col){
+ return `<div class="sv-av" style="--dc:${col}"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><circle cx="60" cy="60" r="58" fill="#1a62f0"/><circle cx="60" cy="60" r="52" fill="#fff"/></svg><div class="sv-ph" style="${photo?`background-image:url('${photo}')`:''}">${photo?'':esc(ini)}</div><i></i></div>`}
+
+/* ---------- the student Home page ---------- */
+function homeStudent(){head('Dashboard','Your enrollment at a glance');
+ call('getStudent',[T()],r=>{const s=r.data,rq=reqsFor(s).req,done=rq.filter(k=>s[k]&&s[k]!=='None').length,rp=rq.length?Math.round(done/rq.length*100):0,
+  PK=['Surname','FirstName','LRN','Birthdate','GradeLevel','AddressLine1','City','Mobile','EmName','EmMobile'],
+  pp=Math.round((PK.filter(k=>s[k]).length+((s.FatherName||s.MotherName)?1:0))/(PK.length+1)*100),
+  cons=!!(s.ReqConsent&&s.ReqConsent!=='None'),st=s.EnrollStatus||'Not Enrolled',on=st==='Enrolled',
+  gs=((s.GradeLevel||'')+' '+(s.Section||'')).trim(),nm=tc([s.FirstName,s.Surname].filter(Boolean).join(' ')||S.user.FullName||'Student'),
+  col=on?'#22c55e':st==='Temporary'?'#f59e0b':'#94a3b8',sy=String(s.SchoolYear||S.cfg.sy).replace('-','\u2013'),
+  map=typeof GALMAP==='string'?GALMAP:'#',
+  k=(l,n,cap,a,v)=>{const t=a?'button':'div';return `<${t} class="sv-k"${a?` data-act="${a}"${v?` data-v="${v}"`:''}`:''}><b>${l}</b>${svStars(n)}<small>${cap}</small></${t}>`};
+  $('view').innerHTML=`<div class="sv hm-wrap" style="display:contents"><div class="sv-cv" style="--lg:url('${LOGO}')"><small>${greet()},</small><h2>${esc(tc(s.FirstName||nm))} &#128075;</h2><p>Welcome to your enrollment portal. Follow the guide below to finish your enrollment.</p>
+   <div class="sv-bar"><span>${I.cal}SY ${esc(sy)}</span><span>${EV_PIN}Taguig City, Philippines</span><span>${I.sch}Moreh Academy${s.Department?' \u00b7 '+esc(tc(s.Department)):''}</span><span class="sv-so"><a href="mailto:morehians@gmail.com" aria-label="Email the Admissions Office">${ic(CIC.mail)}</a><a href="tel:09618766886" aria-label="Call the Admissions Office">${ic(CIC.tel)}</a><a href="${map}" target="_blank" rel="noopener" aria-label="View the school on the map">${ic(CIC.pin)}</a></span></div></div></div>
+  <div class="sv hm"><div class="sv-l"><div class="sv-pc">${svRing(st,S.user.Photo,nm[0]||'S',col)}<h2>${esc(nm)}</h2><p>${esc(tc(gs)||'Grade level not set yet')}${s.Category?' \u00b7 '+esc(s.Category):''}<br>${esc(tc(s.Department||''))}</p>
+    <div class="sv-st"><div><b>${rq.length?done+'/'+rq.length:'\u2013'}</b><small>Requirements</small></div><i></i><div><b>${pp}%</b><small>Profile</small></div></div>
+    <div class="sv-bt"><button class="btn" data-act="nav" data-v="sp">Continue</button><a class="btn alt" href="mailto:morehians@gmail.com">Contact</a></div></div>
+   <div class="sv-jc"><h4>Enrollment Status</h4><div class="sv-job"><img src="${LOGO}" alt=""><div><b>${esc(st)}</b><small>School Year ${esc(sy)}</small></div>${on?SVSTAR(true):''}</div></div></div>
+  <div class="sv-r">${holdBanner(s)}
+   <div class="sv-r1"><div class="sv-or"><h3><span>${I.cal}</span>Office Hours</h3><p><b>Weekdays</b>Mon\u2013Fri 8:00 AM \u2013 5:00 PM<br>Sat 8:00 AM \u2013 3:00 PM</p><p><b>Contact</b>0961 876 6886<br>morehians@gmail.com</p><p><b>Visit us</b>Ground Floor, Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City</p>${I.sch}</div>${evSide()}</div>
+   <div class="card"><div class="ch"><h3>Enrollment Progress</h3></div><div class="sv-kg">${k('Profile',Math.round(pp/20),pp+'% complete','nav','sp')}${k('Requirements',Math.round(rp/20),rq.length?done+' of '+rq.length+' documents':'Choose your grade level','nav','rq')}${k('Parental consent',cons?5:0,cons?'Received by the office':'Print and submit the form','pconsent')}${k('Enrollment',on?5:st==='Temporary'?3:0,esc(st))}</div></div>
+   <div class="card"><h3>Enrollment guide</h3><div id="guidebox" class="pvs">${GUIDE0}</div></div>
+   <div class="row2"><div class="card"><div class="ch"><h3>Quick Actions</h3></div><div class="qas">${qa('c1',I.adm,'Student Profile','nav','sp')}${qa('c3',I.rep,'School Requirements','nav','rq')}${qa('c4',I.rep,'Print Consent Form','pconsent')}${qa('c2',I.rep,'Data Privacy Policy','nav','pp')}${qa('c5',I.sch,'Scholarships','nav','sch')}${qa('c1',I.tf,'Schedule of Fees','nav','tf')}</div></div>${actCard()}</div>
+   <div class="card"><h3>Important Reminders</h3><ul style="line-height:1.9;margin:0;padding-left:20px"><li><b>Enrollment Cancellation / Withdrawal:</b> &#8369;1,000.00 processing fee applies to cancellations/withdrawals on or before June 30. Requests made after June 30 will be recalculated by the Principal's and Accounting Offices based on elapsed class days and applied discounts/incentives.</li></ul></div>
+   ${polCard()}${helpbar()}</div></div>`;
+  renderAct();homeEvents()})}
+
+const _homeSv=home;
+home=function(){return A()?_homeSv():homeStudent()};
+
+/* ===== Admin dashboard restyle v2 (follows your layout mockup) =====
+   FIRST delete the previous restyle block (it starts with "Admin dashboard restyle" and ends with the
+   line  homeAdmin = function () { ... };  ). Then paste this whole block at the very end of the main
+   script in Index.html, right above the closing script tag. Do not type the closing tag inside this block.
+   Includes a one-line Quick Actions row above the charts.
+   Needs the new function dashboardDemo() in Code.gs (file dashboard-demo.gs) and a new deployment.
+   Staff accounts only. The student theme is untouched. To undo: delete this block. */
+
+(function () {
+  const s = document.createElement('style');
+  s.textContent = `
+/* ---------- shell: sidebar, top bar, page background (staff only) ---------- */
+body:not(.stu){--sb:#07122e;--sbd:#0c1b45;--sbh:#14306f;background:#eef2f9}
+body:not(.stu) aside{background:linear-gradient(180deg,#0a1840,#06102a)}
+body:not(.stu) #nav>.nav,body:not(.stu) #nres>.nav{margin:2px 10px;width:calc(100% - 20px);border-radius:10px;padding:11px 12px}
+body:not(.stu) .nav.on,body:not(.stu) .ngh.has,body:not(.stu) .ng.fly>.ngh{background:linear-gradient(90deg,#1d4ed8,#2f7bf0);box-shadow:0 6px 16px #2563eb59;color:#fff}
+body:not(.stu) .ng.fly>.ngh::after{right:-10px}
+body:not(.stu) .nav.sub.on{background:#1d4ed8;box-shadow:none}
+body:not(.stu) .top{background:linear-gradient(90deg,#0a1a42,#10306b);border-radius:14px;box-shadow:0 8px 22px #0a1a4240}
+body:not(.stu) .top h1{color:#fff}
+body:not(.stu) .top p{color:#b9c6e6}
+body:not(.stu) #menu{background:#ffffff1a;border-color:#ffffff30;color:#fff}
+body:not(.stu) .uchip b{color:#fff}
+body:not(.stu) .uchip small{color:#b9c6e6}
+body:not(.stu) #gs{background-color:#fff!important;border-radius:999px!important;box-shadow:0 2px 8px #0003}
+body:not(.stu) .rbd{background:#ffffff1f;color:#fff}
+body:not(.stu) .rbd.warn{background:#fbbf24;color:#3a2a00}
+.sbw{display:none!important}
+.tdate{display:none;align-items:center;gap:8px;background:#fff;color:var(--navy);border-radius:999px;padding:8px 14px;font:600 13px Inter,sans-serif;white-space:nowrap}
+.tdate svg{width:16px;height:16px;color:var(--blue)}
+@media(min-width:1100px){.tdate{display:inline-flex}}
+
+/* ---------- page layout: charts on the left, KPI stack on the right ---------- */
+.dash.hm{gap:22px}
+.dash.hm .dmain{display:grid;gap:20px;min-width:0}
+.dash.hm .dmain>.card,.dash.hm .dmain .row2 .card{margin:0}
+.dash.hm .row2{gap:20px;margin:0}
+@media(max-width:1280px){
+ .dash.hm{display:flex;flex-direction:column}
+ .dash.hm .dside{display:contents}
+ .dash.hm .gkr.sd{order:-1}
+ .dash.hm .dside>.card{order:1}
+}
+.hm .card{border-radius:12px;box-shadow:0 2px 4px #0a1a420f,0 10px 26px #0a1a4214}
+.hm .card .ch h3,.hm .card>h3{font-size:15.5px}
+.hm .ch a{color:#2563eb;font-weight:600}
+.dci{display:flex;width:34px;height:34px;border-radius:50%;background:#eaf1ff;color:#2563eb;align-items:center;justify-content:center;margin-bottom:4px}
+.dci svg{width:18px;height:18px}
+.dlg span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gdv{height:1px;background:var(--line);margin:16px 0}
+.pl{background:#f6f8fd;border:1px solid #e2e8f0}
+
+/* ---------- KPI gradient cards (right column) ---------- */
+.gkr{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:14px;margin-bottom:20px}
+.gkr.sd{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.gk{position:relative;overflow:hidden;border-radius:14px;padding:12px 14px 14px;color:#fff;box-shadow:0 8px 20px #0a1a4226;transition:transform .12s}
+.gk[data-act]{cursor:pointer}.gk[data-act]:hover{transform:translateY(-2px)}
+.gkt{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font:600 13.5px Inter,sans-serif}
+.gkt i{width:34px;height:34px;border-radius:10px;background:#ffffff26;display:flex;align-items:center;justify-content:center;flex:none}
+.gkt svg{width:19px;height:19px}
+.gkv{font:800 26px/1.1 Inter,sans-serif;margin:2px 0 4px}
+.gkd{font:700 12.5px Inter,sans-serif;min-height:18px}
+.gkb{height:34px}
+.gkb svg{display:block;width:100%;height:100%}
+.gkr.sd .gkb:not(.bar){position:absolute;right:14px;bottom:12px;width:100px;height:30px;margin:0}
+.gkb.bar{height:6px;background:#ffffff40;border-radius:6px;margin:10px 0 0}
+.gkb.bar u{display:block;height:100%;background:#fff;border-radius:6px}
+.gk.k1{background:linear-gradient(135deg,#4338ca,#7c3aed)}
+.gk.k2{background:linear-gradient(135deg,#15803d,#22a45d)}
+.gk.k3{background:linear-gradient(135deg,#c2410c,#e8780f)}
+.gk.k4{background:linear-gradient(135deg,#1d4ed8,#2f7bf0)}
+.gk.k5{background:linear-gradient(135deg,#be185d,#db2777)}
+.gk.k6{background:linear-gradient(135deg,#0e7490,#14a3b8)}
+.gk.k7{background:linear-gradient(135deg,#475569,#64748b)}
+@media(max-width:600px){.gkr{grid-template-columns:1fr 1fr}.gkv{font-size:22px}}
+
+/* ---------- Enrolled Learners by Grade & Cluster: highlighted faculties ---------- */
+.gcl{gap:14px}
+.gct{--c:#2563eb;background:#fff;border:1px solid #e2e8f0;border-top:4px solid var(--c);padding:0 12px 12px;overflow:hidden}
+.gct h4{margin:0 -12px 10px;padding:10px 12px;background:color-mix(in srgb,var(--c) 11%,#fff);color:#12204a;align-items:center}
+.gct h4 span{background:color-mix(in srgb,var(--c) 18%,#fff);color:var(--c)}
+.gct.has{border-color:color-mix(in srgb,var(--c) 45%,#fff);border-top-color:var(--c);box-shadow:0 6px 16px color-mix(in srgb,var(--c) 22%,transparent)}
+.gct.has h4 span{background:var(--c);color:#fff}
+.gct tr{background:none}
+.gct tr.z td{color:#64748b;font-weight:500}
+.gct tr.hl{background:color-mix(in srgb,var(--c) 17%,#fff)}
+.gct tr.hl td{color:#12204a;font-weight:700}
+.gct tr.hl td:first-child{box-shadow:inset 3px 0 0 var(--c)}
+
+/* ---------- Quick Actions: one line above the charts ---------- */
+.qar{display:flex;flex-wrap:nowrap;gap:10px;overflow-x:auto;padding:2px 2px 8px;margin:0 0 16px;scrollbar-width:thin}
+.qb{flex:1 0 auto;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;font:600 13.5px Inter,sans-serif;color:var(--navy);cursor:pointer;white-space:nowrap;box-shadow:0 2px 4px #0a1a420f;transition:transform .12s,box-shadow .15s}
+.qb:hover{transform:translateY(-2px);box-shadow:0 8px 18px #0a1a4222}
+.qb .ao{width:34px;height:34px;border-radius:10px}.qb .ao svg{width:18px;height:18px}
+
+/* ---------- Needs Attention: pink alert table ---------- */
+.dxa{background:linear-gradient(180deg,#fff1f2,#fff 70%);border:1px solid #fecdd3}
+.dxa .ch h3{color:#be123c}
+.dxa .chip.warn{background:#fee2e2;color:#b91c1c}
+.dxa .chip.no{background:#ffedd5;color:#c2410c}
+.dxa .at th{background:#ffe4e6}
+.dxa .lrn{min-width:200px}
+/* Recent Registrations: coloured initials tiles */
+#dxrec .av2{color:#fff}
+#dxrec tr:nth-child(5n+1) .av2{background:#2563eb}#dxrec tr:nth-child(5n+2) .av2{background:#16a34a}
+#dxrec tr:nth-child(5n+3) .av2{background:#e8780f}#dxrec tr:nth-child(5n+4) .av2{background:#7c3aed}
+#dxrec tr:nth-child(5n+5) .av2{background:#db2777}
+`;
+  document.head.appendChild(s);
+})();
+
+/* donut palette from the mockup: orange, blue, green, purple, red */
+DC.splice(0, DC.length, '#f59e0b', '#2563eb', '#16a34a', '#7c3aed', '#e11d48');
+
+/* ---------- top bar: date pill ---------- */
+const _topInitGk = topInit;
+topInit = function () {
+  _topInitGk();
+  const tr = document.querySelector('.top .tr');
+  if (tr && !$('tdate')) {
+    const d = document.createElement('span');
+    d.id = 'tdate'; d.className = 'tdate';
+    d.innerHTML = I.cal + new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    tr.insertBefore(d, tr.firstChild);
+  }
+};
+
+/* ---------- KPI helpers ---------- */
+/** One gradient KPI card. o = {cl, l, ic, v, d, a, id, bar}. bar (0-100) draws a share bar; otherwise a sparkline slot is reserved. */
+const gkCard = o => `<div class="gk ${o.cl}"${o.a ? ` data-act="dflt" data-v="${o.a}"` : ''}${o.id ? ` id="${o.id}"` : ''}>
+  <div class="gkt"><span>${o.l}</span><i>${o.ic}</i></div><div class="gkv">${o.v}</div>
+  <div class="gkd"${o.id ? ` id="${o.id}d"` : ''}>${o.d || ''}</div>
+  <div class="gkb${o.bar != null ? ' bar' : ''}"${o.id ? ` id="${o.id}s"` : ''}>${o.bar != null ? `<u style="width:${o.bar}%"></u>` : ''}</div></div>`;
+
+/** White sparkline with a soft fill. */
+function gkSpark(v) {
+  const w = 200, h = 34, mx = Math.max(1, ...v), n = Math.max(1, v.length - 1),
+    l = v.map((y, i) => (i * w / n).toFixed(1) + ',' + (h - 3 - y / mx * (h - 8)).toFixed(1)).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,${h} ${l} ${w},${h}" fill="#fff" opacity=".18"/><polyline points="${l}" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+}
+
+/** Fills the deltas and sparklines once dashboardExtra() has loaded. */
+dxChips = function (X) {
+  const t = X.trend, put = (id, txt) => {
+    const d = $(id + 'd'), s = $(id + 's');
+    if (d) d.textContent = txt;
+    if (s && X.spark && X.spark.length > 1) s.innerHTML = gkSpark(X.spark);
+  };
+  let txt;
+  if (t.prev > 0) { const p = Math.round((t.week - t.prev) / t.prev * 100); txt = (p < 0 ? '\u25bc ' : p === 0 ? '' : '\u25b2 ') + Math.abs(p) + '% vs last week'; }
+  else if (t.week > 0) txt = '\u25b2 ' + t.week + ' new this week';
+  else txt = 'No registrations this week';
+  put('gkT', txt);
+  const d = t.today - t.yesterday;
+  put('gkN', (d < 0 ? '\u25bc ' : d === 0 ? '' : '\u25b2 ') + (d === 0 ? 'Same as yesterday' : Math.abs(d) + ' vs yesterday'));
+};
+
+/* ---------- Needs Attention as a full-width table ---------- */
+function gkAttention() {
+  const el = $('dxatt'); if (!el || !S.dx) return;
+  const L = S.dx.L, top = L.slice(0, 10);
+  el.innerHTML = `<div class="card dxa"><div class="ch"><h3>Needs Attention</h3>${L.length ? `<a href="javascript:void(0)" data-act="dxall">View All (${L.length})</a>` : ''}</div>` +
+    (L.length ? `<p class="dxn">Enrolled learners, holds and overdue temporaries come first. Showing ${top.length} of ${L.length}.</p><div class="tw"><table class="at"><thead><tr><th>Learner</th><th>Grade &amp; Section</th><th>Issues</th><th></th></tr></thead><tbody>${top.map(m =>
+      `<tr><td>${holdWho(m.name, m.id, '')}</td><td>${esc(tc(m.grade)) || '\u2014'}</td><td>${dxBadges(m)}</td><td><button class="btn alt" data-act="flopen" data-v="${esc(m.id)}">Open</button></td></tr>`).join('')}</tbody></table></div>`
+      : '<div class="aemp">Nothing needs attention right now.</div>') + '</div>';
+}
+
+/* ---------- Sex / Per School donuts ---------- */
+function gkDemoLoad() {
+  const el = $('gkdemo'); if (!el) return;
+  const bad = e => {
+    const x = $('gkdemo'); if (!x) return;
+    if (e === 'Not allowed.') x.remove();
+    else x.innerHTML = '<div class="card"><div class="aemp">These charts need the dashboardDemo() function in Code.gs. Add it, then deploy a new version.</div></div>';
+  };
+  google.script.run.withSuccessHandler(r => { if (r && r.success) gkDemoDraw(r.data); else bad(r && r.error) })
+    .withFailureHandler(() => bad('missing')).dashboardDemo(S.token);
+}
+function gkDemoDraw(D) {
+  const el = $('gkdemo'); if (!el) return;
+  const SC = { Male: '#2563eb', Female: '#db2777' }, SP = ['#2563eb', '#16a34a', '#f59e0b', '#7c3aed', '#e11d48'];
+  const items = (a, m) => a.map(x => ({ label: x[0], value: x[1], color: m[x[0]] || '#94a3b8' }));
+  const sc = D.schools.map((x, i) => ({ label: x[0], value: x[1], color: SP[i % 5] }));
+  if (D.otherSchools) sc.push({ label: 'Other schools', value: D.otherSchools, color: '#94a3b8' });
+  el.innerHTML = `<div class="row2"><div class="card"><div class="ch"><h3>Sex</h3></div>
+    ${chartHTML({ type: 'donut', center: 'Applicants', items: items(D.sex, SC) })}</div>
+    <div class="card"><div class="ch"><h3>Per School</h3><span style="color:var(--mut);font-size:13px">Top 5, all levels</span></div>
+    ${sc.length ? chartHTML({ type: 'donut', center: 'Learners', items: sc }) : '<div class="aemp">No previous school recorded yet.</div>'}</div></div>`;
+}
+
+/* after the shared panels draw: swap in the table and load the demographic charts */
+const _dxDrawGk = dxDraw;
+dxDraw = function (X, H) {
+  _dxDrawGk(X, H);
+  if (X) gkAttention();
+  gkDemoLoad();
+};
+
+/* ---------- the admin Home page (REPLACES homeAdmin) ---------- */
+homeAdmin = function () {
+  head('Dashboard', 'Enrollment overview for School Year ' + S.cfg.sy.replace('-', '\u2013'));
+  call('dashboard', [T()], r => {
+    const d = r.data, st = d.stats, tot = st.total || 0, sh = n => tot ? Math.round(n / tot * 100) : 0,
+      pc = n => (tot ? Math.round(n / tot * 1000) / 10 : 0) + '%', oth = Math.max(0, tot - st.enrolled - st.pending - (st.temp || 0));
+    const lv = d.cards.map(c => [c.title, c.rows.reduce((a, x) => a + x[1], 0)]), lt = lv.reduce((a, x) => a + x[1], 0);
+    let acc = 0;
+    const seg = lt ? lv.map((x, i) => { const s0 = acc; acc += x[1] / lt * 100; return `${DC[i % 5]} ${s0}% ${acc}%` }).join(',') : '#e6ebf3 0% 100%';
+
+    const kp = [
+      { cl: 'k1', l: 'Total Applicants', ic: I.users, v: nfmt(tot), d: 'Loading trend\u2026', a: 'All', id: 'gkT' },
+      { cl: 'k2', l: 'Enrolled', ic: SICO.ok, v: nfmt(st.enrolled), d: pc(st.enrolled) + ' of applicants', a: 'Enrolled', bar: sh(st.enrolled) },
+      { cl: 'k3', l: 'Not Yet Enrolled', ic: I.rep, v: nfmt(st.pending), d: pc(st.pending) + ' of applicants', a: 'Not Enrolled', bar: sh(st.pending) },
+      { cl: 'k4', l: 'New Today', ic: I.adm, v: nfmt(st.today), d: 'Registered today', id: 'gkN' },
+      { cl: 'k5', l: 'Temporary', ic: I.cal, v: nfmt(st.temp || 0), d: pc(st.temp || 0) + ' of applicants', a: 'Temporary', bar: sh(st.temp || 0) },
+      { cl: 'k6', l: 'Transferred Out', ic: I.out, v: st.transferred == null ? '\u2013' : nfmt(st.transferred), d: pc(st.transferred || 0) + ' of applicants', a: 'Transferred Out', bar: sh(st.transferred || 0) },
+      { cl: 'k7', l: 'Cancelled', ic: I.x, v: st.cancelled == null ? '\u2013' : nfmt(st.cancelled), d: pc(st.cancelled || 0) + ' of applicants', a: 'Cancelled', bar: sh(st.cancelled || 0) }
+    ].map(gkCard).join('');
+
+    const hello = `<div style="margin:0 0 14px"><h2 style="font:800 22px Inter,sans-serif;color:var(--navy)">${greet()}, ${esc(tc(S.user.FullName || 'Administrator'))} &#128075;</h2><p style="margin:2px 0 0;color:var(--mut)">Here&rsquo;s what&rsquo;s happening with admissions today. Click a card to open that list.</p></div>`;
+
+    const pipe = [['Not Enrolled', st.pending, '#f59e0b'], ['Enrolled', st.enrolled, '#16a34a'], ['Temporary', st.temp || 0, '#8b5cf6'], ['Transferred / Cancelled', oth, '#dc2626']]
+      .map(x => `<div class="pl"><span class="pn">${x[0]}</span><b>${nfmt(x[1])}</b><em>${pc(x[1])}</em><div class="ptr"><i style="width:${tot ? x[1] / tot * 100 : 0}%;background:${x[2]}"></i></div></div>`).join('');
+
+    /* one colour per faculty; levels with learners get a highlighted card and highlighted rows */
+    const LC = ['#2563eb', '#16a34a', '#e8780f', '#7c3aed', '#db2777'];
+    const gct = d.cards.map((c, ci) => {
+      const t = c.rows.reduce((a, x) => a + x[1], 0);
+      return `<div class="gct${t ? ' has' : ''}" style="--c:${LC[ci % 5]}"><h4>${esc(c.title)}<span>${t}</span></h4><table><tbody>${c.rows.map(x => `<tr class="${x[1] > 0 ? 'hl' : 'z'}"><td>${esc(x[0])}</td><td>${x[1]}</td></tr>`).join('')}</tbody></table></div>`;
+    }).join('');
+
+    const qb = (cl, ic, l, a, v) => `<button class="qb" data-act="${a}"${v ? ` data-v="${v}"` : ''}><span class="ao ${cl}">${ic}</span>${l}</button>`;
+    const quick = `<div class="qar" role="group" aria-label="Quick actions">${qb('c1', I.adm, 'Register Student', 'quick')}${qb('c2', I.search, 'Find Learner', 'nav', 'adm')}${FULL() ? qb('c4', I.rep, 'Reports', 'nav', 'rep') : qb('c4', I.cal, 'Campus Bulletin', 'nav', 'ev')}${qb('c3', I.rep, 'Export Today (CSV)', 'exptoday')}${qb('c5', I.sch, 'Scholarships', 'nav', 'sch')}${qb('c1', I.tf, 'Schedule of Fees', 'nav', 'tf')}</div>`;
+
+    $('view').innerHTML = hello + quick + `<div class="dash hm"><div class="dmain">
+     <div class="row2"><div class="card"><div class="ch"><h3>Enrolled by Level</h3></div><div class="dn"><div class="donut"><div class="pie2" style="background:conic-gradient(${seg})"></div><div class="dctr"><span class="dci">${I.sch}</span><b>${nfmt(lt)}</b><small>Enrolled</small></div></div><div class="dlg">${lv.map((x, i) => `<div><i style="background:${DC[i % 5]}"></i><span>${esc(x[0])}</span><b>${lt ? Math.round(x[1] / lt * 100) : 0}%</b><em>${x[1]}</em></div>`).join('')}</div></div></div>
+     ${FULL() ? `<div id="dxsch">${dxSkel('Applicants by Scholarship')}</div>` : `<div class="card"><div class="ch"><h3>Enrollment Pipeline</h3></div>${pipe}</div>`}</div>
+     ${FULL() ? `<div id="gkdemo">${dxSkel('Sex and Schools')}</div>` : ''}
+     <div class="card"><div class="ch"><h3>Enrolled Learners by Grade &amp; Cluster</h3></div><div class="gcl">${gct}</div></div>
+     <div id="dxrec">${dxSkel('Recent Registrations')}</div>
+     <div id="dxatt">${dxSkel('Needs Attention')}</div></div>
+    <div class="dside"><div class="gkr sd">${kp}</div>${evSide()}${actCard()}</div></div>`;
+    renderAct(); homeEvents();
+
+    /* extra panels load on their own so the main numbers appear first */
+    let X = null, H = null, pend = 2;
+    const fin = () => { if (--pend) return; dxDraw(X, H) };
+    google.script.run.withSuccessHandler(q => { if (q && q.success) X = q.data; fin() }).withFailureHandler(() => fin()).dashboardExtra(S.token);
+    google.script.run.withSuccessHandler(q => { if (q && q.success) H = q.data; fin() }).withFailureHandler(() => fin()).holdsOverview(S.token);
+  });
+};
+
+/* ===== Admission list + Learner record v2 =====
+   PASTE at the very END of the main script in Index.html (after the Academics / policies block, before the closing script tag).
+   ALSO apply the small searchStudents() edit in Code.gs (see the notes in the chat). Deploy a NEW version.
+   Nothing here renames an id, a data-act or a data-k, and no existing backend call changes. */
+
+(function(){const s=document.createElement('style');s.textContent=`
+@media screen{
+/* ---------- Admission list ---------- */
+.admbar{position:sticky;top:var(--tbh);z-index:6;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:14px 16px;margin-bottom:16px}
+.admrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.admrow+.admrow{margin-top:12px}
+.admrow .sb{flex:1 1 300px;flex-wrap:nowrap}
+.admrow .sb input{flex:1;min-width:0}
+.admsel{height:46px;border:1px solid #cbd5e1;border-radius:10px;padding:0 12px;font:inherit;background:#fff;color:var(--txt);min-width:150px;max-width:100%}
+.admsel:focus{outline:0;border-color:var(--blue);box-shadow:var(--ring)}
+.admmeta{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;color:var(--mut);font-size:13px}
+.admmeta a{font-weight:600}
+#hits{transition:opacity .15s}#hits.busy{opacity:.5;pointer-events:none}
+.emp{text-align:center;padding:40px 16px;color:var(--mut)}
+.emp i{width:56px;height:56px;border-radius:50%;background:var(--soft);color:var(--blue);display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px}
+.emp i svg{width:26px;height:26px}.emp b{display:block;color:var(--navy);font-size:16px;margin-bottom:4px}.emp p{margin:0 0 14px}
+.lrn[data-act]{cursor:pointer}.lrn[data-act]:hover b{color:var(--blue);text-decoration:underline}
+.fbar{display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:33;background:#0f1f3d;color:#fff;border-radius:16px;padding:10px 12px 10px 18px;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 14px 40px #0f172a55;max-width:calc(100vw - 24px)}
+.fbar.on{display:flex;animation:fbup .18s ease-out}
+@keyframes fbup{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(min-width:1024px){.fbar{left:calc(50% + var(--sbw,260px)/2)}}
+.fbar b{font-size:14.5px}
+.fbar .btn{padding:8px 14px;font-size:13px}
+.fbar #selbn,.fbar #selbn *{color:#dbeafe!important;font-size:12.5px}
+.fbar .gh{background:none;border:0;color:#bfdbfe;font:600 13px Inter,sans-serif;cursor:pointer;padding:6px}
+@media(max-width:767px){
+ .fbar{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+ .admbar{position:static}
+ .at.stk thead{display:none}
+ .at.stk,.at.stk tbody,.at.stk tr,.at.stk td{display:block;width:100%}
+ .at.stk tr{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;padding:8px 10px;background:#fff;box-shadow:var(--sh)}
+ .at.stk td{border:0;padding:6px 4px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+ .at.stk td[data-label]:before{content:attr(data-label);color:var(--mut);font-size:12px;font-weight:600;flex:none}
+ .at.stk td.nolab{display:block}
+}
+/* ---------- Learner record ---------- */
+.rec2{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+.rmain{min-width:0}
+.rhead{position:sticky;top:var(--tbh);z-index:6;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:12px 14px 8px;margin-bottom:18px}
+.rhead .act.acb{position:static;background:none;border:0;box-shadow:none;padding:0;margin:0}
+.stp{display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;padding:12px 2px 8px;margin-top:10px;border-top:1px solid var(--line)}
+.rbd .rs{margin-left:.4em}
+.stpi{flex:1 1 0;min-width:150px;display:flex;gap:10px;align-items:center;padding:8px 10px;border:0;background:none;border-radius:10px;cursor:pointer;text-align:left;font:inherit;position:relative;color:var(--mut);transition:background .12s}
+.stpi:hover{background:#f1f5f9}
+.stpi+.stpi:before{content:'';position:absolute;left:-14px;top:50%;width:14px;height:2px;background:#cbd5e1}
+.stpi.ok+.stpi:before{background:#16a34a}
+.stpc{width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font:700 13px Inter,sans-serif;background:#e2e8f0;color:#475569;transition:background .15s,box-shadow .15s}
+.stpc svg{width:15px;height:15px}
+.stpi.on{background:var(--soft)}
+.stpi.on .stpc{background:var(--blue);color:#fff;box-shadow:0 0 0 4px #2563eb2b}
+.stpi.ok .stpc{background:#16a34a;color:#fff}
+.stpi.ok.on .stpc{box-shadow:0 0 0 4px #16a34a2b}
+.stpt{min-width:0}.stpt b{display:block;font-size:12.5px;color:var(--navy);line-height:1.25}.stpt small{display:block;color:var(--mut);font-size:11.5px;white-space:nowrap}
+.rrail{position:sticky;top:calc(var(--tbh) + 8px)}
+.rrail .card{margin:0;padding:20px}
+.rpho{width:96px;height:96px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,#dbeafe,#e0e7ff) center/cover no-repeat;color:#1e3a8a;display:flex;align-items:center;justify-content:center;font:800 30px Inter,sans-serif;border:3px solid #fff;box-shadow:0 0 0 2px var(--heroline),var(--sh)}
+.rnm{text-align:center;margin:0 0 2px;font-size:17px;color:var(--navy)}
+.rid{text-align:center;color:var(--mut);font-size:12.5px;margin-bottom:10px}
+.rchips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.rrw{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:13px}
+.rrw span{color:var(--mut)}.rrw b{color:var(--navy);text-align:right;overflow-wrap:anywhere}
+.rpg{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.rpt{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}.rpt b{color:var(--navy)}.rpt span{font-weight:700;color:var(--blue)}
+.rpg small{display:block;margin-top:6px;color:var(--mut);font-size:12px}
+@media(max-width:1199px){.rec2{display:block}.rrail{display:none}}
+@media(min-width:1200px){.rhero{display:none}}
+#nm .rec2{display:block}#nm .rrail{display:none}#nm .rhero{display:block}#nm .rhead{top:0}
+@media(max-width:700px){
+ .stpi{min-width:0;flex:none;padding:6px}.stpt{display:none}.stpi.on .stpt{display:block}
+ .rhead{position:static}
+}
+.ferr{display:block;margin-top:5px;color:#b91c1c;font-size:12px;font-weight:600}
+.f.bad label{color:#b91c1c}
+}`;document.head.appendChild(s)})();
+
+/** Grade & Section label. Grade 11 / 12: "11 STEM Paul" (grade, cluster, section). Every other level: "Grade 7 Charity". */
+const gsLabel=r=>{const g=String(r.GradeLevel||'');
+ if(g!=='Grade 11'&&g!=='Grade 12')return tc((g+' '+(r.Section||'')).trim());
+ return [g.replace('Grade ',''),abbr(r.Cluster),tc(r.Section||'')].filter(Boolean).join(' ')};
+
+/* =====================================================================
+   ADMISSION LIST
+   ===================================================================== */
+S.admRid=0;S.gf=S.gf||'';S.sf=S.sf||'';
+function admDeb(){clearTimeout(S.admT);S.admT=setTimeout(()=>admLoad(),350)}
+
+/** Keeps the toolbar controls in step with the filter state. */
+function admSync(){const f=S.flt||'All';
+ document.querySelectorAll('#admbar .pill').forEach(p=>p.classList.toggle('on',p.dataset.v===f));
+ const g=$('fg'),y=$('fy'),c=$('admclr');if(g)g.value=S.gf||'';if(y)y.value=S.sf||'';
+ if(c)c.classList.toggle('hidden',!(f!=='All'||S.gf||S.sf||($('q')&&$('q').value)))}
+
+/** REPLACES adm(): same tabs and record view, new search page. */
+adm=function(){head('Admission','Search, register and update enrollees');S.cur=S.cur||'search';
+ const tabs=`<div class="tabs"><button class="tab ${S.cur==='search'?'on':''}" data-act="tab" data-v="search">${I.search} Search</button>${S.tabs.map(t=>`<button class="tab ${S.cur===t.key?'on':''}" data-act="tab" data-v="${t.key}">${esc(t.rec.FullName||'New enrollee')}<i data-act="close" data-v="${t.key}">${I.x}</i></button>`).join('')}</div>`;
+ const cur=S.tabs.find(t=>t.key===S.cur);S.t=cur||null;
+ if(cur){$('view').innerHTML=tabs+formHTML(cur);return}
+ S.cur='search';
+ const D=S.dsh&&S.dsh.stats,v=k=>D?nfmt(D[k]):'\u2013';
+ const kc=[['ks0','c1',I.adm,'Total Applicants','total','All','All records'],['ks1','c2',I.home,'Enrolled','enrolled','Enrolled','Show enrolled only'],['ks2','c3',I.rep,'Not Yet Enrolled','pending','Not Enrolled','Show pending only'],['ks3','c4',I.cal,'New Today','today','','Registered today']]
+  .map(x=>`<div class="shc ${x[5]?'':'nc'}"${x[5]?` data-act="flt" data-v="${x[5]}"`:''}><div class="shh"><span class="ki ${x[1]}">${x[2]}</span><span>${x[3]}</span></div><div class="shv" id="${x[0]}">${v(x[4])}</div><div class="shs" style="color:var(--mut)">${x[6]}</div></div>`).join('');
+ const y0=parseInt(String(S.cfg.sy).slice(0,4),10),yrs=[];for(let y=2025;y<=y0;y++)yrs.push(y+'-'+(y+1));
+ $('view').innerHTML=tabs+`<div class="shero"><div class="sht"><div><h2>Admission</h2><p>Search, register and update enrollees. Click a card to filter the list.</p></div><button class="shbtn" data-act="new">+ New enrollee</button></div><div class="shk">${kc}</div></div>
+ <div class="admbar" id="admbar" role="search">
+  <div class="admrow"><div class="sb"><input id="q" value="${esc(S.q||'')}" placeholder="Search by name, LRN or Enrollment ID" aria-label="Search learners" oninput="admDeb()" onkeydown="if(event.key==='Enter'){clearTimeout(S.admT);admLoad()}"><button class="btn" data-act="search">${I.search} Search</button></div>
+   <select id="fg" class="admsel" aria-label="Grade level" onchange="S.gf=this.value;S.lim=25;admSync();admLoad()"><option value="">All grade levels</option>${S.grades.map(g=>`<option>${g}</option>`).join('')}</select>
+   <select id="fy" class="admsel" aria-label="School year" onchange="S.sf=this.value;S.lim=25;admSync();admLoad()"><option value="">All school years</option>${yrs.slice().reverse().map(y=>`<option value="${y}">SY ${y}</option>`).join('')}</select></div>
+  <div class="admrow">${['All','Not Enrolled','Enrolled','Temporary','Transferred Out','Cancelled'].map(p=>`<button class="pill" data-act="flt" data-v="${p}">${p}</button>`).join('')}</div>
+  <div class="admmeta"><span id="admn">Loading&hellip;</span><a id="admclr" class="hidden" href="javascript:void(0)" data-act="admclr">Clear filters</a></div>
+ </div>
+ <div class="card"><div class="tw" id="hits"></div></div><div id="bulk" class="fbar" role="region" aria-label="Bulk actions"></div>`;
+ admSync();admLoad();admStats()};
+
+act.flt=v=>{S.flt=v;S.lim=25;if($('admbar')){admSync();admLoad()}else adm()};
+act.admclr=()=>{S.flt='All';S.gf='';S.sf='';S.q='';S.lim=25;if($('q'))$('q').value='';admSync();admLoad()};
+
+/** REPLACES admLoad(): no full-screen spinner while typing, ignores out-of-date answers, stacked cards on phones. */
+admLoad=function(){const hits=$('hits');if(!hits)return;
+ const q=($('q')||{}).value||'',f=S.flt||'All',g=S.gf||'',y=S.sf||'',key=[q,f,g,y].join('|');
+ S.q=q;if(S.skey!==key){S.skey=key;S.lim=25;S.allSel=false}
+ const rid=++S.admRid;
+ if(!hits.firstChild)hits.innerHTML='<div style="padding:6px">'+'<i class="galsk" style="height:48px;margin:8px 0;border-radius:10px"></i>'.repeat(5)+'</div>';else hits.classList.add('busy');
+ admSync();
+ google.script.run
+  .withSuccessHandler(r=>{if(rid!==S.admRid||!$('hits'))return;$('hits').classList.remove('busy');
+   if(!r||!r.success){toast((r&&r.error)||'Search failed.',false);if(r&&/Session expired/.test(r.error))setTimeout(()=>location.reload(),1500);return}
+   admDraw(r.data)})
+  .withFailureHandler(e=>{if(rid!==S.admRid)return;const h=$('hits');if(h)h.classList.remove('busy');toast(e.message,false)})
+  .searchStudents(S.token,q,f,S.lim||25,g,y)};
+
+function admDraw(d){const L=d.rows;S.ids=d.ids;S.total=d.total;
+ const bits=[];if((S.flt||'All')!=='All')bits.push(S.flt);if(S.gf)bits.push(S.gf);if(S.sf)bits.push('SY '+S.sf);
+ $('admn').textContent=d.total+(d.total===1?' learner':' learners')+(bits.length?' \u00b7 '+bits.join(' \u00b7 '):'')+(L.length<d.total?' (showing '+L.length+')':'');
+ $('bulk').innerHTML='<b><span id="selc">0</span> selected</b><span id="selbn"></span><button class="btn alt" data-act="bulk" data-v="Enrolled">Mark Enrolled</button><button class="btn alt" data-act="bulk" data-v="Not Enrolled">Mark Not Enrolled</button><button class="gh" data-act="selclear">Clear</button>';
+ $('hits').innerHTML=L.length?`<table class="at stk"><thead><tr><th><input type="checkbox" data-act="selall" aria-label="Select all"></th><th>Learner</th><th>LRN</th><th>Grade &amp; Section</th><th>Enrollment</th><th></th></tr></thead><tbody>${L.map(s=>{
+   const st=s.EnrollStatus||'Not Enrolled',o=st==='Cancelled'?['Cancelled']:st==='Transferred Out'?['Transferred Out','Not Enrolled','Enrolled']:st==='Temporary'?['Temporary','Not Enrolled','Enrolled']:['Not Enrolled','Enrolled'],
+   p=String(s.FullName||'').split(','),ini=((p[0]||'?').trim()[0]||'?')+(((p[1]||'').trim()[0])||'');
+   return `<tr><td class="nolab"><input type="checkbox" class="sel" value="${esc(s.StudentID)}" aria-label="Select ${esc(tc(s.FullName))}" ${st==='Cancelled'?'disabled':''}></td>
+    <td class="nolab"><div class="lrn" data-act="open" data-v="${esc(s.StudentID)}"><span class="av2">${esc(ini)}</span><div><b>${esc(tc(s.FullName))}</b><small>${esc(s.StudentID)}${s.SchoolYear?' \u00b7 SY '+esc(s.SchoolYear):''}</small></div></div></td>
+    <td data-label="LRN">${esc(s.LRN)}</td><td data-label="Class">${esc(gsLabel(s))}</td>
+    <td data-label="Status"><select class="stsel ${stc(st)}" data-act="rowst" data-id="${esc(s.StudentID)}" aria-label="Enrollment status" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select></td>
+    <td class="nolab"><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')}</tbody></table>`
+   +(L.length<d.total?`<div style="text-align:center;margin-top:16px"><button class="btn alt" data-act="more">Load 50 more</button><div style="color:var(--mut);font-size:12.5px;margin-top:6px">Showing ${L.length} of ${d.total}</div></div>`:'')
+  :`<div class="emp"><i>${I.search}</i><b>No matching learners</b><p>Try a different name or LRN, or clear the filters.</p><button class="btn alt" data-act="admclr">Clear filters</button></div>`;
+ selRefresh()}
+
+/* the bulk bar only shows while something is selected */
+const _srV2=selRefresh;
+selRefresh=function(){_srV2();const b=$('bulk'),c=$('selc');if(b&&c)b.classList.toggle('on',(parseInt(c.textContent,10)||0)>0)};
+
+/* =====================================================================
+   LEARNER RECORD
+   ===================================================================== */
+const STKEYS={1:['Surname','FirstName','LRN','Classification','Category','GradeLevel','PrevSchool'],
+ 2:['Birthdate','SexualOrient','AddressLine1','Barangay','City','Mobile','Religion'],
+ 3:[['FatherName','MotherName'],'EmName','EmRelation','EmMobile']};
+const CHK2=SVG('M5 12l5 5L20 7',14).replace('stroke-width="1.8"','stroke-width="3"');
+
+/** Key-detail counts per step. Students are not counted on fields only the office can fill. */
+function stepStat(t){const r=t.rec,skip=A()?[]:['Category','Classification'],has=k=>Array.isArray(k)?k.some(x=>r[x]):!!r[k],o={};let N=0,D=0;
+ [1,2,3].forEach(i=>{const ks=STKEYS[i].filter(k=>!skip.includes(k)),d=ks.filter(has).length;o[i]={n:ks.length,d:d};N+=ks.length;D+=d});
+ const R=reqsFor(r).req,d4=R.filter(k=>r[k]&&r[k]!=='None').length;o[4]={n:R.length,d:d4};N+=R.length;D+=d4;
+ o[5]={n:0,d:0};o.all={n:N,d:D};return o}
+
+const STSHORT=['Academic & School','Personal Info','Family & Contacts','Requirements','Status'];
+function stepperInner(t){const o=stepStat(t);
+ return STEPS.map((s,i)=>{const n=i+1,x=o[n],done=x.n>0&&x.d===x.n;
+  return `<button type="button" class="stpi ${t.step===n?'on':''} ${done?'ok':''}" data-act="wstep" data-v="${n}" title="${esc(s[0])}"${t.step===n?' aria-current="step"':''}><span class="stpc">${done?CHK2:n}</span><span class="stpt"><b>${esc(STSHORT[i])}</b><small>${x.n?x.d+' / '+x.n+(n===4?' submitted':' complete'):'Review &amp; confirm'}</small></span></button>`}).join('')}
+
+function railProg(t){const o=stepStat(t),pc=o.all.n?Math.round(o.all.d/o.all.n*100):0;
+ return `<div class="rpt"><b>Profile completeness</b><span>${pc}%</span></div><span class="mbar"><u style="width:${pc}%"></u></span><small>${o.all.d} of ${o.all.n} key details${o[4].n?' \u00b7 '+o[4].d+' of '+o[4].n+' requirements':''}</small>`}
+
+function railHTML(t){const r=t.rec,st=r.EnrollStatus||'Not Enrolled',p=String(r.FullName||'').split(','),
+ nm=r.FullName?tc(r.FullName):(r.Surname||r.FirstName?tc([r.Surname,r.FirstName].filter(Boolean).join(', ')):'New enrollee'),
+ a=(r.FullName?(p[0]||'').trim()[0]:(r.Surname||'')[0])||'N',b=(r.FullName?(p[1]||'').trim()[0]:(r.FirstName||'')[0])||'',
+ ph=A()?r.Photo:(S.user&&S.user.Photo),holds=A()?(r.HoldOffices||[]):(r.Holds||[]).map(h=>h.Office),
+ row=(l,v)=>v?`<div class="rrw"><span>${l}</span><b>${esc(v)}</b></div>`:'';
+ return `<div class="rrail" role="complementary" aria-label="Learner summary"><div class="card"><div class="rpho" style="${ph?`background-image:url(${ph})`:''}">${ph?'':esc((a+b).toUpperCase())}</div>
+ <h3 class="rnm">${esc(nm)}</h3><div class="rid">${r.StudentID?esc(r.StudentID):'Not yet saved'}</div>
+ <div class="rchips"><span class="chip ${stc(st)}">${esc(st)}</span>${holds.map(h=>`<span class="chip warn">Hold: ${esc(h)}</span>`).join('')}</div>
+ ${row('Grade &amp; section',gsLabel(r))}${row('LRN',r.LRN)}${row('School year',r.SchoolYear)}${row('Classification',r.Classification)}${row('Category',r.Category)}${st==='Temporary'&&r.TempUntil?row('Temporary until',fmtD(r.TempUntil)):''}
+ ${A()&&r.ProcessedBy?row('Last processed',r.ProcessedBy+(r.ProcessedDate?' \u00b7 '+fmtS(r.ProcessedDate):'')):''}
+ <div class="rpg" id="rrp">${railProg(t)}</div></div></div>`}
+
+/** Live-update the stepper counts and the profile bar without redrawing (and without stealing focus). */
+let STT=0;
+function stpUpdate(){const t=S.t;if(!t||!t.edit||!$('stp'))return;collect(t);$('stp').innerHTML=stepperInner(t);const p=$('rrp');if(p)p.innerHTML=railProg(t)}
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{
+ const d=e.target.dataset;if(!d||!d.k)return;
+ const f=e.target.closest&&e.target.closest('.f.bad');if(f&&ev==='input')fClearOne(f);
+ if(!S.t||!$('stp'))return;clearTimeout(STT);STT=setTimeout(stpUpdate,250)}));
+
+/** REPLACES formHTML(): sticky header (actions + stepper), summary rail, same sections and menus. */
+formHTML=function(t){S.t=t;t.step=t.step||1;const id=t.rec.StudentID;
+ const mi=(a,l,v,red)=>`<button data-act="${a}"${v?` data-v="${v}"`:''}${red?' style="color:#c0392b"':''}>${l}</button>`,
+  mn=(k,l,items,right)=>items.length?`<div style="position:relative"><button class="btn alt" data-act="gmenu" data-v="${k}">${l} &#9662;</button><div class="dd hidden" id="gm-${k}" style="top:46px;${right?'right:0':'left:0;right:auto'};min-width:230px">${items.join('')}</div></div>`:'';
+ const acct=[FULL()?mi('acct','Create account'):'',mi('rstacct','Reset password / Unlock'),mi('mailone','Email status notice')].filter(Boolean),
+  enr=[t.rec.NeedsReenroll?mi('reen1','Re-enroll for '+esc(t.rec.NeedsReenroll),'promote'):'',t.rec.NeedsReenroll?mi('reen1','Re-enroll (retain grade)','retain'):'',mi('cancelen','Cancel enrollment'),FULL()?'<div style="height:1px;background:var(--line);margin:4px 0"></div>'+mi('del','Delete record','',1):''].filter(Boolean),
+  prt=[mi('slip','Confirmation slip (print)'),mi('slippdf','Confirmation slip (PDF)'),mi('eform','Enrollment form (print)'),mi('eformpdf','Enrollment form (PDF)'),cxOn(t.rec)?mi('cform','Cancellation form (print / PDF)'):'',idOk(t.rec)?mi('idcard','Student ID card (TLC)'):'',idOk(t.rec)?mi('corform','Certificate of Registration (TLC)'):''].filter(Boolean);
+ const bar=`<div class="act acb">${t.edit?'<button class="btn" data-act="save">Save</button><button class="btn alt" data-act="canceledit">Cancel edit</button>':'<button class="btn" data-act="edit">Edit</button>'}${A()&&id?mn('acct','Account',acct)+mn('enr','Enrollment',enr):''}${id?(A()?'<span style="margin-left:auto"></span>'+mn('prt','Print / PDF',prt,1):'<button class="btn alt" data-act="slip" style="margin-left:auto">Print Student Enrollment Form</button>'):''}</div>`;
+ const body=STEPS.map((s,i)=>`<div class="wpane ${t.step===i+1?'on':''}">${s[1].filter(k=>showSec(k,t.rec)).map(k=>`<div class="card"><h3>${SECT[k]}${(k==='req'||k==='status')&&!A()?' <span class="chip">view only</span>':''}${k==='academic'&&!A()?' <span class="chip">Section: view only</span>':''}</h3><div class="g">${secFields(k,t)}</div></div>`).join('')}${i===4?histCard(t.rec)+flagPanel(t.rec):''}</div>`).join('');
+ const nv=`<div class="wnav"><span>${t.step>1?'<button class="btn alt" data-act="wnav" data-v="-1">&larr; Previous</button>':''}</span><span>Step ${t.step} of 5</span><span>${t.step<5?'<button class="btn" data-act="wnav" data-v="1">Next step &rarr;</button>':(t.edit?'<button class="btn" data-act="save">Save</button>':'')}</span></div>`;
+ return `<div class="rhero">${recHero(t)}</div><div class="rec2"><div class="rmain"><div class="rhead">${bar}<div class="stp" id="stp" role="group" aria-label="Enrollment steps">${stepperInner(t)}</div></div>${body}${nv}</div>${railHTML(t)}</div>`};
+
+/* =====================================================================
+   INLINE VALIDATION (replaces the toast-only check; the same rules)
+   ===================================================================== */
+const FRE={p:/^\d{11}$/,l:/^[1-5]\d{11}$/,e:/^[^@\s]+@[^@\s]+\.[^@\s]+$/};
+const FVK={Mobile:'p',FatherMobile:'p',MotherMobile:'p',EmMobile:'p',GuardMobile:'p',RelMobile:'p',LRN:'l',Email:'e',FatherEmail:'e',MotherEmail:'e',GuardEmail:'e'};
+const FVM={p:'Contact number must be exactly 11 digits.',l:'LRN must be 12 digits and start with 1, 2, 3, 4 or 5.',e:'Enter a valid email address.'};
+const fRoot=()=>(S.nm&&$('nm'))?$('nm'):$('view');
+function fMark(k,msg){const e=fRoot().querySelector('[data-k="'+k+'"]');if(!e)return null;const f=e.closest('.f');if(!f)return e;
+ f.classList.add('bad');let s=f.querySelector(':scope>.ferr');if(!s){s=document.createElement('small');s.className='ferr';s.setAttribute('role','alert');f.appendChild(s)}s.textContent=msg;return e}
+function fClearOne(f){f.classList.remove('bad');const s=f.querySelector(':scope>.ferr');if(s)s.remove()}
+function fClearAll(){document.querySelectorAll('.f.bad').forEach(fClearOne)}
+
+wCheck=function(t){const r=t.rec;fClearAll();let first=null;
+ const bad=(k,m)=>{const e=fMark(k,m);if(!first)first={e:e,m:m}};
+ if(t.step===1){
+  if(!r.Surname)bad('Surname','Enter the surname.');
+  if(!r.FirstName)bad('FirstName','Enter the first name.');
+  if(!FRE.l.test(r.LRN||''))bad('LRN',FVM.l)}
+ if(t.step===2&&r.Mobile&&!FRE.p.test(r.Mobile))bad('Mobile',FVM.p);
+ if(t.step===3){
+  ['FatherMobile','MotherMobile','EmMobile','GuardMobile'].concat(r.LivingWith==='Relatives / Legal Guardian'?['RelMobile']:[]).forEach(k=>{if(r[k]&&!FRE.p.test(r[k]))bad(k,FVM.p)});
+  ['FatherEmail','MotherEmail'].forEach(k=>{if(r[k]&&!FRE.e.test(r[k]))bad(k,FVM.e)})}
+ if(first){toast(first.m,false);if(first.e){first.e.scrollIntoView({block:'center',behavior:'smooth'});try{first.e.focus({preventScroll:true})}catch(_){}}return false}
+ if(t.step===1&&certRequired(r)&&!r.CertNo)toast('Reminder: the Certificate Number is still blank. You may continue and submit it later.','warn');
+ return true};
+
+/* check a field as soon as the person leaves it */
+document.addEventListener('focusout',e=>{const k=e.target.dataset&&e.target.dataset.k,ty=FVK[k];if(!ty||!S.t||!S.t.edit)return;
+ const v=String(e.target.value||'').trim(),f=e.target.closest('.f');if(!f)return;
+ if(!v||FRE[ty].test(v))fClearOne(f);else fMark(k,FVM[ty])});
+
+/* the record banner (shown on narrow screens and in the New Enrollee pop-up) uses the same Grade & Section label */
+recHero=function(t){const r=t.rec,p=String(r.FullName||'').split(','),nm=r.FullName?tc(r.FullName):(r.Surname||r.FirstName?tc([r.Surname,r.FirstName].filter(Boolean).join(', ')):'New enrollee'),
+ ini=((r.FullName?(p[0]||'').trim()[0]:(r.Surname||nm)[0])||'N')+(r.FullName?((p[1]||'').trim()[0]||''):(r.FirstName||'')[0]||''),gs=gsLabel(r);
+ return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(gs)}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`};
 </script></body></html>

@@ -173,12 +173,16 @@ function photo_(id) {
 }
 
 
-function searchStudents(token, q, status, limit) {
+function searchStudents(token, q, status, limit, grade, sy) {
   try {
     who_(token, 'admin'); q = String(q || '').toLowerCase();
     limit = Math.max(25, Math.min(parseInt(limit, 10) || 25, 5000));
+    grade = GRADES.indexOf(grade) >= 0 ? grade : '';
+    sy = /^\d{4}-\d{4}$/.test(sy || '') ? sy : '';
     const hits = studentsLite_().filter(s => (s.FullName + s.LRN + s.StudentID).toLowerCase().includes(q))
-      .filter(s => !status || status === 'All' || (s.EnrollStatus || 'Not Enrolled') === status).reverse();
+      .filter(s => !status || status === 'All' || (s.EnrollStatus || 'Not Enrolled') === status)
+      .filter(s => !grade || s.GradeLevel === grade)
+      .filter(s => !sy || s.SchoolYear === sy).reverse();
     return ok({
       total: hits.length,
       rows: hits.slice(0, limit).map(s => ({ StudentID:s.StudentID, FullName:s.FullName, LRN:s.LRN, GradeLevel:s.GradeLevel, Section:s.Section, EnrollStatus:s.EnrollStatus, SchoolYear:s.SchoolYear })),
@@ -895,5 +899,40 @@ function getCareerResult(token) {
       }
     }
     return ok(null);
+  } catch (e) { return fail(e); }
+}
+
+/* ===== Dashboard demographic donuts =====
+ * PASTE at the END of Code.gs, then deploy a NEW version.
+ * Read-only. Counts active learners of the active school year (cancelled and transferred-out are excluded),
+ * the same population as the "Applicants by Scholarship" donut.
+ */
+
+/**
+ * Counts for the Sex, Gender Identity and Per School donuts on the admin Home page.
+ * Same access rule as the Demographic report: not for Encoders, office desks or academic staff.
+ * @param {string} token Session token.
+ * @return {{success:boolean, data?:{sex:Array, gender:Array, schools:Array, otherSchools:number}, error?:string}}
+ */
+function dashboardDemo(token) {
+  try {
+    const u = who_(token, 'admin');
+    if (u.Clearance === 'Encoder' || OFFICE_CL.indexOf(u.Clearance) >= 0 || ACAD_ROLES.indexOf(u.Clearance) >= 0) throw new Error('Not allowed.');
+    const live = rowsSY_().filter(r => r.EnrollStatus !== 'Cancelled' && r.EnrollStatus !== 'Transferred Out');
+
+    /** [[label, count], ...] sorted by count, skipping rows where fn returns ''. */
+    const tally = fn => {
+      const m = {};
+      live.forEach(r => { const k = fn(r); if (k) m[k] = (m[k] || 0) + 1; });
+      return Object.keys(m).map(k => [k, m[k]]).sort((a, b) => b[1] - a[1]);
+    };
+
+    const schools = tally(r => String(r.PrevSchool || '').trim());   // learners with no previous school are left out
+    return ok({
+      sex: tally(r => r.SexualOrient || 'Not specified'),
+      gender: tally(r => r.GenderOrient || 'Not specified'),
+      schools: schools.slice(0, 5),
+      otherSchools: schools.slice(5).reduce((a, x) => a + x[1], 0)
+    });
   } catch (e) { return fail(e); }
 }
