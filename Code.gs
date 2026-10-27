@@ -150,18 +150,10 @@ const ok = (data, message) => ({ success:true, message:message||'', data:data })
 const fail = e => ({ success:false, error:e.message });
 const deptOf_ = g => { const i = GRADES.indexOf(g); return i<0?'':i<3?'Preschool':i<9?'Elementary':i<13?'Junior High School':'Senior High School'; };
 
-function doGet(e) {
-  // Public school website is the default entry point. Keep the existing portal
-  // intact and accessible at ?portal=1; all existing server-side functions remain unchanged.
-  if (e && e.parameter && e.parameter.portal === '1') {
-    return HtmlService.createTemplateFromFile('Index').evaluate()
-      .setTitle('Moreh Academy Portal')
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-  }
-  return HtmlService.createHtmlOutputFromFile('PublicHome')
-    .setTitle('Moreh Academy | Learn with purpose. Lead with character.')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-    .addMetaTag('description', 'Discover Moreh Academy — a learning community supporting students from the early years through Grade 12.');
+function doGet() {
+  return HtmlService.createTemplateFromFile('Index').evaluate()
+    .setTitle('Moreh Academy Portal')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 function include(f) { return HtmlService.createHtmlOutputFromFile(f).getContent(); }
 

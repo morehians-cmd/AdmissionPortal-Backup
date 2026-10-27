@@ -3857,4 +3857,401 @@ document.addEventListener('focusout',e=>{const k=e.target.dataset&&e.target.data
 recHero=function(t){const r=t.rec,p=String(r.FullName||'').split(','),nm=r.FullName?tc(r.FullName):(r.Surname||r.FirstName?tc([r.Surname,r.FirstName].filter(Boolean).join(', ')):'New enrollee'),
  ini=((r.FullName?(p[0]||'').trim()[0]:(r.Surname||nm)[0])||'N')+(r.FullName?((p[1]||'').trim()[0]||''):(r.FirstName||'')[0]||''),gs=gsLabel(r);
  return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(gs)}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`};
+
+ /* ===== Student Home v2 + Reports v2 =====
+   PASTE at the very END of the main script in Index.html, AFTER admission-ui-v2.js (it uses gsLabel from that file).
+   No backend changes. Admin / office / teacher homes are untouched: only learners get the new Home.
+   Everything keeps the existing ids and data-act hooks (guidebox, hev, ract, rout, rfil ...). */
+
+(function(){const s=document.createElement('style');s.textContent=`
+@media screen{
+/* ---------- Student Home ---------- */
+.shh2{padding:22px 24px}
+.hs{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(260px,340px);gap:24px;align-items:center}
+.ring{--p:0;position:relative;width:116px;height:116px;border-radius:50%;background:conic-gradient(var(--blue) calc(var(--p)*1%),#d6e2fb 0);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring:before{content:'';position:absolute;inset:11px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.ring b,.ring small{position:relative}
+.ring b{font:800 26px/1 Inter,sans-serif;color:var(--navy)}.ring small{color:var(--mut);font-size:11.5px;margin-top:2px}
+.hsg{display:block;font:600 14px Inter,sans-serif;color:var(--mut)}
+.hsm h2{font:800 26px/1.2 Inter,sans-serif;color:var(--navy);margin:2px 0 6px}
+.hsm p{margin:0 0 14px;color:var(--mut)}
+.hsl{display:grid;gap:8px}
+.hsi{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--heroline);border-radius:12px;padding:9px 12px}
+.hsi i{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid #cbd5e1;display:flex;align-items:center;justify-content:center;color:#fff}
+.hsi.ok i{background:#16a34a;border-color:#16a34a}.hsi i svg{width:12px;height:12px}
+.hsi b{display:block;font-size:13px;color:var(--navy)}.hsi small{display:block;color:var(--mut);font-size:12px;line-height:1.3}
+.hsk{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+@media(max-width:1100px){.hs{grid-template-columns:auto minmax(0,1fr)}.hsl{grid-column:1/-1;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}}
+@media(max-width:600px){.hs{grid-template-columns:1fr;justify-items:start}.hsm h2{font-size:22px}}
+/* ---------- Reports ---------- */
+.rsrch{margin:0 0 14px}
+.rsrch input{width:100%;height:46px;padding:0 16px 0 44px;border:1px solid #cbd5e1;border-radius:12px;font:inherit;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M21 21l-4.3-4.3'/%3E%3C/svg%3E") no-repeat 14px center/18px}
+.rsrch input:focus{outline:0;border-color:var(--blue);box-shadow:var(--ring)}
+.rrec{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 6px}
+.rrec>span{font-size:12.5px;font-weight:700;color:var(--mut);margin-right:2px}
+.rt.wide th:first-child,.rt.wide td:first-child{position:sticky;left:0;z-index:2}
+.rt.wide td:first-child{background:#fff;box-shadow:1px 0 0 var(--line)}
+.rt.wide tbody tr:nth-child(even) td:first-child{background:#f8fafd}
+.rt.wide tbody tr:hover td:first-child{background:#eef3ff}
+.rt.wide tr.tt td:first-child{background:#eaf0fb}
+}`;document.head.appendChild(s)})();
+
+/* =====================================================================
+   STUDENT HOME
+   ===================================================================== */
+const HCHK=SVG('M5 12l5 5L20 7',14).replace('stroke-width="1.8"','stroke-width="3"');
+/* [keyword read by gStat(), short title, headline when it is the next step] */
+const HS=[['profile','Student profile','Complete your student profile'],
+ ['consent','Consent form','Submit the signed parental consent form'],
+ ['requirement','Requirements','Submit your school requirements'],
+ ['enrollment status','Enrollment','Your documents are in. Enrollment is being confirmed']];
+
+const polDetails=()=>`<details class="card scs cpd"><summary class="sch"><span class="ao c3">${SICO.info}</span><h3>Transfer Out &amp; Cancellation Policies</h3><span class="cpch">${CPCH}</span></summary><div class="scb">${[POL.transfer,POL.cancel].map(P=>`<div class="fpm"><div class="fpmt"><b>${P.title}</b></div><p style="margin:4px 0 6px;color:var(--mut)">${esc(P.def)}</p><b style="font-size:13px;color:var(--navy)">Documents to release</b>${ul(P.docs.map(esc))}</div>`).join('')}</div></details>`;
+
+function homeStudent(){head('Dashboard','Your enrollment at a glance');
+ call('getStudent',[T()],r=>{const s=r.data,name=tc(s.FirstName||S.user.FullName||'Student');
+  const st=HS.map(x=>Object.assign({k:x[0],t:x[1],h:x[2],msg:'',done:false},gStat(x[0],s)||{}));
+  const done=st.filter(x=>x.done).length,next=st.find(x=>!x.done),pc=Math.round(done/st.length*100);
+  const head2=next?next.h:'You\u2019re all set for School Year '+esc(String(S.cfg.sy).replace('-','\u2013')),
+   sub=next?next.msg:'Your enrollment is confirmed. Keep an eye on the Campus Bulletin for announcements.',
+   b=next&&next.k!=='enrollment status'&&next.btn?`<button class="btn" data-act="${next.btn[1]}"${next.btn[2]?` data-v="${next.btn[2]}"`:''}>${next.btn[0]} &rarr;</button>`:'';
+  const R=reqsFor(s).req,rd=R.filter(k=>s[k]&&s[k]!=='None').length,rp=R.length?Math.round(rd/R.length*100):0;
+  const cards=dcard('c2',I.home,'Enrollment Status',esc(s.EnrollStatus||'Not Enrolled'),'Current status','#16a34a','','',1)
+   +dcard('c1',I.adm,'Grade &amp; Section',esc(gsLabel(s)||'Not set yet'),esc(tc(s.Department||'')),'#2563eb','nav','sp',1)
+   +dcard('c3',I.rep,'Requirements',rd+' / '+R.length,'<em class="mbar"><u style="width:'+rp+'%"></u></em>','','nav','rq')
+   +dcard('c4',I.cal,'School Year',esc(s.SchoolYear||'-'),esc(s.Classification||''),'#7c3aed','','',1);
+  $('view').innerHTML=holdBanner(s)
+  +`<div class="shero shh2"><div class="hs"><div class="ring" style="--p:${pc}" role="img" aria-label="${done} of ${st.length} steps done"><b>${done}/${st.length}</b><small>steps done</small></div>
+    <div class="hsm"><span class="hsg">${greet()}, ${esc(name)} &#128075;</span><h2>${head2}</h2><p>${esc(sub)}</p>${b}</div>
+    <div class="hsl">${st.map(x=>`<div class="hsi ${x.done?'ok':''}"><i>${x.done?HCHK:''}</i><span><b>${esc(x.t)}</b><small>${esc(x.msg)}</small></span></div>`).join('')}</div></div></div>
+  <div class="hsk">${cards}</div>
+  <div class="dash hm"><div class="dmain">
+   <div class="card"><h3>Enrollment guide</h3><div id="guidebox" class="pvs">${GUIDE0}</div></div>
+   ${polDetails()}
+   <div class="card"><h3>Important Reminders</h3><ul style="line-height:1.9;margin:0;padding-left:20px"><li><b>Office Hours:</b> Mon&ndash;Fri: 8:00 AM &ndash; 5:00 PM | Sat: 8:00 AM &ndash; 3:00 PM.</li><li><b>Enrollment Cancellation / Withdrawal:</b> &#8369;1,000.00 processing fee applies to cancellations/withdrawals on or before June 30. Requests made after June 30 will be recalculated by the Principal's and Accounting Offices based on elapsed class days and applied discounts/incentives.</li><li><b>Contact Information:</b> Ground Floor, Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City | Mobile: 0961 876 6886 | Email: morehians@gmail.com</li></ul></div>
+   ${helpbar()}</div>
+  <div class="dside"><div class="card"><div class="ch"><h3>Quick Actions</h3></div><div class="qas">${qa('c1',I.adm,'Student Profile','nav','sp')}${qa('c3',I.rep,'School Requirements','nav','rq')}${qa('c4',I.rep,'Print Consent Form','pconsent')}${qa('c2',I.rep,'Data Privacy Policy','nav','pp')}${qa('c5',I.sch,'Scholarships','nav','sch')}${qa('c1',I.tf,'Schedule of Fees','nav','tf')}</div></div>${evSide()}${actCard()}</div></div>`;
+  renderAct();homeEvents()})}
+
+/* learners get the new Home; admin, office and teacher accounts keep theirs */
+const _homeS2=home;
+home=function(){return A()?_homeS2():homeStudent()};
+
+/* =====================================================================
+   REPORTS: search, recently viewed, sticky first column on wide tables
+   ===================================================================== */
+const RRK='mrh_rr';
+const rrGet=()=>{try{const ok=RL().map(x=>x[0]);return JSON.parse(localStorage.getItem(RRK)||'[]').filter(k=>ok.includes(k))}catch(e){return []}};
+
+const _selRepR=selRep;
+selRep=function(t){try{localStorage.setItem(RRK,JSON.stringify([t].concat(rrGet().filter(k=>k!==t)).slice(0,4)))}catch(e){}_selRepR(t)};
+
+function repFilter(v){const q=String(v||'').trim().toLowerCase();let n=0;
+ document.querySelectorAll('#view .rsel').forEach(g=>{let c=0;
+  g.querySelectorAll('.rc').forEach(b=>{const ok=!q||b.textContent.toLowerCase().includes(q);b.classList.toggle('hidden',!ok);if(ok)c++});
+  g.classList.toggle('hidden',!c);const l=g.previousElementSibling;if(l&&l.classList.contains('rgl'))l.classList.toggle('hidden',!c);n+=c});
+ const e=$('rsn');if(e)e.classList.toggle('hidden',n>0)}
+
+const _repR=rep;
+rep=function(){_repR();
+ const card=[...document.querySelectorAll('#view .card')].find(c=>{const h=c.querySelector('.ch h3');return h&&/All Reports/.test(h.textContent)});if(!card)return;
+ const R=Object.fromEntries(RL().map(x=>[x[0],x])),rc=rrGet();
+ card.querySelector('.ch').insertAdjacentHTML('afterend',
+  '<div class="rsrch"><input id="rsq" type="search" placeholder="Search reports" aria-label="Search reports" oninput="repFilter(this.value)"></div>'
+  +(rc.length?`<div class="rrec"><span>Recently viewed</span>${rc.map(k=>`<button class="pill" data-act="rp" data-v="${k}">${esc(R[k][1])}</button>`).join('')}</div>`:'')
+  +'<div id="rsn" class="aemp hidden">No matching reports.</div>')};
+
+  /* ===== Schedule of Fees + Scholarships: segmented controls v2 =====
+   PASTE at the very END of the main script in Index.html (after home-reports-ui-v2.js). No backend changes.
+   Reuses the existing helpers: planCard, pmeta, pm, isT, tierFor, PLAN_ORDER, SCHM, SCHK, helpbar, SICO.
+   Keeps data-act hooks, ids and the Fees / Fee Notes / Scholarships sheets exactly as they are. */
+
+(function(){const s=document.createElement('style');s.textContent=`
+@media screen{
+.segbar{position:sticky;top:var(--tbh);z-index:5;padding:14px 16px;margin-bottom:18px}
+.segs{display:flex;gap:16px 32px;flex-wrap:wrap;align-items:flex-end}
+.segs>div{min-width:0;max-width:100%}
+.segl{font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);margin:0 0 6px}
+.seg{display:inline-flex;gap:4px;background:#eef2f8;border:1px solid var(--line);border-radius:12px;padding:4px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{display:inline-flex;align-items:center;gap:7px;border:0;background:none;border-radius:9px;padding:8px 14px;font:600 13.5px Inter,sans-serif;color:var(--mut);cursor:pointer;white-space:nowrap;transition:background .12s,color .12s,box-shadow .12s}
+.seg button:hover{color:var(--navy);background:#ffffff80}
+.seg button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px #0f172a26,0 0 0 1px var(--line)}
+.seg .sdot{width:9px;height:9px;border-radius:50%;flex:none}
+.fgrid.one{grid-template-columns:1fr}
+.cmp th{background:#f1f5f9;color:#475569;font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:11px 14px;white-space:nowrap}
+.cmp td{padding:13px 14px;vertical-align:middle}
+.cmp .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cmp tr.cmp-best td{background:#f0fdf4}
+.cmp tr.cmp-best td:first-child{box-shadow:inset 3px 0 0 #16a34a}
+@media(max-width:767px){.segbar{position:static}}
+}`;document.head.appendChild(s)})();
+
+/* keyboard: arrows / Home / End move through a segmented control and select the item */
+document.addEventListener('keydown',e=>{const b=e.target.closest&&e.target.closest('.seg button');
+ if(!b||!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+ const L=[...b.parentElement.children];let i=L.indexOf(b);
+ i=e.key==='ArrowRight'?(i+1)%L.length:e.key==='ArrowLeft'?(i-1+L.length)%L.length:e.key==='Home'?0:L.length-1;
+ e.preventDefault();S.segKb=b.parentElement.getAttribute('aria-label')||'seg';L[i].click()},true);
+/** After a re-render, put keyboard focus back on the selected item of the control that was being used. */
+function segFocus(){const k=S.segKb;if(!k)return;S.segKb='';const o=document.querySelector('.seg[aria-label="'+k+'"] button.on');if(o)o.focus()}
+
+/* =====================================================================
+   SCHEDULE OF FEES
+   ===================================================================== */
+const _tpF=tuitionPage;
+tuitionPage=function(){S.fplan='';_tpF()};
+
+/** REPLACES feeRender(): grade-level and plan segmented controls, a compare table, then the plan cards. */
+feeRender=function(){const F=S.fees,tiers=[...new Set(F.rows.map(x=>x.Tier))];S.tierList=tiers;
+ if(!tiers.length)return $('view').innerHTML='<div class="card">The fee schedule has not been filled in yet.</div>';
+ const stu=!A();let t;
+ if(stu){t=tierFor(S.fg,tiers);
+  if(!t)return $('view').innerHTML=`<div class="card">${S.fg?'No fee schedule has been set for your level yet. Please contact the Admissions Office.':'Choose your <b>Grade Level</b> in <b>Student Profile</b> to see the tuition fees for your level.'}</div>`}
+ else{t=tiers.includes(S.tierName)?S.tierName:tiers[0];S.tierName=t}
+ const rows=F.rows.filter(x=>x.Tier===t),
+  plans=[...new Set(rows.map(x=>x.Plan))].sort((a,b)=>{const i=PLAN_ORDER.indexOf(a),j=PLAN_ORDER.indexOf(b);return(i<0?99:i)-(j<0?99:j)});
+ S.fplanList=plans;if(S.fplan&&!plans.includes(S.fplan))S.fplan='';
+ const promos=F.notes.filter(n=>n.Type.toLowerCase()==='promo'),grants=F.notes.filter(n=>n.Type.toLowerCase()==='grant'),lines=s=>s.split('|').map(x=>x.trim()).filter(Boolean);
+
+ /* one summary line per plan */
+ const sum=plans.map(p=>{const its=rows.filter(x=>x.Plan===p),tot=its.find(isT),pay=its.filter(x=>!isT(x)),full=p==='Full Payment',
+   total=tot?tot.Amount:pay.reduce((a,x)=>a+x.Amount,0),rest=full?[]:pay.slice(1);
+  return{p:p,total:total,upon:full?total:(pay[0]?pay[0].Amount:0),n:full?1:pay.length,
+   then:!rest.length?'\u2014':rest.every(x=>x.Amount===rest[0].Amount)?rest.length+' \u00d7 '+pm(rest[0].Amount):'Varies'}});
+ const min=sum.length?Math.min(...sum.map(x=>x.total)):0;
+
+ const hero=`<div class="shero nk"><div class="sht"><div><h2>${stu?'Your Tuition Fees':'Schedule of Fees'}</h2><p>${stu?'Choose how you would like to pay. Every plan below covers the same school year.':'Select a grade level to view its payment plans. Fees are read from your Google Sheet and changes show here right away.'}</p>${stu?`<div class="shch"><span class="shchip">Your grade level: ${esc(S.fg)}</span><span class="shchip">${esc(t)}</span></div>`:''}</div>${F.url?`<a class="shbtn" href="${esc(F.url)}" target="_blank" rel="noopener">${I.rep} Edit fee sheet</a>`:''}</div></div>`;
+
+ const segT=!stu&&tiers.length>1?`<div><div class="segl">Grade level</div><div class="seg" role="group" aria-label="Grade level">${tiers.map((x,j)=>`<button type="button" class="${x===t?'on':''}" aria-pressed="${x===t}" data-act="ftier" data-v="${j}">${esc(x)}</button>`).join('')}</div></div>`:'';
+ const segP=plans.length>1?`<div><div class="segl">Payment plan</div><div class="seg" role="group" aria-label="Payment plan"><button type="button" class="${S.fplan?'':'on'}" aria-pressed="${!S.fplan}" data-act="fplan" data-v="-1">All plans</button>${plans.map((p,j)=>`<button type="button" class="${S.fplan===p?'on':''}" aria-pressed="${S.fplan===p}" data-act="fplan" data-v="${j}"><i class="sdot" style="background:${pmeta(p).c}"></i>${esc(p)}</button>`).join('')}</div></div>`:'';
+ const bar=segT||segP?`<div class="card segbar"><div class="segs">${segT}${segP}</div></div>`:'';
+
+ const cmp=sum.length>1?`<div class="card"><div class="ch"><h3>Compare payment plans</h3><span style="color:var(--mut);font-size:13px">${esc(t)}</span></div><div class="tw"><table class="at cmp"><thead><tr><th>Plan</th><th class="n">Payments</th><th class="n">Upon enrollment</th><th>Then</th><th class="n">Total</th><th class="n">Extra vs lowest</th><th></th></tr></thead><tbody>${sum.map((x,j)=>{const best=x.total===min;
+  return `<tr class="${best?'cmp-best':''}"><td><i class="dot" style="background:${pmeta(x.p).c}"></i><b>${esc(x.p)}</b>${best?' <span class="rb g">Lowest total</span>':''}</td><td class="n">${x.n}</td><td class="n">${pm(x.upon)}</td><td>${x.then}</td><td class="n"><b>${pm(x.total)}</b></td><td class="n">${best?'\u2014':'+'+pm(x.total-min)}</td><td><button class="btn alt" data-act="fplan" data-v="${j}">View schedule</button></td></tr>`}).join('')}</tbody></table></div></div>`:'';
+
+ const show=S.fplan?[S.fplan]:plans;
+ const cards=`<div class="fgrid${show.length===1?' one':''}">${show.map(p=>planCard(p,rows.filter(x=>x.Plan===p),plans.indexOf(p))).join('')}</div>`;
+ const promoCard=promos.length?`<div class="card"><div class="ch"><h3>Promos &amp; Discounts</h3></div>${promos.map(p=>`<div class="fpm"><div class="fpmt"><span class="ao c3">${SICO.gift}</span><b>${esc(p.Title)}</b></div>${lines(p.Details).map(x=>`<div class="sci"><i>${SICO.chk}</i><div>${esc(x)}</div></div>`).join('')}</div>`).join('')}</div>`:'';
+ const grantCard=grants.length?`<div class="card"><div class="ch"><h3>Discounts &amp; Grants</h3></div>${grants.map(g=>`<div class="fgr"><b>${esc(g.Title)}</b><span>${esc(g.Details)}</span></div>`).join('')}</div>`:'';
+
+ $('view').innerHTML=hero+bar+`<div class="dash"><div class="dmain">${S.fplan?'':cmp}${cards}<div class="scn" style="margin-top:20px">${SICO.info}<div>These amounts are for reference only. Final fee assessment is handled by the School Cashier.</div></div></div><div class="dside">${promoCard}${grantCard}${helpbar()}</div></div>`;
+ segFocus()};
+
+act.ftier=i=>{S.tierName=S.tierList[+i];feeRender()};
+act.fplan=i=>{S.fplan=+i<0?'':(S.fplanList||[])[+i]||'';feeRender()};
+
+/* =====================================================================
+   SCHOLARSHIPS: one program switcher on the overview and on every program page
+   ===================================================================== */
+const _schRS=schRender;
+schRender=function(){_schRS();
+ if(S.schEdit)return;                                   // the editor keeps its own toolbar
+ const hero=document.querySelector('#view .shero');if(!hero)return;
+ const k=S.sk,btn=(a,v,l,on,t)=>`<button type="button" class="${on?'on':''}" aria-pressed="${!!on}" data-act="${a}"${v?` data-v="${v}"`:''}${t?` title="${esc(t)}"`:''}>${l}</button>`,
+  bar=document.createElement('div');bar.className='card segbar';
+ bar.innerHTML=`<div class="segs"><div><div class="segl">Program</div><div class="seg" role="group" aria-label="Scholarship program">${btn('schback','','Overview',!k)}${SCHK.map(x=>btn('schk',x,x,k===x,SCHM[x].n)).join('')}</div></div></div>`;
+ hero.after(bar);
+ const back=hero.querySelector('[data-act=schback]');if(back)back.remove();   // the switcher replaces the back button
+ segFocus()};
+
+/* ===== Student Home v3.1: bento grid in the admin dashboard colour style =====
+   PASTE at the very END of the main script in Index.html (after the Schedule of Fees / Scholarships block,
+   before the closing script tag). Do not type the closing tag inside this block.
+
+   If you already pasted student-home-bento.js, DELETE that block first. This file replaces it completely.
+
+   Colours copied from the admin dashboard
+   - Hero: the top-bar navy gradient (#0a1a42 to #10306b).
+   - KPI tiles: the same gradient pairs as the admin cards (indigo, green, orange, blue, pink, cyan, slate).
+     Status picks its gradient like the admin pipeline: Enrolled green, Not Enrolled orange, Temporary pink,
+     Transferred Out cyan, Cancelled slate.
+   - Journey and This week: white cards with the 4px coloured top border and tinted header of the
+     "Grade and Cluster" faculty cards.
+   - Quick actions: the admin .qb buttons with the c1..c5 icon squares.
+   - Card shadow and radius match the admin cards.
+
+   Only homeStudent() is replaced. No backend changes. The student sidebar and window colour are unchanged.
+   The classes are self-contained (.bn-*), so this block does not depend on the admin CSS being present.
+*/
+
+(function () {
+  const s = document.createElement('style');
+  s.textContent = `
+@media screen{
+:root{--bn-surface:#fff;--bn-line:var(--line,#e3e8ef);--bn-text:var(--txt,#0f172a);--bn-mut:var(--mut,#475569);
+ --bn-sunk:#eef2f9;--bn-ok:#15803d;--bn-navy1:#0a1a42;--bn-navy2:#10306b;
+ --bn-sh:0 2px 4px #0a1a420f,0 10px 26px #0a1a4214;--bn-gsh:0 8px 20px #0a1a4226}
+:root[data-theme="dark"]{--bn-surface:#162036;--bn-line:#2a3856;--bn-text:#e8eeff;--bn-mut:#a9b7d6;--bn-sunk:#0f1830;--bn-ok:#4ade80}
+
+.bento{display:grid;gap:16px;margin-bottom:20px;grid-template-columns:repeat(4,minmax(0,1fr));
+ grid-template-areas:"hero hero st cl" "hero hero rq rq" "jr jr jr jr" "cal cal fee fee" "cal cal qa qa"}
+.bn-hero{grid-area:hero}.bn-st{grid-area:st}.bn-cl{grid-area:cl}.bn-rq{grid-area:rq}
+.bn-jr{grid-area:jr}.bn-cal{grid-area:cal}.bn-fee{grid-area:fee}.bn-qa{grid-area:qa}
+
+/* white cards (journey, this week, quick actions) */
+.bn-t{background:var(--bn-surface);border:1px solid var(--bn-line);border-radius:12px;padding:18px 20px;min-width:0;
+ box-shadow:var(--bn-sh);color:var(--bn-text)}
+.bn-t h4{margin:0 0 10px;font:600 14px Inter,sans-serif;color:var(--bn-text);display:flex;gap:8px;align-items:center}
+.bn-t h4 svg{width:17px;height:17px;color:var(--c,var(--blue))}
+.bn-sub{font-size:12.5px;color:var(--bn-mut);margin:4px 0 0;line-height:1.5}
+.bn-f{border-top:4px solid var(--c)}
+.bn-f>h4:first-child,.bn-f>.ch:first-child{margin:-18px -20px 14px;padding:12px 20px;background:color-mix(in srgb,var(--c) 11%,var(--bn-surface))}
+.bn-f>.ch:first-child h4{margin:0}
+
+/* hero: navy gradient, white text */
+.bn-hero{background:linear-gradient(135deg,var(--bn-navy1),var(--bn-navy2));border:0;box-shadow:var(--bn-gsh);padding:24px;
+ display:flex;flex-direction:column;justify-content:space-between;gap:20px;min-height:270px;color:#fff}
+.bn-hi{font:600 14px Inter,sans-serif;color:#9fc0ff;margin:0}
+.bn-hl{font:800 27px/1.2 Inter,sans-serif;letter-spacing:-.02em;color:#fff;margin:8px 0}
+.bn-hero .bn-sub{font-size:14px;max-width:36ch;color:#d3def5}
+.bn-hero .btn{margin-top:16px;background:#fff;color:var(--bn-navy1);border-color:#fff;box-shadow:none}
+.bn-hero .btn:hover{background:#e8f0ff}
+.bn-dots{display:flex;align-items:center;gap:8px}
+.bn-dots i{width:9px;height:9px;border-radius:50%;background:#ffffff40;display:block}
+.bn-dots i.d{background:#4ade80}
+.bn-dots i.n{width:12px;height:12px;background:#fff;box-shadow:0 0 0 4px #ffffff40}
+.bn-dots span{font-size:12.5px;color:#d3def5;margin-left:4px}
+
+/* gradient KPI tiles (admin palette) */
+.bn-g{position:relative;overflow:hidden;border-radius:14px;padding:14px 16px 16px;color:#fff;box-shadow:var(--bn-gsh);min-width:0;
+ display:flex;flex-direction:column;gap:4px;transition:transform .12s}
+.bn-g[data-act]{cursor:pointer}.bn-g[data-act]:hover{transform:translateY(-2px)}
+.bn-gt{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;font:600 13.5px Inter,sans-serif}
+.bn-gt i{width:34px;height:34px;border-radius:10px;background:#ffffff26;display:flex;align-items:center;justify-content:center;flex:none}
+.bn-gt svg{width:19px;height:19px}
+.bn-gv{font:800 24px/1.2 Inter,sans-serif;overflow-wrap:anywhere}
+.bn-gd{font:600 13px/1.4 Inter,sans-serif;color:#fff}
+.bn-gb{height:6px;border-radius:6px;background:#ffffff40;margin-top:8px;overflow:hidden}
+.bn-gb u{display:block;height:100%;background:#fff;border-radius:6px;text-decoration:none}
+.bn-k1{background:linear-gradient(135deg,#4338ca,#7c3aed)}
+.bn-k2{background:linear-gradient(135deg,#15803d,#22a45d)}
+.bn-k3{background:linear-gradient(135deg,#c2410c,#e8780f)}
+.bn-k4{background:linear-gradient(135deg,#1d4ed8,#2f7bf0)}
+.bn-k5{background:linear-gradient(135deg,#be185d,#db2777)}
+.bn-k6{background:linear-gradient(135deg,#0e7490,#14a3b8)}
+.bn-k7{background:linear-gradient(135deg,#475569,#64748b)}
+
+/* journey */
+.bn-jr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.bn-jr>h4{grid-column:1/-1}
+.bn-js{border-top:3px solid var(--bn-line);padding-top:10px;font-size:12.5px;color:var(--bn-mut);line-height:1.45}
+.bn-js b{display:block;font-size:13.5px;color:var(--bn-text);margin-bottom:2px}
+.bn-js small{display:block;font-size:12px}
+.bn-js.d{border-color:#16a34a}
+.bn-js.n{border-color:#2563eb}.bn-js.n b{color:#2563eb}
+
+/* this week */
+.bn-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;margin-bottom:12px}
+.bn-days div{padding:7px 0;border-radius:10px;font-size:11.5px;color:var(--bn-mut)}
+.bn-days div b{display:block;font-size:15px;color:var(--bn-text)}
+.bn-days div.on{background:color-mix(in srgb,#7c3aed 13%,var(--bn-surface))}
+.bn-days div em{display:block;width:5px;height:5px;border-radius:50%;background:#7c3aed;margin:3px auto 0}
+.bn-evl .gi:first-child{border-top:1px solid var(--bn-line)}
+
+/* quick actions (admin .qb look) */
+.bn-qg{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:10px}
+.bn-qb{display:flex;align-items:center;gap:10px;background:var(--bn-surface);border:1px solid var(--bn-line);border-radius:12px;padding:9px 12px;
+ font:600 13.5px Inter,sans-serif;color:var(--bn-text);cursor:pointer;text-align:left;box-shadow:0 2px 4px #0a1a420f;transition:transform .12s,box-shadow .15s}
+.bn-qb:hover{transform:translateY(-2px);box-shadow:0 8px 18px #0a1a4222}
+.bn-qb .ao{width:34px;height:34px;border-radius:10px;flex:none}.bn-qb .ao svg{width:18px;height:18px}
+
+/* below the grid */
+.bn-more{display:grid;gap:20px}
+.bn-more .card{margin:0}
+
+@media(max-width:1000px){
+ .bento{grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-areas:"hero hero" "st cl" "rq rq" "jr jr" "cal cal" "fee qa"}
+ .bn-hero{min-height:0}
+}
+@media(max-width:600px){
+ .bento{gap:12px;grid-template-areas:"hero hero" "st cl" "rq rq" "jr jr" "cal cal" "fee fee" "qa qa"}
+ .bn-hl{font-size:23px}
+ .bn-jr{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+}`;
+  document.head.appendChild(s);
+})();
+
+/* ---------- pieces ---------- */
+/** One gradient KPI tile. o = {k: colour class, cls: grid area class, l: label, ic: icon, v: value, d: caption, a/v2: nav target, bar: 0-100}. */
+const bnG = o => `<div class="bn-g ${o.k} ${o.cls}"${o.a ? ` data-act="nav" data-v="${o.a}"` : ''}><div class="bn-gt"><span>${esc(o.l)}</span><i>${o.ic}</i></div><div class="bn-gv">${o.v}</div><div class="bn-gd">${o.d || ''}</div>${o.bar != null ? `<div class="bn-gb" role="img" aria-label="${o.bar}% complete"><u style="width:${o.bar}%"></u></div>` : ''}</div>`;
+
+/** Fills the 7-day strip and the three next events. Safe to call when the tile is gone (user navigated away). */
+function bnEvents() {
+  google.script.run
+    .withSuccessHandler(r => {
+      const days = $('bn-days'), list = $('bn-evl');
+      if (!days || !list) return;
+      const E = r && r.success ? r.data : [], has = new Set(E.map(x => x.EventDate)), t0 = new Date();
+      days.innerHTML = [0, 1, 2, 3, 4, 5, 6].map(i => {
+        const d = new Date(t0.getFullYear(), t0.getMonth(), t0.getDate() + i);
+        return `<div class="${i ? '' : 'on'}"><small>${d.toLocaleDateString('en-US', { weekday: 'short' })}</small><b>${d.getDate()}</b>${has.has(ymd(d)) ? '<em aria-label="Has an event"></em>' : ''}</div>`;
+      }).join('');
+      const L = E.filter(x => evIn(x.EventDate) >= 0)
+        .sort((a, b) => (a.EventDate + a.EventTime).localeCompare(b.EventDate + b.EventTime)).slice(0, 3);
+      list.innerHTML = L.length ? L.map(x => {
+        const m = evm(x.Category), d = evDate(x.EventDate);
+        return `<div class="gi"><span class="gd" style="background:${m.c};font-size:14px">${d.getDate()}</span><div><b>${esc(x.Title)}</b><small>${esc(d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }))} \u00b7 ${m.k === 'Announcement' ? 'Announcement' : evWhen(evIn(x.EventDate))}${x.EventTime ? ' \u00b7 ' + esc(x.EventTime) : ''}</small></div></div>`;
+      }).join('') : '<div class="aemp">No upcoming events. Check the bulletin for announcements.</div>';
+    })
+    .withFailureHandler(() => {
+      const l = $('bn-evl'); if (l) l.innerHTML = '<div class="aemp">Could not load events. Refresh the page to try again.</div>';
+    })
+    .getEvents(S.token);
+}
+
+/* ---------- the student Home page (REPLACES homeStudent) ---------- */
+homeStudent = function () {
+  head('Dashboard', 'Your enrollment at a glance');
+  call('getStudent', [T()], r => {
+    const s = r.data,
+      steps = HS.map(x => Object.assign({ k: x[0], t: x[1], h: x[2], msg: '', done: false }, gStat(x[0], s) || {})),
+      idx = steps.findIndex(x => !x.done), next = idx < 0 ? null : steps[idx],
+      R = reqsFor(s).req, rd = R.filter(k => s[k] && s[k] !== 'None').length, rp = R.length ? Math.round(rd / R.length * 100) : 0,
+      st = s.EnrollStatus || 'Not Enrolled', name = tc(s.FirstName || S.user.FullName || 'Student'),
+      sy = String(s.SchoolYear || S.cfg.sy).replace('-', '\u2013'), gs = gsLabel(s),
+      SK = { 'Enrolled': 'bn-k2', 'Not Enrolled': 'bn-k3', 'Temporary': 'bn-k5', 'Transferred Out': 'bn-k6', 'Cancelled': 'bn-k7' };
+
+    /* hero: the single next thing to do */
+    const act1 = next && next.btn && next.k !== 'enrollment status'
+      ? `<button class="btn" data-act="${next.btn[1]}"${next.btn[2] ? ` data-v="${next.btn[2]}"` : ''}>${esc(next.btn[0])}</button>`
+      : `<button class="btn" data-act="nav" data-v="ev">Open the bulletin</button>`;
+    const headline = next ? next.h : 'You\u2019re all set for School Year ' + sy;
+    const sub = next ? (next.msg || 'This is the next step in your enrollment.')
+      : (st === 'Enrolled' ? 'Your enrollment is confirmed. Watch the bulletin for announcements.' : 'Every step is done. The office is confirming your enrollment.');
+    const dots = steps.map((x, i) => `<i class="${x.done ? 'd' : i === idx ? 'n' : ''}"></i>`).join('') +
+      `<span>${next ? 'Step ' + (idx + 1) + ' of ' + steps.length : 'All steps done'}</span>`;
+    const hero = `<div class="bn-hero"><div><p class="bn-hi">${greet()}, ${esc(name)} &#128075;</p><h2 class="bn-hl">${esc(headline)}</h2><p class="bn-sub">${esc(sub)}</p>${act1}</div><div class="bn-dots" role="img" aria-label="${next ? 'Step ' + (idx + 1) + ' of ' + steps.length : 'All steps done'}">${dots}</div></div>`;
+
+    /* gradient KPI tiles */
+    const status = bnG({ k: SK[st] || 'bn-k3', cls: 'bn-st', l: 'Status', ic: I.home, v: esc(st), d: 'School Year ' + esc(sy) + (st === 'Temporary' && s.TempUntil ? '<br>Until ' + esc(fmtD(s.TempUntil)) : '') });
+    const cls = bnG({ k: 'bn-k4', cls: 'bn-cl', l: 'Class', ic: I.sch, a: 'sp', v: esc(gs || 'Not set yet'), d: gs ? esc(tc(s.Department || '')) + (s.Category ? ' \u00b7 ' + esc(s.Category) : '') : 'Choose your grade level in your profile.' });
+    const req = bnG({ k: 'bn-k1', cls: 'bn-rq', l: 'Requirements', ic: I.rep, a: 'rq', v: R.length ? rd + ' of ' + R.length + ' submitted' : 'Choose your grade level first', d: R.length ? rp + '% complete' : '', bar: R.length ? rp : null });
+    const fee = bnG({ k: 'bn-k6', cls: 'bn-fee', l: 'Schedule of fees', ic: I.tf, a: 'tf', v: 'Compare payment plans', d: 'For reference only. The Cashier assesses your final fees.' });
+
+    /* white cards with coloured top borders */
+    const jr = `<div class="bn-t bn-f bn-jr" style="--c:#2563eb">${'<h4>' + I.cal + 'Enrollment journey</h4>'}${steps.map((x, i) =>
+      `<div class="bn-js ${x.done ? 'd' : i === idx ? 'n' : ''}"><b>${esc(x.t)}</b>${x.done ? 'Done' : i === idx ? 'You are here' : 'To do'}<small>${esc(x.msg)}</small></div>`).join('')}</div>`;
+
+    const cal = `<div class="bn-t bn-f bn-cal" style="--c:#7c3aed"><div class="ch"><h4>${I.cal}This week</h4><a href="javascript:void(0)" data-act="nav" data-v="ev">View bulletin</a></div><div class="bn-days" id="bn-days"><i class="galsk" style="grid-column:1/-1;height:54px;border-radius:10px"></i></div><div class="bn-evl" id="bn-evl"><div class="aemp">Loading&hellip;</div></div></div>`;
+
+    const Q = [['Student profile', 'nav', 'sp', I.adm, 'c1'], ['Consent form', 'pconsent', '', I.rep, 'c3'], ['Scholarships', 'nav', 'sch', I.sch, 'c5'], ['Privacy policy', 'nav', 'pp', I.rep, 'c2']];
+    if (S.cl) Q.push(['Career evaluation', 'nav', 'ce', ABI.target, 'c4']);
+    const qa = `<div class="bn-t bn-f bn-qa" style="--c:#e8780f"><h4>${SICO.list}Quick actions</h4><div class="bn-qg">${Q.map(x => `<button class="bn-qb" data-act="${x[1]}"${x[2] ? ` data-v="${x[2]}"` : ''}><span class="ao ${x[4]}">${x[3]}</span>${esc(x[0])}</button>`).join('')}</div></div>`;
+
+    const guide = `<details class="card scs cpd"><summary class="sch"><span class="ao c1">${SICO.list}</span><h3>Enrollment guide</h3><span class="cpch">${CPCH}</span></summary><div class="scb"><div id="guidebox" class="pvs">${GUIDE0}</div></div></details>`;
+
+    const rem = `<div class="card"><h3>Important reminders</h3><ul style="line-height:1.9;margin:0;padding-left:20px"><li><b>Office hours:</b> Mon&ndash;Fri 8:00 AM &ndash; 5:00 PM, Sat 8:00 AM &ndash; 3:00 PM.</li><li><b>Cancellation or withdrawal:</b> a &#8369;1,000.00 processing fee applies on or before June 30. Requests after June 30 are recalculated by the Principal\u2019s and Accounting Offices based on class days elapsed and applied discounts or incentives.</li><li><b>Contact:</b> Ground Floor, Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City &middot; 0961 876 6886 &middot; morehians@gmail.com</li></ul></div>`;
+
+    $('view').innerHTML = holdBanner(s) +
+      `<div class="bento">${hero}${status}${cls}${req}${jr}${cal}${fee}${qa}</div>` +
+      `<div class="bn-more">${guide}${actCard()}${rem}${polDetails()}${helpbar()}</div>`;
+
+    renderAct();
+    loadGuide();
+    bnEvents();
+  });
+};
 </script></body></html>
