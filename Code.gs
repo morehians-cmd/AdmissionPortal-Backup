@@ -158,18 +158,17 @@ function doGet(e) {
       .setTitle('Moreh Academy Portal')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
-  return HtmlService.createHtmlOutputFromFile('PublicHome')
+
+  // Public logo files are stored in Google Drive and shared as "Anyone with the link".
+  const page = HtmlService.createTemplateFromFile('PublicHome');
+  page.sealUrl = 'https://drive.google.com/uc?export=view&id=188vLU71_IFJ5EeRCa881p0dUZJn7riTq';
+  page.wordmarkUrl = 'https://drive.google.com/uc?export=view&id=1FzqYpP7VXjZXYKa3xLbbdMu997JT2e3H';
+  return page.evaluate()
     .setTitle('Moreh Academy | Learn with purpose. Lead with character.')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .addMetaTag('description', 'Discover Moreh Academy — a learning community supporting students from the early years through Grade 12.');
 }
 function include(f) { return HtmlService.createHtmlOutputFromFile(f).getContent(); }
-
-function rows_(k) {
-  const sh = sh_(k), h = k==='S'?COLS:UCOLS;
-  if (sh.getLastRow()<2) return [];
-  return sh.getRange(2,1,sh.getLastRow()-1,h.length).getValues().map(r => { const o={}; h.forEach((c,i)=>o[c]=String(r[i])); return o; });
-}
 function age_(b) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(b||'')) return '';
   const d=new Date(b), n=new Date(); let a=n.getFullYear()-d.getFullYear();
