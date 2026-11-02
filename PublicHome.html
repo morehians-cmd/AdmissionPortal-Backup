@@ -68,9 +68,28 @@ footer{background:var(--navy);color:#c9d6ff;padding:56px 0 110px}footer .w{displ
 #lb{position:fixed;inset:0;z-index:80;background:#00103acc;display:none;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}#lb.on{display:flex}#lb img{max-width:100%;max-height:92vh;border-radius:14px}
 .rv{opacity:0;transform:translateY(18px);transition:opacity .6s,transform .6s}.rv.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}.rv{opacity:1;transform:none}}
+
+/* Public admission information */
+.reqgrid{display:grid;gap:16px}
+@media(min-width:760px){.reqgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.reqcard{background:#fff;border-radius:var(--r);padding:24px;box-shadow:0 8px 30px #00285e14;border-top:5px solid var(--or)}
+.reqcard h3{font-size:21px;color:var(--navy);margin-bottom:12px}
+.reqcard ul{margin:0;padding-left:20px;color:var(--mut)}
+.reqcard li{margin:7px 0}
+.reqnote{margin-top:18px;padding:16px 18px;border-radius:14px;background:#fff4e8;color:#63320e}
+.faqs{display:grid;gap:12px;max-width:900px}
+.faqs details{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 6px 22px #00285e10}
+.faqs summary{font:700 16px Montserrat;color:var(--navy);cursor:pointer}
+.faqs details p{color:var(--mut);margin:12px 0 0}
+.contactgrid{display:grid;gap:16px}
+@media(min-width:760px){.contactgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.contactcard{background:#fff;border-radius:var(--r);padding:24px;box-shadow:0 8px 30px #00285e14}
+.contactcard h3{font-size:20px;color:var(--navy);margin-bottom:8px}
+.contactcard p{margin:6px 0;color:var(--mut)}
+.contactcard a{color:var(--blue);font-weight:700}
 </style></head><body>
 <header><div class="w hb"><a class="lg" href="#top"><img id="lg" src="https://i.imgur.com/roCMSYf.jpeg" alt="">Moreh Academy</a>
-<nav class="d" aria-label="Sections"><a href="#about">About</a><a href="#scholarships">Scholarships</a><a href="#clusters">Clusters</a><a href="#quiz">Evaluation</a><a href="#campus">Campus</a><a href="#enroll">Enrollment</a></nav>
+<nav class="d" aria-label="Sections"><a href="#about">About</a><a href="#scholarships">Scholarships</a><a href="#clusters">Clusters</a><a href="#requirements">Requirements</a><a href="#faqs">FAQs</a><a href="#contact">Contact</a></nav>
 <a class="btn g l pl" href="#">Student login</a><a class="btn o pl" href="#">Enroll now</a></div></header>
 <main id="top">
 <div class="hero"><div class="w"><div><h1>Learn with purpose. Lead with character.</h1><p>From Nursery to Grade 12, Moreh Academy in Central Bicutan, Taguig helps learners grow in faith, knowledge and skill. Enrollment for <span id="sy">the new school year</span> is open.</p>
@@ -89,7 +108,52 @@ footer{background:var(--navy);color:#c9d6ff;padding:56px 0 110px}footer .w{displ
 <section id="campus" style="padding-top:0"><div class="w"><div class="sh rv"><h2>Facilities and campus tour</h2><p>Ground Floor, Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City.</p></div><div class="gal" id="gl"></div>
 <a class="btn b map" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=Moreh+Academy+Learning+Center+3+Reyes+St+Central+Bicutan+Taguig">Get directions</a></div></section>
 
-<section id="enroll" class="dark"><div class="w"><div class="sh rv"><h2>How to enroll</h2><p>Four steps from account to classroom.</p></div><ol class="st rv" id="gd">
+
+<section id="requirements">
+ <div class="w">
+  <div class="sh rv"><h2>Admission requirements</h2><p>Prepare the documents for your intended grade level. The Admissions Office will confirm any grade-specific or scholarship-related conditions.</p></div>
+  <div class="reqgrid">
+   <article class="reqcard rv"><h3>Preschool</h3><ul>
+    <li>PSA Birth Certificate (photocopy)</li><li>Three (3) 2&quot;x2&quot; photos, white background, with nametag</li><li>Long brown expandable envelope, clean and free of writings or markings</li><li>Original parental / legal guardian consent, signed</li>
+   </ul></article>
+   <article class="reqcard rv"><h3>Elementary</h3><ul>
+    <li>Original official report card</li><li>Original Form 137 / Permanent Record</li><li>Original certificate</li><li>PSA Birth Certificate (photocopy)</li><li>Three (3) 2&quot;x2&quot; photos, white background, with nametag</li><li>Long brown expandable envelope</li><li>Original parental / legal guardian consent, signed</li>
+   </ul></article>
+   <article class="reqcard rv"><h3>Junior High School</h3><ul>
+    <li>Original official report card</li><li>Original Form 137 / SF10</li><li>Original certificate</li><li>PSA Birth Certificate (photocopy)</li><li>Three (3) 2&quot;x2&quot; photos, white background, with nametag</li><li>Long brown expandable envelope</li><li>Original parental / legal guardian consent, signed</li>
+    <li>For applicable scholars: TLC Transfer Form (TLC scholars) or ESC Certification (ESC grantees)</li>
+   </ul></article>
+   <article class="reqcard rv"><h3>Senior High School</h3><ul>
+    <li><b>For initial evaluation:</b> photocopy of report card (grades up to at least the 3rd grading period), PSA Birth Certificate (photocopy), three (3) 2&quot;x2&quot; photos, and long brown expandable envelope</li>
+    <li><b>Upon official admission:</b> original report card, original PSA Birth Certificate, original Good Moral Certificate, and original Form 137 / SF10</li>
+    <li>Signed parental / legal guardian consent</li>
+    <li>For applicable scholars: ESC Certificate, TLC Transfer Form, or voucher certificate (SHSVP / PUB-QVR / QVA)</li>
+   </ul></article>
+  </div>
+  <p class="reqnote">Requirements may vary according to grade level and scholarship category. The authenticated student / parent portal provides the applicant's checklist and status. Please confirm special cases with the Admissions Office.</p>
+ </div>
+</section>
+<section id="faqs" style="padding-top:0">
+ <div class="w"><div class="sh rv"><h2>Frequently asked questions</h2><p>Quick answers about the Moreh Academy admission process.</p></div>
+  <div class="faqs rv">
+   <details><summary>How do I start an application?</summary><p>Select Enroll now or Start enrollment to open the secure portal. New enrollees can create an account and complete the required student information.</p></details>
+   <details><summary>Are admission requirements the same for every grade?</summary><p>No. Requirements depend on the applicant's grade level. Some transfer or scholarship documents apply only to eligible applicants.</p></details>
+   <details><summary>What should Senior High applicants submit first?</summary><p>For initial evaluation, submit photocopies of the report card (up to at least the 3rd grading period) and PSA Birth Certificate, together with the required photos and envelope. Original documents are required upon official admission.</p></details>
+   <details><summary>Where can I view the School Fee Schedule?</summary><p>The School Fee Schedule is not displayed on this public homepage. It is available only inside the authenticated student / parent account. Fee assessment is handled by the School Cashier.</p></details>
+   <details><summary>Which Senior High clusters are offered?</summary><p>Moreh Academy offers STEM, ASSH, Business and Entrepreneurship (BE), ICT Support and Computer Programming Technologies (ICT), and Hospitality and Tourism (HT).</p></details>
+   <details><summary>Who can I contact for admission questions?</summary><p>Contact the Admissions Office using the phone number or email listed below.</p></details>
+  </div>
+ </div>
+</section>
+<section id="contact" style="padding-top:0">
+ <div class="w"><div class="sh rv"><h2>Contact Moreh Academy</h2><p>Reach the Admissions Office for application guidance and document clarifications.</p></div>
+  <div class="contactgrid">
+   <div class="contactcard rv"><h3>Admissions Office</h3><p>Monday–Friday: 8:00 AM–5:00 PM</p><p>Saturday: 8:00 AM–3:00 PM</p><p><a href="tel:+639618766886">0961 876 6886</a></p><p><a href="mailto:morehians@gmail.com">morehians@gmail.com</a></p></div>
+   <div class="contactcard rv"><h3>Visit the campus</h3><p>Ground Floor, Learning Center 3, Reyes St. corner Makintar St., Central Bicutan, Taguig City.</p><p><a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=Moreh+Academy+Learning+Center+3+Reyes+St+Central+Bicutan+Taguig">Get directions</a></p></div>
+  </div>
+ </div>
+</section>
+\n<section id="enroll" class="dark"><div class="w"><div class="sh rv"><h2>How to enroll</h2><p>Four steps from account to classroom.</p></div><ol class="st rv" id="gd">
 <li><b>Create your account</b><span>Register with your LRN and email, then complete your student profile.</span></li>
 <li><b>Print the consent form</b><span>Your parent or legal guardian signs the Parental Consent &amp; Data Privacy form.</span></li>
 <li><b>Submit your requirements</b><span>Bring the documents to the Admissions Office in person.</span></li>
@@ -98,7 +162,7 @@ footer{background:var(--navy);color:#c9d6ff;padding:56px 0 110px}footer .w{displ
 </main>
 <footer><div class="w"><div><h3>Moreh Academy</h3><p>Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City</p></div><div><h3>Admissions Office</h3><p>Mon&ndash;Fri 8:00 AM&ndash;5:00 PM<br>Sat 8:00 AM&ndash;3:00 PM<br><a href="tel:09618766886">0961 876 6886</a><br><a href="mailto:morehians@gmail.com">morehians@gmail.com</a></p></div><div><h3>Portal</h3><p><a class="pl" href="#">Student login</a><br><a class="pl" href="#">Admission portal</a></p></div></div></footer>
 <nav id="bn" aria-label="Quick navigation"><a href="#top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8v10H3z"/></svg>Home</a><button id="bm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Explore</button><a class="pl c" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Enroll</a><a class="pl" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Login</a></nav>
-<div id="ms"><button id="mx">Close</button><a href="#about">About Moreh Academy</a><a href="#scholarships">Scholarship guide</a><a href="#clusters">Senior High clusters</a><a href="#quiz">Evaluation</a><a href="#campus">Facilities and campus</a><a href="#enroll">How to enroll</a></div>
+<div id="ms"><button id="mx">Close</button><a href="#about">About Moreh Academy</a><a href="#scholarships">Scholarship guide</a><a href="#clusters">Senior High clusters</a><a href="#quiz">Evaluation</a><a href="#requirements">Admission requirements</a><a href="#faqs">FAQs</a><a href="#campus">Facilities and campus</a><a href="#contact">Contact</a><a href="#enroll">How to enroll</a></div>
 <div id="lb"><img alt=""></div>
 <script>
 const $=id=>document.getElementById(id),esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -126,5 +190,5 @@ google.script.run.withSuccessHandler(r=>{if(!r||!r.success)return;const d=r.data
  $('ev').innerHTML=(d.events||[]).map(e=>`<div><b>${esc(e.t)}</b><small>${esc(new Date(e.d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}))}${e.v?' \u00b7 '+esc(e.v):''}</small></div>`).join('');
  const g=d.gallery||[],gl=$('gl');gl.innerHTML=g.length?g.map(p=>`<figure data-id="${esc(p.id)}"><div class="sk"></div></figure>`).join(''):'<p style="color:#51607e;grid-column:1/-1">Photos are coming soon.</p>';
  let i=0;(function next(){if(i>=g.length)return;const p=g[i++];google.script.run.withSuccessHandler(x=>{const f=gl.querySelector('[data-id="'+p.id+'"]');if(f&&x&&x.success&&x.data){const c=String(p.cap||'').replace(/^[^:|]{2,30}[:|]\s*/,'');f.innerHTML=`<img loading="lazy" alt="${esc(c)}" src="${x.data}">${c?`<figcaption>${esc(c)}</figcaption>`:''}`;f.querySelector('img').onclick=()=>{$('lb').querySelector('img').src=x.data;$('lb').classList.add('on')}}next()}).withFailureHandler(next).getPublicPhoto(p.id)})()
-}).getPublicContent();
+}).withFailureHandler(e=>{console.warn('Public homepage content could not be loaded:',e&&e.message||e)}).getPublicContent();
 </script></body></html>
