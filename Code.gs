@@ -157,9 +157,14 @@ const ok = (data, message) => ({ success:true, message:message||'', data:data })
 const fail = e => ({ success:false, error:e.message });
 const deptOf_ = g => { const i = GRADES.indexOf(g); return i<0?'':i<3?'Preschool':i<9?'Elementary':i<13?'Junior High School':'Senior High School'; };
 
-function doGet() {
-  return HtmlService.createTemplateFromFile('Index').evaluate()
-    .setTitle('Moreh Academy Portal')
+function doGet(e) {
+  // The public homepage is the default entry point. The portal link uses ?portal=1
+  // so existing authentication, student, parent, and staff workflows stay separate.
+  const portal = e && e.parameter && e.parameter.portal === '1';
+  const page = portal ? 'Index' : 'PublicHome';
+  const title = portal ? 'Moreh Academy Portal' : 'Moreh Academy';
+  return HtmlService.createTemplateFromFile(page).evaluate()
+    .setTitle(title)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 function include(f) { return HtmlService.createHtmlOutputFromFile(f).getContent(); }
