@@ -1,1 +1,3 @@
-/** Admission review workflow module. */
+const APPROVAL_COLS = ['LoggedAt','StudentID','FullName','Actor','ActorRole','Decision','Remarks','ActiveHolds','OverrideReason'];
+function approvalSh_(){const ss=SpreadsheetApp.getActiveSpreadsheet();let sh=ss.getSheetByName('Approval History');if(!sh){sh=ss.insertSheet('Approval History');sh.getRange(1,1,1,APPROVAL_COLS.length).setValues([APPROVAL_COLS]).setFontWeight('bold');sh.setFrozenRows(1);}return sh;}
+function reviewQueue(token){try{owner_(token);return ok(rows_('S').filter(r=>!['Enrolled','Cancelled','Transferred Out'].includes(r.EnrollStatus)).reverse().slice(0,500).map(r=>({StudentID:r.StudentID,FullName:r.FullName,GradeLevel:r.GradeLevel,Section:r.Section,SchoolYear:r.SchoolYear,EnrollStatus:r.EnrollStatus||'Not Enrolled',ReviewStatus:r.ReviewStatus||'For Review',PendingRequirements:reqsFor_(r).req.filter(k=>!r[k]||r[k]==='None').length,ActiveHolds:holdsOf_(r.StudentID)})));}catch(e){return fail(e);}}
