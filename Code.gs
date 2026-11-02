@@ -200,7 +200,7 @@ function searchStudents(token, q, status, limit, grade, sy) {
 
 function getStudent(token, id) {
   try {
-    const u = who_(token); if (u.Role==='student') id = u.StudentID;
+    const u = who_(token); if (u.Role==='guardian') throw new Error('Use the Parent / Guardian linked-learner view.'); if (u.Role==='student') id = u.StudentID;
     if (OFFICE_CL.indexOf(u.Clearance) >= 0 || ACAD_ROLES.indexOf(u.Clearance) >= 0) throw new Error('Not allowed.');   // office accounts never open full records
     const hit = findRow_('S', 'StudentID', id), s = hit && hit.o;
     if (!s) throw new Error('Student record not found.');
@@ -217,6 +217,7 @@ function saveStudent(token, rec) {
   const lock = LockService.getScriptLock(); let u, row, old, isNew, oldStatus, statusChanged;
   try {
     u = who_(token);                                   // before the lock: a bad session fails fast
+    if (u.Role==='guardian') throw new Error('Parent / Guardian accounts have read-only linked-learner access.');
     if (OFFICE_CL.indexOf(u.Clearance) >= 0 || ACAD_ROLES.indexOf(u.Clearance) >= 0) throw new Error('Not allowed.');
     const sh = sh_('S'), staff = u.Role==='admin', admin = isFull_(u);
     lock.waitLock(20000);
