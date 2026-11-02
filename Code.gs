@@ -239,6 +239,11 @@ function saveStudent(token, rec) {
       row.SubmittedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
       row.SubmittedBy = u.Username;
     }
+    if (staff && u.Clearance==='Encoder' && old && old.ReviewStatus==='Returned') {
+      row.ReviewStatus = 'For Review';
+      row.SubmittedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+      row.SubmittedBy = u.Username;
+    }
     if (row.Email && !EMAIL_RE.test(row.Email)) throw new Error('Enter a valid student email address.');
     if (row.GuardEmail && !EMAIL_RE.test(row.GuardEmail)) throw new Error('Enter a valid parent / guardian email address.');
     FIELDS.forEach(f => { const v = row[f[1]]; if (typeof v === 'string' && /^[=@\t\r]/.test(v)) throw new Error('"' + f[2] + '" cannot start with = or @.'); });
