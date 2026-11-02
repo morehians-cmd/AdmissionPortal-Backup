@@ -32,7 +32,7 @@ function createGuardianInvite(token,studentId){
   const rec={studentId:hit.o.StudentID,email:email,name:name,invitedBy:actor.Username,hash:otHash_(challenge,code),exp:Date.now()+900000,tries:0};
   CacheService.getScriptCache().put('gi_'+challenge,JSON.stringify(rec),900);
   try{MailApp.sendEmail({to:email,name:'Moreh Academy Admissions',subject:'Moreh Academy: Parent / Guardian portal invitation',
-   body:'Hello '+name+',\n\nA Parent / Guardian portal invitation has been requested for the learner '+hit.o.FullName+'.\n\nYour one-time verification code is: '+code+'\n\nEnter this code in the Parent / Guardian invitation section of the Moreh Academy portal within 15 minutes. You will create a password if this is your first linked account.\n\nIf you did not expect this invitation, contact the Admissions Office. The code grants access only after verification.'});}
+   body:'Hello '+name+',\n\nA Parent / Guardian portal invitation has been requested for the learner '+hit.o.FullName+'.\n\nInvitation reference: '+challenge+'\nYour one-time verification code is: '+code+'\n\nEnter this reference and code in the Parent / Guardian invitation section of the Moreh Academy portal within 15 minutes. You will create a password if this is your first linked account.\n\nIf you did not expect this invitation, contact the Admissions Office. The code grants access only after verification.'});}
   catch(e){CacheService.getScriptCache().remove('gi_'+challenge);throw new Error('The invitation email could not be sent. Please try again later.');}
   audit_(actor,'guardian.invite',hit.o.StudentID,email);
   return ok({challenge:challenge,hint:maskEmail_(email)},'A verification code was sent to '+maskEmail_(email)+'.');
