@@ -92,7 +92,7 @@ function confirmRegistration(challenge, code) {
     if (all.some(s => s.LRN === p.lrn || (s.Email || '').toLowerCase() === p.em || (s.Surname + '|' + s.FirstName + '|' + s.Birthdate).toUpperCase() === me) || rows_('U').some(u => u.Username === p.em)) { cache.remove(ck); throw bad; }
     const g = p.g || {};
     row = { StudentID:nextIdV2_(all, SY), CreatedAt:Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss'),
-      Surname:p.sn, FirstName:p.fn, LRN:p.lrn, Email:p.em0, Birthdate:p.bd, Age:age_(p.bd), Classification:'New', SchoolYear:SY, EnrollStatus:'Not Enrolled', ReqConsent:'None',
+      Surname:p.sn, FirstName:p.fn, LRN:p.lrn, Email:p.em0, Birthdate:p.bd, Age:age_(p.bd), Classification:'New', SchoolYear:SY, EnrollStatus:'Not Enrolled', ReviewStatus:'For Review', SubmittedAt:Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss'), SubmittedBy:p.em, ReqConsent:'None',
       GuardName:g.name || '', GuardRelation:g.rel || '', GuardEmail:g.email || '', GuardMobile:g.mobile || '' };
     row.ConsentAt = row.CreatedAt; row.FullName = p.sn + ', ' + p.fn;
     const sh = sh_('S'); put_(sh, sh.getLastRow() + 1, 1, [COLS.map(c => row[c] || '')]);
@@ -130,9 +130,9 @@ function setStatus(token, ids, status) {
   const lock = LockService.getScriptLock(), notes = []; let n = 0, skipped = 0, blocked = 0, u = null;
   try {
     lock.waitLock(20000);
-    u = who_(token, 'admin');
-    if (!['Not Enrolled', 'Enrolled'].includes(status))
-      throw new Error(status === 'Transferred Out' ? 'Transferred Out needs a reason and a date. Open the learner and set it in Step 5.' : 'Invalid status.');
+    u = owner_(token);
+    if (status !== 'Not Enrolled')
+      throw new Error(status === 'Enrolled' ? 'Use the Approval Queue to approve an application.' : 'Invalid status.');
     ids = Array.isArray(ids) ? ids.slice(0, 500) : [];
     const sh = sh_('S'), all = rows_('S'), logs = [], pos = {}, held = status === 'Enrolled' ? activeFlags_() : {};
     all.forEach((s, i) => { pos[s.StudentID] = i; });
