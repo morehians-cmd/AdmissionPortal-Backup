@@ -915,7 +915,7 @@ const act={out:()=>{clearInterval(CD);if($('idm'))$('idm').remove();try{google.s
  cancelen:()=>{collect(S.t);const r=S.t.rec;r.EnrollStatus='Cancelled';if(!r.CancelDate)r.CancelDate=today();S.t.edit=true;S.t.step=5;paint();window.scrollTo(0,0);toast('Choose the primary reason in Step 5, then click Save to confirm the cancellation.','warn')},
  acct:()=>{const u=prompt('Username (leave blank to use the LRN):');if(u===null)return;const p=prompt('Temporary password (leave blank to auto-generate):');if(p===null)return;call('createLogin',[T(),S.t.rec.StudentID,u,p],r=>alert('Account created.\\n\\nUsername: '+r.data.username+'\\nTemporary password: '+r.data.password+(r.data.emailed?'\\n\\n(Also emailed to the student.)':'\\n\\n(No email on file - give these to the student personally.)')))},
  tip:v=>toast(v),
- showreg:()=>$('regbox').classList.toggle('hidden'),
+ showreg:()=>{const b=$('regbox');b.classList.remove('hidden');Array.from(b.children).forEach(el=>{if(el.id==='gclaimbox')el.classList.add('hidden');else el.classList.remove('hidden')})},
  reg:()=>{const g=i=>$(i).value;S.regData={surname:g('rs'),firstName:g('rf'),lrn:g('rl'),birthdate:g('rb'),email:g('re'),password:g('rpw'),guardName:g('gn'),guardRel:g('gr'),guardEmail:g('ge'),guardMobile:g('gm')};privModal(true)},
  print:()=>window.print(),tab:v=>{if(S.t)collect(S.t);S.cur=v;adm()},
  close:v=>{S.tabs=S.tabs.filter(t=>t.key!==v);if(S.cur===v)S.cur='search';adm()},
@@ -2044,7 +2044,7 @@ function guardianChildPage(id){
 act.gchild=id=>guardianChildPage(id);
 act.gback=()=>guardianHome();
 act.ginvite=()=>call('createGuardianInvite',[T(),S.t.rec.StudentID],r=>toast(r.message));
-act.showguardian=()=>{$('regbox').classList.add('hidden');$('gclaimbox').classList.toggle('hidden');$('giref').focus()};
+act.showguardian=()=>{const b=$('regbox');b.classList.remove('hidden');Array.from(b.children).forEach(el=>{if(el.id==='gclaimbox')el.classList.remove('hidden');else el.classList.add('hidden')});$('giref').focus()};
 act.gclaim=()=>call('confirmGuardianInvite',[$('giref').value.trim(),$('gicode').value.trim(),$('gipw').value],r=>{toast(r.message);if(r.data){$('u').value=r.data.username;if(!r.data.existingAccount)$('p').value=$('gipw').value;$('gclaimbox').classList.add('hidden')}});
 
 function menuFor(){
