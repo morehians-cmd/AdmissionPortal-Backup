@@ -118,6 +118,9 @@ function who_(token, role, allowMustChange) {
   if (!s || !s.u || Date.now() - s.i > SESS_ABS_MS) throw expired;
   if (s.v !== svGet_(s.u)) { cache.remove('s_' + token); throw expired; }
   const u = userCached_(s.u);
+  // A staff-only endpoint must require an actual staff account, not merely a valid session.
+  // This explicitly excludes Student and Parent / Guardian accounts before office-scope checks.
+  if (role === 'admin' && u.Role !== 'admin') throw new Error('Not allowed.');
   if (role === 'admin' && (OFFICE_CL.indexOf(u.Clearance) >= 0 || ACAD_ROLES.indexOf(u.Clearance) >= 0)) throw new Error('Not allowed.');   // office accounts reach only the Holds functions
   if (u.MustChange === '1' && !allowMustChange) throw new Error('Please set a new password under My Profile to continue.');
   putSession_(token, u, s.i);          // sliding expiry
