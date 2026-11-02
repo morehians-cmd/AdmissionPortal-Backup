@@ -49,7 +49,7 @@ function flagSearch(token, q) {
 /** Holds of one learner. The internal reason is returned only to the Owner and to the office that raised it. */
 function flagList(token, studentId) {
   try {
-    const fu = flagUser_(token), id = String(studentId || ''), owner = fu.u.Clearance === 'isFull_(...)';
+    const fu = flagUser_(token), id = String(studentId || ''), owner = isFull_(fu.u);
     return ok(flagRows_().filter(f => f.StudentID === id && (!fu.office || f.Office === fu.office)).map(f => ({
       FlagID:f.FlagID, Office:f.Office, Status:f.Status, Instruction:f.Instruction, RaisedBy:f.RaisedBy, RaisedAt:f.RaisedAt, ClearedBy:f.ClearedBy, ClearedAt:f.ClearedAt,
       Reason:(owner || fu.office === f.Office) ? f.Reason : '' })).sort((a, b) => b.RaisedAt.localeCompare(a.RaisedAt)));
@@ -62,7 +62,7 @@ function raiseFlag(token, studentId, office, reason, instruction) {
   try {
     lock.waitLock(20000);
     const fu = flagUser_(token);
-    if (!fu.office && fu.u.Clearance !== 'isFull_(...)') throw new Error('Only the Guidance, Accounting and Academic offices can raise holds.');
+    if (!fu.office && !isFull_(fu.u)) throw new Error('Only the System Admin or System Manager can raise holds.');
     office = fu.office || String(office || '');
     if (OFFICE_CL.indexOf(office) < 0) throw new Error('Choose an office.');
     const id = String(studentId || ''); if (!findStudent_(id)) throw new Error('Learner not found.');
@@ -82,7 +82,7 @@ function clearFlag(token, flagId) {
   try {
     lock.waitLock(20000);
     const fu = flagUser_(token);
-    if (!fu.office && fu.u.Clearance !== 'isFull_(...)') throw new Error('Only the office that raised a hold can clear it.');
+    if (!fu.office && !isFull_(fu.u)) throw new Error('Only the System Admin or System Manager can clear holds.');
     const f = flagRows_().find(x => x.FlagID === String(flagId));
     if (!f) throw new Error('Hold not found.');
     if (f.Status !== 'Active') throw new Error('This hold is already cleared.');
@@ -99,7 +99,7 @@ function grantTemporary(token, studentId, until, reason) {
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(20000);
-    const u = who_(token, 'admin'), id = String(studentId || ''), hit = findStudent_(id), tz = Session.getScriptTimeZone();
+    const u = owner_(token), id = String(studentId || ''), hit = findStudent_(id), tz = Session.getScriptTimeZone();
     if (!hit) throw new Error('Learner not found.');
     const row = hit.o, was = row.EnrollStatus, d = String(until || '').trim(), why = String(reason || '').trim().slice(0, 200);
     if (['Enrolled', 'Temporary', 'Cancelled', 'Transferred Out'].includes(was)) throw new Error('Temporary enrollment can only be granted to a learner who is not yet enrolled.');
@@ -121,7 +121,7 @@ function grantTemporary(token, studentId, until, reason) {
 /** Data for the Holds page (Owner / Encoder) and the Desk (office accounts). */
 function holdsOverview(token) {
   try {
-    const fu = flagUser_(token), owner = fu.u.Clearance === 'isFull_(...)', rows = flagRows_(), lite = {}, act = {};
+    const fu = flagUser_(token), owner = isFull_(fu.u), rows = flagRows_(), lite = {}, act = {};
     studentsLite_().forEach(s => lite[s.StudentID] = s);
     rows.forEach(f => { if (f.Status === 'Active') (act[f.StudentID] || (act[f.StudentID] = [])).push(f.Office); });
     const flags = rows.filter(f => f.Status === 'Active' && (!fu.office || f.Office === fu.office)).map(f => { const s = lite[f.StudentID] || {};
