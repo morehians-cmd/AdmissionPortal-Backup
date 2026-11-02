@@ -1814,7 +1814,7 @@ function feeRender(){
  $('view').innerHTML=hero+`<div class="dash"><div class="dmain">${tierBlocks}<div class="scn" style="margin-top:20px">${SICO.info}<div>All amounts are static reference information. The School Cashier alone performs the official fee assessment and settlement.</div></div></div><div class="dside">${promoCard}${grantCard}${helpbar()}</div></div>`;
 }
 
-const FULL=()=>A()&&['Full','Manager'].includes(S.user.Clearance),SYS=()=>A()&&S.user.Clearance==='Full',ROLEN=c=>c==='Full'?'Administrator':c==='Manager'?'System Manager':c;;
+const FULL=()=>A()&&['Full','Manager'].includes(S.user.Clearance),SYS=()=>A()&&S.user.Clearance==='Full',ROLEN=c=>c==='Full'?'System Admin':c==='Manager'?'System Manager':c;;
 let IDLE=null,WARN=null,CD=null;
 function idleReset(){if(!S.token||$('idm'))return;clearTimeout(IDLE);clearTimeout(WARN);WARN=setTimeout(idleWarn,240000);IDLE=setTimeout(()=>act.out(),300000)}
 ['click','keydown','mousemove','touchstart','scroll'].forEach(e=>document.addEventListener(e,idleReset,{passive:true}));
