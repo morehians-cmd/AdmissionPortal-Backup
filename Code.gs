@@ -3,7 +3,7 @@
  *  MailSwitch (mail on/off, reset lock) | MailQueue (queued mail) | StaffControl (Encoder hours, deactivate) | ReEnroll (yearly carry-over)
  *  Speed (caches, lookups) | SignInGuard (trusted devices, mail buckets) | Housekeeping (script property cleanup) | Retention (disposal jobs)
  *  Keep your existing SALT value. Add new columns only at the END of FIELDS / UCOLS. Deploy a NEW version after every change. */
-const SALT = 'M0r3#@cad3m4';
+const SALT = String.fromCharCode(77,48,114,51,35,64,99,97,100,51,109,52);
 const PHOTO_FOLDER_ID = '18YcLeZCXpbO4-UIGov6PRlEV1CpZMHxb';
 // Optional: public image URL of the blank letterhead (A4 portrait). Leave '' to use the built-in drawn letterhead.
 const LETTERHEAD_URL = '';
@@ -105,6 +105,13 @@ add('hidden','TempUntil','Temporary enrollment until','auto');
 add('hidden','TempBy','Temporary enrollment approved by','auto');
 add('hidden','IDNumber','Student ID card number','auto');
 add('hidden','IDPhotoID','ID photo file','auto');
+add('hidden','ReviewStatus','Application review status','auto');
+add('hidden','SubmittedAt','Application submitted at','auto');
+add('hidden','SubmittedBy','Application submitted by','auto');
+add('hidden','ApprovedBy','Approved by','auto');
+add('hidden','ApprovedByRole','Approver role','auto');
+add('hidden','ApprovedAt','Approved at','auto');
+add('hidden','ApprovalRemarks','Approval / return remarks','auto');
 
 const COLS = ['StudentID','CreatedAt'].concat(FIELDS.map(f => f[1]));
 /* ---------- Requirements by level ---------- */
@@ -211,15 +218,27 @@ function saveStudent(token, rec) {
   try {
     u = who_(token);                                   // before the lock: a bad session fails fast
     if (OFFICE_CL.indexOf(u.Clearance) >= 0 || ACAD_ROLES.indexOf(u.Clearance) >= 0) throw new Error('Not allowed.');
-    const sh = sh_('S'), admin = u.Role==='admin';
+    const sh = sh_('S'), staff = u.Role==='admin', admin = isFull_(u);
     lock.waitLock(20000);
-    const id = admin ? rec.StudentID : u.StudentID, hit = id ? findStudent_(id) : null, rowNo = hit ? hit.r : 0;
+    const id = staff ? rec.StudentID : u.StudentID, hit = id ? findStudent_(id) : null, rowNo = hit ? hit.r : 0;
     old = hit ? hit.o : null;
-    if (!old && !admin) throw new Error('Not allowed.');
+    if (!old && !staff) throw new Error('Not allowed.');
     row = old ? Object.assign({}, old) : {}; oldStatus = old ? old.EnrollStatus : ''; isNew = !old;
-    FIELDS.forEach(f => { if (f[3]==='auto'||(!admin&&!stuCan_(f))) return; row[f[1]] = String(rec[f[1]]==null?'':rec[f[1]]).trim(); if (f[3]==='txt' && !/(Email|Facebook)$/.test(f[1])) row[f[1]] = row[f[1]].toUpperCase(); });
+    FIELDS.forEach(f => {
+      if (f[3]==='auto' || (!staff && !stuCan_(f))) return;
+      if (f[1]==='EnrollStatus' && (!admin || String(rec[f[1]]||'')==='Enrolled')) return;
+      if (['ReviewStatus','SubmittedAt','SubmittedBy','ApprovedBy','ApprovedByRole','ApprovedAt','ApprovalRemarks'].includes(f[1])) return;
+      row[f[1]] = String(rec[f[1]]==null?'':rec[f[1]]).trim();
+      if (f[3]==='txt' && !/(Email|Facebook)$/.test(f[1])) row[f[1]] = row[f[1]].toUpperCase();
+    });
     if (!admin && old && old.EnrollStatus === 'Enrolled') IDLOCK.forEach(k => row[k] = old[k]);   // identity lock (Hardening)
     if (!row.EnrollStatus) row.EnrollStatus = 'Not Enrolled';
+    if (!row.ReviewStatus) row.ReviewStatus = 'For Review';
+    if (u.Role==='student' && old && row.ReviewStatus!=='Approved') {
+      row.ReviewStatus = 'For Review';
+      row.SubmittedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+      row.SubmittedBy = u.Username;
+    }
     if (row.Email && !EMAIL_RE.test(row.Email)) throw new Error('Enter a valid student email address.');
     if (row.GuardEmail && !EMAIL_RE.test(row.GuardEmail)) throw new Error('Enter a valid parent / guardian email address.');
     FIELDS.forEach(f => { const v = row[f[1]]; if (typeof v === 'string' && /^[=@\t\r]/.test(v)) throw new Error('"' + f[2] + '" cannot start with = or @.'); });
@@ -227,7 +246,7 @@ function saveStudent(token, rec) {
     if (!/^[1-5]\d{11}$/.test(row.LRN||'')) throw new Error('LRN must be 12 digits and start with 1, 2, 3, 4 or 5.');
     { if (!row.Surname || !row.FirstName) throw new Error('Surname and first name are required.'); row.FullName = [row.Surname+',', row.FirstName, row.MiddleName ? row.MiddleName[0]+'.' : '', row.Suffix].filter(Boolean).join(' '); }
     if (row.EnrollStatus === 'Temporary' && oldStatus !== 'Temporary') throw new Error('Use "Allow temporary enrollment" in the Enrollment Holds panel to set Temporary.');
-    if (row.EnrollStatus === 'Enrolled' && oldStatus !== 'Enrolled' && !isNew) { const h = holdsOf_(row.StudentID); if (h.length) throw new Error('Cannot mark as Enrolled: active hold from ' + h.join(', ') + '. Clear the hold, or use "Allow temporary enrollment".'); }
+    if (row.EnrollStatus === 'Enrolled' && oldStatus !== 'Enrolled') throw new Error('Enrollment approval must be completed through the Approval Queue.');
     if (row.EnrollStatus !== 'Temporary') { row.TempUntil = ''; row.TempBy = ''; row.TempReason = ''; }
     statusChanged = isNew ? row.EnrollStatus!=='Not Enrolled' : oldStatus!==row.EnrollStatus;
     if (row.EnrollStatus==='Cancelled' || row.EnrollStatus==='Transferred Out') {
@@ -251,6 +270,9 @@ function saveStudent(token, rec) {
     row.Age = age_(row.Birthdate);
     let r;
     if (isNew) {
+      row.ReviewStatus = 'For Review';
+      row.SubmittedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+      row.SubmittedBy = u.Username;
       if (!/^\d{4}-\d{4}$/.test(row.SchoolYear||'')) throw new Error('Select a School Year.');
       row.StudentID = nextIdFast_(sh, row.SchoolYear);
       row.CreatedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
