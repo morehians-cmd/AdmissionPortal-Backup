@@ -888,6 +888,11 @@ function runReviewDecision(id,decision,remarks){
  if(decision==='approve')google.script.run.withSuccessHandler(done).withFailureHandler(e=>{ $('load').classList.add('hidden');toast(e.message,false); }).approveApplication(T(),id,remarks||'');
  else google.script.run.withSuccessHandler(done).withFailureHandler(e=>{ $('load').classList.add('hidden');toast(e.message,false); }).returnApplication(T(),id,remarks);
 }
+function approvalHistoryPage(){
+ head('Approval History','Read-only decision record.');
+ $('view').innerHTML='<div class="card"><p>Loading…</p></div>';
+ call('approvalHistoryList',[T()],r=>{const rows=r.data||[];$('view').innerHTML='<div class="card"><h3>Application decisions</h3>'+(rows.length?'<div style="overflow:auto"><table class="at"><thead><tr><th>Date</th><th>Applicant</th><th>Officer</th><th>Decision</th><th>Remarks</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+esc(x.LoggedAt)+'</td><td>'+esc(x.FullName)+'<small style="display:block">'+esc(x.StudentID)+'</small></td><td>'+esc(x.ActorRole)+'<small style="display:block">'+esc(x.Actor)+'</small></td><td>'+esc(x.Decision)+'</td><td>'+esc(x.Remarks||x.HoldExceptionReason||'—')+'</td></tr>').join('')+'</tbody></table></div>':'<p>No decisions recorded.</p>')+'</div>';});
+}
 function nav(id){$('dd').classList.add('hidden');$('np').classList.add('hidden');document.querySelectorAll('#nav .nav').forEach(b=>b.classList.toggle('on',b.dataset.v===id));const hit=document.querySelector('#nav .sub[data-v="'+id+'"]'),hg=hit&&hit.closest('.ng');if(hg){document.querySelectorAll('#nav .ng').forEach(x=>{x.classList.toggle('open',x===hg);x.querySelector('.ngh').classList.toggle('has',x===hg)})}$('side').classList.remove('open');({home,adm,rep,review:reviewPage,history:approvalHistoryPage,me:profile,sp:stuProfile,rq:stuReq,pp:privacyPage,ev:eventsPage,um:usersPage,set:settingsPage,sch:schPage,tf:tuitionPage,fl:flagsPage,gd:guidePage,about:()=>contentPage('about'),cluster:()=>contentPage('cluster'),handbook:()=>contentPage('handbook'),facilities:()=>contentPage('facilities'),faq:()=>contentPage('faq'),ia:idArtPage,ce:careerPage,ac:acadPage})[id]()}
 
 const csvCell=c=>{let s=String(c==null?'':c);if(/^[=+\-@\t\r]/.test(s))s="'"+s;else if(/^(0\d+|\d{11,})$/.test(s))return '="'+s+'"';return '"'+s.split('"').join('""')+'"'};
