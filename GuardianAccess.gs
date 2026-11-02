@@ -14,7 +14,11 @@ function guardianLinkRows_(){
  return n<1?[]:sh.getRange(2,1,n,GUARD_LINK_COLS.length).getDisplayValues().map((r,i)=>{const o={_r:i+2};GUARD_LINK_COLS.forEach((k,j)=>o[k]=String(r[j]||''));return o;});
 }
 function guardianLinksFor_(username){
- return guardianLinkRows_().filter(x=>x.GuardianUsername===username&&x.Status==='Verified');
+ const students={};rows_('S').forEach(r=>students[r.StudentID]=r);
+ return guardianLinkRows_().filter(x=>{
+  const r=students[x.StudentID];
+  return x.GuardianUsername===username&&x.Status==='Verified'&&r&&String(r.GuardEmail||'').trim().toLowerCase()===String(x.GuardianEmail||'').trim().toLowerCase();
+ });
 }
 /** Staff sends an invitation only to the guardian email already stored on the learner record. */
 function createGuardianInvite(token,studentId){
