@@ -620,7 +620,45 @@ aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
 </style>
 <!-- ============================================================
   MOREH ACADEMY PORTAL - MODERN UI THEME (CSS only)
-  INSTALL: paste this whole <style> block in Index.html, in <head>, AFTER the last existing </style> and before </head>.
+  INSTALL: paste this whole <style> block in Index.html, in <head>, AFTER the last existing </style> and before 
+<style id="moreh-admin-dashboard">
+@media screen{
+ :root{--ma-navy:#101f45;--ma-blue:#2457a7;--ma-gold:#e6b43c;--ma-cream:#f7f5ef}
+ body{background:var(--ma-cream)}
+ aside{background:linear-gradient(180deg,#10234d 0%,#091733 100%)!important}
+ .brand{padding-top:22px;padding-bottom:22px}.brand b{letter-spacing:.06em}
+ .nav.on,.ngh.has,.ng.fly>.ngh{background:linear-gradient(90deg,#dca92f,#f1c85b)!important;color:#12204a!important;box-shadow:inset 3px 0 0 #fff!important}
+ .nav.on svg,.ngh.has svg{color:#12204a}
+ main{background:var(--ma-cream)}
+ .top{border-radius:14px;background:#fffdf8;border-color:#eee7d8;box-shadow:0 2px 12px #17284a0d}
+ .top h1{font-family:Georgia,"Times New Roman",serif;font-size:22px;color:var(--ma-navy)}
+ .dh.shero{position:relative;overflow:hidden;background:linear-gradient(112deg,#10234d 0%,#173d78 62%,#285c9d 100%);border:0;border-radius:18px;padding:28px 30px 22px;color:#fff;box-shadow:0 10px 28px #10234d24}
+ .dh.shero:after{content:"";position:absolute;right:-70px;top:-150px;width:420px;height:420px;border:1px solid #ffffff20;border-radius:50%;box-shadow:0 0 0 32px #ffffff08,0 0 0 68px #ffffff06;pointer-events:none}
+ .dh .sht{position:relative;z-index:1;margin:0 0 20px}
+ .dh .sht h2{font:700 clamp(24px,3vw,34px)/1.15 Georgia,"Times New Roman",serif;color:#fff;letter-spacing:0}
+ .dh .sht p{color:#e7edf8;font-size:14px;margin-top:8px}
+ .dh .dhd,.dh .dhd small{color:#e7edf8}.dh .dhd span{color:#fff}
+ .dh .hlogo{background:#ffffff20;border:2px solid #ffffff40}.dh .hlogo img{border:2px solid #fff}
+ .dh .shk{position:relative;z-index:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+ .dh .shc{border:1px solid #ffffff45;border-radius:14px;background:#fff;padding:15px 16px;box-shadow:0 5px 18px #06142b22}
+ .dh .shc:hover{transform:translateY(-2px);border-color:#f1c85b}
+ .dh .shh{color:#42516e;font-weight:600}.dh .shv{font-size:27px;color:#10234d;font-weight:800}.dh .shs{color:#64748b!important}
+ .dh .ki.c1,.dh .ki.c4{background:#e9effb;color:#1c4f9a}.dh .ki.c2{background:#e8f5eb;color:#16834a}.dh .ki.c3{background:#fff3d9;color:#b77908}
+ .hm .card{background:#fffefa;border:1px solid #eee8dc;box-shadow:0 3px 14px #15284b0b;border-radius:15px}
+ .hm .card .ch h3,.hm .card>h3{font-family:Georgia,"Times New Roman",serif;font-size:18px;color:#14264e}
+ .hm .card .ch h3:before,.hm .card>h3:before{background:var(--ma-gold);width:4px;height:21px}
+ .hm .pl{background:#f8f6ef;border-color:#eee7d8}.hm .pl .pn{color:#263653}.hm .ptr{background:#ebe7dd}.hm .ptr i{background:var(--ma-gold)!important}
+ .hm .lv{background:#fbfaf6;border-color:#eee8dc}.hm .lv h4 span{background:#fff3d5;color:#815b0b}
+ .hm .lr .bar{background:#ebe7dd}.hm .lr .bar i{background:var(--ma-blue)}
+ .hm .qa{border:1px solid #eee8dc;background:#fffefa;border-radius:12px}.hm .qa:hover{border-color:#e6c56e;background:#fffdf6}
+ .hm .gi{border-bottom:1px solid #eee8dc}.hm .helpbar{background:#fff8e7;border-color:#f0dfb2}
+ .ftr{border-color:#e8e1d4}
+ @media(max-width:900px){.dh .shk{grid-template-columns:repeat(2,minmax(0,1fr))}.dh .sht{align-items:flex-start}}
+ @media(max-width:560px){.dh.shero{padding:20px 16px}.dh .shk{grid-template-columns:1fr 1fr;gap:8px}.dh .shc{padding:11px}.dh .shv{font-size:22px}.dh .dhr{gap:8px}.dh .hlogo{display:none}}
+ @media(max-width:380px){.dh .shk{grid-template-columns:1fr}}
+}
+</style>
+</head>.
   It only restyles. No JS, no DOM ids, no data-act / data-k hooks, no backend call is touched.
   Everything is inside @media screen, so printed forms, slips, ID cards and reports are unchanged.
 ============================================================ -->
