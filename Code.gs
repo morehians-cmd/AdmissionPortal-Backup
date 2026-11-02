@@ -589,24 +589,31 @@ function createStaff(token, f) {
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(20000); const ou = sysOwner_(token);
-    const un = String(f.username||'').trim().toLowerCase(), name = String(f.fullName||'').trim().toUpperCase(), em = String(f.email||'').trim(), dept = String(f.department||'').trim().slice(0,60);
-    let pw = String(f.password || '');
+    const un = String(f.username||'').trim().toLowerCase(), name = String(f.fullName||'').trim().toUpperCase(), em = String(f.email||'').trim();
+    const type = String(f.type||'Admission Encoder').trim();
+    let dept = String(f.department||'').trim().slice(0,60), pw = String(f.password || '');
     if (!name) throw new Error('Full name is required.');
-    if (!dept) throw new Error('Department is required.');
     if (!/^[a-z0-9._@-]{4,40}$/.test(un)) throw new Error('Username must be 4-40 characters (letters, numbers, . _ @ -).');
     if (rows_('U').some(u=>u.Username===un)) throw new Error('This username already exists.');
     if (em && !EMAIL_RE.test(em)) throw new Error('Enter a valid email address.');
     if (otpOn_() && !em) throw new Error('An email address is required: staff sign-in codes are switched on.');
     if (pw && pw.length<8) throw new Error('Password must be at least 8 characters.');
     if (!pw) pw = tempPw_();
-    const cl = ['Guidance', 'Accounting'].indexOf(f.type) >= 0 ? f.type : (f.type === 'Manager' ? 'Manager' : 'Encoder');
-    addUser_(un, pw, 'admin', name, '', em, true, cl === 'Encoder' ? 'Encoder' : cl === 'Manager' ? 'System Manager' : cl + ' Office', cl, dept);
-    if (em) { try { MailApp.sendEmail({ to:em, name:'Moreh Academy Admissions', subject:'Moreh Academy portal: your staff account', body:'Hello '+name+',\n\nAn Encoder account was created for you on the Moreh Academy portal.\n\nUsername: '+un+'\nTemporary password: '+pw+'\n\nYou will be asked to choose a new password when you sign in.' }); } catch(_) {} }
-    audit_(ou, 'staff.create', un, cl); alert_('staff:' + un, 'New staff account created', ou.Username + ' created ' + un);
-    return ok({ username:un, password:pw }, 'Encoder account created');
+    const legacy = ['Guidance','Accounting','Academic'].includes(type);
+    if (type === 'Manager') { dept='Registrar'; }
+    else if (type === 'Admission Encoder') { dept='Admission'; }
+    else if (type === 'Registrar Encoder') { dept='Registrar'; }
+    else if (type === 'Encoder') { dept = ['Admission','Registrar'].includes(dept) ? dept : 'Admission'; }
+    else if (legacy) { dept=type; }
+    else throw new Error('Choose a valid staff role.');
+    const cl = type === 'Manager' ? 'Manager' : legacy ? type : 'Encoder';
+    const designation = cl === 'Encoder' ? dept + ' Encoder' : cl === 'Manager' ? 'System Manager' : cl + ' Office';
+    addUser_(un, pw, 'admin', name, '', em, true, designation, cl, dept);
+    if (em) { try { MailApp.sendEmail({ to:em, name:'Moreh Academy Admissions', subject:'Moreh Academy portal: your staff account', body:'Hello '+name+',\n\nA '+designation+' account was created for you on the Moreh Academy portal.\n\nUsername: '+un+'\nTemporary password: '+pw+'\n\nYou will be asked to choose a new password when you sign in.' }); } catch(_) {} }
+    audit_(ou, 'staff.create', un, cl + ' / ' + dept); alert_('staff:' + un, 'New staff account created', ou.Username + ' created ' + un);
+    return ok({ username:un, password:pw }, designation + ' account created');
   } catch(e) { return fail(e); } finally { try { lock.releaseLock(); } catch(_) {} }
 }
-
 
 /* ---------- Notification bell ---------- */
 function evRows_() {
