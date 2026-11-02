@@ -1569,38 +1569,38 @@ const fileName=(r,suf)=>String(r.FullName||'Learner').replace(/[^A-Za-z0-9\u00c0
 function loadJs(u){return new Promise((ok,no)=>{const e=document.createElement('script');e.src=u;e.onload=ok;e.onerror=()=>no(new Error('Could not load the PDF library. Check your internet connection.'));document.head.appendChild(e)})}
 const cxOpts=()=>({date:$('cdt').value,reason:$('crs').value.toUpperCase()});
 function cancelModal(r){const m=document.createElement('div');m.className='mod';m.id='cm';S.cr=r;
- m.innerHTML=\`<div><div class="bd"><h3 style="margin:0 0 4px;color:var(--navy)">Cancellation of Enrollment</h3><p style="color:var(--mut);margin:0 0 14px">Complete the cancellation details. Financial amounts are assessed by the School Cashier; the Principal Office writes any applicable amounts on the printed form.</p><div class="g">\${cxPolicy(r)}<div class="f"><label>Date of cancellation</label><input id="cdt" type="date" value="\${esc(r.CancelDate||today())}"></div><div class="f"><label>Reason</label><input id="crs" value="\${esc(cxReason(r))}"></div></div></div><div class="ft"><button class="btn alt" data-act="ccl">Close</button><button class="btn alt" data-act="cprint">Print form</button><button class="btn" data-act="cpdf">Download PDF</button></div></div>\`;document.body.appendChild(m)}
+ m.innerHTML=`<div><div class="bd"><h3 style="margin:0 0 4px;color:var(--navy)">Cancellation of Enrollment</h3><p style="color:var(--mut);margin:0 0 14px">Complete the cancellation details. Financial amounts are assessed by the School Cashier; the Principal Office writes any applicable amounts on the printed form.</p><div class="g">${cxPolicy(r)}<div class="f"><label>Date of cancellation</label><input id="cdt" type="date" value="${esc(r.CancelDate||today())}"></div><div class="f"><label>Reason</label><input id="crs" value="${esc(cxReason(r))}"></div></div></div><div class="ft"><button class="btn alt" data-act="ccl">Close</button><button class="btn alt" data-act="cprint">Print form</button><button class="btn" data-act="cpdf">Download PDF</button></div></div>`;document.body.appendChild(m)}
 function printCancel(r,o){printHTML(cancelHTML(r,o),true,fileName(r,'Cancellation'))}
-const CX_CSS=\`<style>
+const CX_CSS=`<style>
 .ef .cxl{font-size:9.5pt;line-height:4.3mm;color:#1f3159}
 .ef .att{margin:0;font-size:9.4pt;line-height:4.65mm;color:#1f3159;text-align:left}
-</style>\`;
+</style>`;
 function cancelHTML(r,o){o=o||{date:r.CancelDate||today(),reason:cxReason(r)};
- const lineRow=label=>\`<div class="rw" style="gap:1.2mm"><div class="v" style="flex:1;justify-content:space-between"><span>\${esc(label)}</span><span style="display:inline-block;width:35mm;border-bottom:.25mm solid #1f3159">&nbsp;</span></div></div>\`;
+ const lineRow=label=>`<div class="rw" style="gap:1.2mm"><div class="v" style="flex:1;justify-content:space-between"><span>${esc(label)}</span><span style="display:inline-block;width:35mm;border-bottom:.25mm solid #1f3159">&nbsp;</span></div></div>`;
  const feeRows=[lineRow('Refundable fee / credit'),lineRow('Refundable fee / credit'),lineRow('Refundable fee / credit'),lineRow('Total Refundable'),lineRow('Amount to be settled'),lineRow('Amount to be settled'),lineRow('Amount to be settled'),lineRow('Total to be Settled')].join('');
  const SN={ReqSF9:'SF9 / Report Card',ReqF137:'Form 137',ReqBirth:'Birth Certificate',ReqMoral:'Good Moral Certificate',ReqJHS:'JHS Completion Cert.',ReqPhoto:'2x2 ID Photo',ReqTransferee:'Transferee Certification',ReqConsent:'Parental Consent Form'};
  const Q=r.EnrollStatus==='Transferred Out'?releaseDocs(r).map(x=>[x[1],'For release']):S.fields.filter(f=>f[0]==='req'&&f[3]!=='auto'&&f[3]!=='date'&&f[1]!=='ReqRemarks'&&r[f[1]]&&r[f[1]]!=='None').map(f=>[SN[f[1]]||f[2],r[f[1]]]);
- const rqRows=[0,1,2,3,4,5,6,7,8].map(i=>{const q=Q[i]||['',''];return \`<div class="rw" style="gap:1.4mm"><label class="dname" style="width:35.9mm">\${esc(q[0])}</label><div class="v s">\${esc(q[1])}</div></div>\`}).join('');
- const ln=(t,w)=>\`<span style="display:inline-block;min-width:\${w}mm;border-bottom:.25mm solid #1f3159;text-align:center;font-weight:700">\${t?esc(t):'&nbsp;'}</span>\`;
+ const rqRows=[0,1,2,3,4,5,6,7,8].map(i=>{const q=Q[i]||['',''];return `<div class="rw" style="gap:1.4mm"><label class="dname" style="width:35.9mm">${esc(q[0])}</label><div class="v s">${esc(q[1])}</div></div>`}).join('');
+ const ln=(t,w)=>`<span style="display:inline-block;min-width:${w}mm;border-bottom:.25mm solid #1f3159;text-align:center;font-weight:700">${t?esc(t):'&nbsp;'}</span>`;
  const dest=[r.DestSchool,r.DestType?'('+r.DestType+')':''].filter(Boolean).join(' '),SIG='<br>(Signature over Printed Name)';
- return \`<div class="ef">\${EF_CSS}\${SLIP_CSS}\${CX_CSS}
- \${efHead('ENROLLMENT CANCELLATION SLIP')}
- \${efLearner(r,r.Photo||'')}
- \${efBar('Cancellation Details',99.2)}
- \${efAt(13.5,106.3,183,efCol(4.1,.9,efRw(efFd('Reason',o.reason,{lw:16.3})),efRw(efFd('Receiving School',dest,{lw:27.8,s:1}),efFd('Cancellation Date',fmtD(o.date),{lw:29.8,bw:44.3}))))}
- \${efBar('Requirements to Release',118.7,10.5,90.9)}
- \${efBar('Summary of Fees',117.9,108.7,90.9)}
- \${efAt(13.7,126.7,84.8,efCol(4.2,.6,rqRows))}
- \${efAt(111,126.7,85.5,efCol(4.2,.6,feeRows))}
- \${efBar('Attestation of Cancellation',175)}
- \${efAt(14,183.2,182,\`<p class="att">I, \${ln('',72)} (Parent/Legal Guardian), hereby officially request the cancellation of enrollment for \${ln(r.FullName,72)} (Student Name) for School Year \${ln(r.SchoolYear,30)}. I understand that by submitting this cancellation slip, the reserved slot will be forfeited and any released documents or financial account settlement will follow the institutional policies of the school.</p>\`)}
- \${efAt(15.1,216.3,60,'Requested by:','cxl')}\${efAt(109.5,215.9,60,'Approved by:','cxl')}
- \${efAt(14.6,230.9,56.5,'Parent / Legal Guardian'+SIG,'sg')}\${efAt(77.4,230.9,24.9,'Date','sg')}
- \${efAt(112.5,230.9,56.6,'School Registrar'+SIG,'sg')}\${efAt(172,230.9,24.8,'Date','sg')}
- \${efAt(15.1,245.5,60,'Verified by:','cxl')}\${efAt(109.5,244.9,60,'Released by:','cxl')}
- \${efAt(14.6,259.9,56.5,'School Cashier'+SIG,'sg')}\${efAt(77.4,259.9,24.9,'Date','sg')}
- \${efAt(112.5,259.9,56.6,'Admission Head'+SIG,'sg')}\${efAt(172,259.9,24.8,'Date','sg')}
- <div class="ab ftr"></div></div>\`}
+ return `<div class="ef">${EF_CSS}${SLIP_CSS}${CX_CSS}
+ ${efHead('ENROLLMENT CANCELLATION SLIP')}
+ ${efLearner(r,r.Photo||'')}
+ ${efBar('Cancellation Details',99.2)}
+ ${efAt(13.5,106.3,183,efCol(4.1,.9,efRw(efFd('Reason',o.reason,{lw:16.3})),efRw(efFd('Receiving School',dest,{lw:27.8,s:1}),efFd('Cancellation Date',fmtD(o.date),{lw:29.8,bw:44.3}))))}
+ ${efBar('Requirements to Release',118.7,10.5,90.9)}
+ ${efBar('Summary of Fees',117.9,108.7,90.9)}
+ ${efAt(13.7,126.7,84.8,efCol(4.2,.6,rqRows))}
+ ${efAt(111,126.7,85.5,efCol(4.2,.6,feeRows))}
+ ${efBar('Attestation of Cancellation',175)}
+ ${efAt(14,183.2,182,`<p class="att">I, ${ln('',72)} (Parent/Legal Guardian), hereby officially request the cancellation of enrollment for ${ln(r.FullName,72)} (Student Name) for School Year ${ln(r.SchoolYear,30)}. I understand that by submitting this cancellation slip, the reserved slot will be forfeited and any released documents or financial account settlement will follow the institutional policies of the school.</p>`)}
+ ${efAt(15.1,216.3,60,'Requested by:','cxl')}${efAt(109.5,215.9,60,'Approved by:','cxl')}
+ ${efAt(14.6,230.9,56.5,'Parent / Legal Guardian'+SIG,'sg')}${efAt(77.4,230.9,24.9,'Date','sg')}
+ ${efAt(112.5,230.9,56.6,'School Registrar'+SIG,'sg')}${efAt(172,230.9,24.8,'Date','sg')}
+ ${efAt(15.1,245.5,60,'Verified by:','cxl')}${efAt(109.5,244.9,60,'Released by:','cxl')}
+ ${efAt(14.6,259.9,56.5,'School Cashier'+SIG,'sg')}${efAt(77.4,259.9,24.9,'Date','sg')}
+ ${efAt(112.5,259.9,56.6,'Admission Head'+SIG,'sg')}${efAt(172,259.9,24.8,'Date','sg')}
+ <div class="ab ftr"></div></div>`}
 function printRef(name,rows){const n=Math.max(5,rows.length);let t='';for(let i=0;i<n;i++){const x=rows[i]||['','','',''];t+=`<tr><td style="height:30px">${i+1}. ${esc(x[0])}</td><td>${esc(x[1])}${x[2]?' / '+esc(x[2]):''}</td><td>${esc(x[3])}</td></tr>`}
  printHTML(`<div class="sl">${hd('REFERRAL PROGRAM FORM')}<table><tr><th style="width:50%">NAME OF REFERRED STUDENT</th><th>LEVEL/DEPARTMENT</th><th>DATE COMPLETED</th></tr>${t}</table>
  <div class="two" style="margin-top:6px"><div><table><tr><th>FOR ADMISSIONS ONLY</th></tr><tr><td style="height:36px">Total Number of Valid Referrals:</td></tr><tr><td style="height:36px">Total Incentive Amount:</td></tr><tr><td style="height:130px">VERIFIED &amp; CERTIFIED BY:<div class="ln" style="margin-top:56px">ADMISSIONS OFFICER</div><div class="ln">DATE</div></td></tr></table></div>
