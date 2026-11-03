@@ -6,7 +6,7 @@
     "node": ">=22.16.0"
   },
   "scripts": {
-    "build": "esbuild src/kdf-entry.js --bundle --format=iife --global-name=AP_KDF --target=es2020 --outfile=dist/AP_KdfBundle.gs",
+    "build": "esbuild src/index.js --bundle --format=iife --global-name=AP_KDF --target=es2020 --outfile=dist/AP_KdfBundle.gs",
     "test": "node --test"
   },
   "dependencies": {
