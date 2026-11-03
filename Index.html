@@ -419,6 +419,50 @@ aside{position:fixed;left:0;top:0;bottom:0;height:100vh;width:var(--sbw);backgro
  .ng.fly>.ngh::after{display:none}
  .nav.sub{padding-left:36px}
 }
+
+/* Moreh Academy Student Portal — visual refresh */
+:root{--navy:#082957;--blue:#245CC5;--soft:#edf3ff;--cream:#f4f6fb;--line:#e5ebf4;--txt:#172943;--mut:#687890;--sh:0 8px 26px rgba(8,41,87,.07)}
+body{background:#f4f6fb;color:#172943}
+aside{background:linear-gradient(180deg,#082957 0%,#061d3d 100%);width:258px;padding:22px 16px}
+.brand{padding:2px 10px 26px}.brand img{border:2px solid #ffffff55;box-shadow:0 4px 12px #00152e55}
+.nav{border-radius:12px;padding:12px 14px;color:#c3d2eb;gap:12px;transition:background .18s,color .18s}
+.nav:hover{background:#ffffff14;color:#fff}.nav.on{background:#245CC5;color:#fff;box-shadow:0 6px 16px #001a4055}
+.me{border-color:#ffffff25;color:#a8b9d6}.me #who{color:#fff}
+main{max-width:1500px;padding:26px 30px 64px}
+.top{background:#fff;border:1px solid #e8edf5;border-radius:16px;padding:14px 18px;box-shadow:var(--sh);align-items:center;margin-bottom:22px}
+.top h1{font-size:22px;letter-spacing:-.035em;color:#082957}.top p{font-size:13px}
+.card{border:1px solid #e8edf5;border-radius:18px;box-shadow:var(--sh);padding:24px}
+.card h3{font-size:16px;letter-spacing:-.015em;color:#082957}
+.kpi,.stat,.tile{border:1px solid #e8edf5;border-radius:16px;box-shadow:var(--sh)}
+.kpi{padding:17px}.kpi b{letter-spacing:-.04em}
+.btn{background:#245CC5;border-radius:10px;font-weight:700;transition:transform .15s,box-shadow .15s}
+.btn:hover{background:#194da9;transform:translateY(-1px);box-shadow:0 6px 14px #245cc533}
+.btn.alt{background:#fff;color:#082957;border:1px solid #dfe7f2}.btn.alt:hover{background:#edf3ff}
+.f input,.f select,.f textarea{border:1px solid #dce4ef;border-radius:10px;background:#fff}
+.f input:focus,.f select:focus,.f textarea:focus{outline:3px solid #245cc51c;border-color:#245CC5}
+.chip{border-radius:999px;padding:5px 11px;font-size:11.5px;letter-spacing:.01em}
+.dash{gap:20px}.dside .card{margin-bottom:18px}
+.hello{border:1px solid #dce7fa;background:linear-gradient(115deg,#e9f1ff 0%,#f7faff 58%,#fff5e7 100%);border-radius:20px;padding:28px 30px}
+.hello h2{font-size:clamp(24px,3vw,32px);letter-spacing:-.045em}
+.hello small{font-size:14px;color:#245CC5}
+.kpis{gap:14px}.kpi{background:#fff}
+.hm .dmain>.card{margin-bottom:18px}
+#guidebox{line-height:1.75}
+#guidebox ol{padding-left:22px}
+#guidebox ol>li{padding:14px 16px;margin:10px 0;border:1px solid #e7edf5;border-radius:14px;background:#fff}
+#guidebox ol>li.gdone{background:#f0fbf4;border-color:#c8ead3}
+#guidebox ol>li.gnow{border-color:#245CC5;box-shadow:0 0 0 3px #245cc51a}
+.gpg{background:#f4f7fc;border:1px solid #e7edf5;border-radius:12px;padding:12px 14px}
+.gpg .mbar{display:block;height:8px;background:#e0e8f4;border-radius:99px;overflow:hidden;margin-top:8px}
+.gpg .mbar u{display:block;height:100%;background:linear-gradient(90deg,#245CC5,#F2A900);border-radius:99px}
+.gtabs{background:#f0f4fa}
+.gtabs button.on{background:#245CC5}
+.qas{gap:8px}.qas>*{border-radius:12px}
+.ev,.evd{border-radius:14px}
+.sb input{border-radius:12px}
+@media(max-width:900px){main{padding:18px 16px 70px}aside{box-shadow:0 12px 38px #00152e55}.top{padding:12px 14px}.hello{padding:22px 18px}.hello h2{font-size:25px}}
+@media(max-width:600px){.card{padding:18px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi{padding:13px}.kpi b{font-size:22px}.kpi small{font-size:12px}.dash{grid-template-columns:minmax(0,1fr)}.hello{align-items:flex-start}.hr{display:none}}
+
 </style><style>
 /* UI refinement pass */
 :root{--mut:#475569}
@@ -970,7 +1014,7 @@ function home(){
  else{head('Dashboard','Your enrollment at a glance');call('getStudent',[T()],r=>{const s=r.data,rq=S.fields.filter(f=>f[0]==='req'&&reqsFor(s).req.includes(f[1])),done=rq.filter(f=>s[f[1]]&&s[f[1]]!=='None').length,pr=rq.length?Math.round(done/rq.length*100):0,gs=((s.GradeLevel||'')+' '+(s.Section||'')).trim();
   const cards=dcard('c2',I.home,'Enrollment Status',esc(s.EnrollStatus||'Not Enrolled'),'Current status','#16a34a','','',1)+dcard('c1',I.adm,'Grade &amp; Section',esc(gs||'Not set yet'),esc(tc(s.Department||'')),'#2563eb','nav','sp',1)+dcard('c3',I.rep,'Requirements',done+' / '+rq.length,'<em class="mbar"><u style="width:'+pr+'%"></u></em>','','nav','rq')+dcard('c4',I.cal,'School Year',esc(s.SchoolYear||'-'),esc(s.Classification||''),'#7c3aed','','',1);
   $('view').innerHTML=dhero(tc(s.FirstName||S.user.FullName||'Student'),'Here&rsquo;s your enrollment progress at a glance.',cards)+`<div class="dash hm"><div class="dmain">
-  ${holdBanner(s)}<div class="card"><h3>Enrollment guide</h3><div id="guidebox" class="pvs">${GUIDE0}</div></div>
+  ${holdBanner(s)}<div class="card"><h3>What Should I Do Next?</h3><div id="guidebox" class="pvs">${GUIDE0}</div></div>
   <div class="card"><h3>Important Reminders</h3></ul></div>${polCard()}${helpbar()}</div><ul style="line-height:1.9;margin:0;padding-left:20px"><li><b>Office Hours:</b> Mon&ndash;Fri: 8:00 AM &ndash; 5:00 PM | Sat: 8:00 AM &ndash; 3:00 PM.</li><li><b>Enrollment Cancellation / Withdrawal:</b> &#8369;1,000.00 processing fee applies to cancellations/withdrawals on or before June 30. Requests made after June 30 will be recalculated by the Principal's and Accounting Offices based on elapsed class days and applied discounts/incentives.</li><li><b>Contact Information:</b> Ground Floor, Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City | Mobile: 0961 876 6886 | Email: morehians@gmail.com</li></ul></div>${helpbar()}</div>
   <div class="dside"><div class="card"><div class="ch"><h3>Quick Actions</h3></div><div class="qas">${qa('c1',I.adm,'Student Profile','nav','sp')}${qa('c3',I.rep,'School Requirements','nav','rq')}${qa('c4',I.rep,'Print Consent Form','pconsent')}${qa('c2',I.rep,'Data Privacy Policy','nav','pp')}${qa('c5',I.sch,'Scholarships','nav','sch')}${qa('c1',I.tf,'Schedule of Fees','nav','tf')}</div></div>${evSide()}${actCard()}</div></div>`;renderAct();homeEvents()})}}
 
