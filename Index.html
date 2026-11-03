@@ -692,7 +692,44 @@ aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
 </style>
 <!-- ============================================================
   MOREH ACADEMY PORTAL - MODERN UI THEME (CSS only)
-  INSTALL: paste this whole <style> block in Index.html, in <head>, AFTER the last existing </style> and before </head>.
+  INSTALL: paste this whole <style> block in Index.html, in <head>, AFTER the last existing </style> and before <style id="system-admin-refresh">
+/* System administrator workspace refresh */
+#nav .ng[data-g] .ngh{font-weight:700;letter-spacing:.01em}
+#nav .ns .nsh{color:#f2c45c;font-weight:800;letter-spacing:.09em;text-transform:uppercase;font-size:10px}
+#view .card{background:#fff}
+#view .card .ch{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+#view .card .ch h3{font-size:16px;font-weight:800}
+#view .card p{line-height:1.65}
+#view .g{gap:16px}
+#view .f label{font-size:12px;font-weight:750;color:#52647d;letter-spacing:.025em}
+#view .f input,#view .f select,#view .f textarea{min-height:43px;padding:10px 12px}
+#view .f textarea{min-height:112px;resize:vertical}
+#view .tw{border:1px solid #e7edf5}
+#view .tw table{min-width:820px}
+#view .tw th{position:sticky;top:0;z-index:1;background:#f1f5fb}
+#view .tw td{font-size:13px}
+#view .lvls .lv{border:1px solid #e8edf5;border-radius:14px;padding:16px;background:#fbfcff}
+#view .lvls .lv h4{color:#0b2a5b;font-weight:800}
+#view .act{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#view .btn.red{background:#fff1f0;color:#b42318;border:1px solid #ffd5d1}
+#view .chip.ok{background:#e9f8ef;color:#167344}
+#view .chip.warn{background:#fff5df;color:#986300}
+#view .chip.no{background:#fff0ef;color:#b42318}
+#view .shero{box-shadow:0 12px 34px #0829570a}
+#view .shero h2{font-family:Montserrat,Inter,sans-serif;font-weight:800}
+#view .shc{background:#fff}
+#view .shc .ki{box-shadow:none}
+#view .dash .card{box-shadow:0 8px 26px #0829570a}
+#view .qas{gap:9px}
+#view .qas .qa{border:1px solid #e8edf5;border-radius:12px;padding:12px;background:#fbfcff}
+@media(max-width:760px){
+ #view .card{padding:16px}
+ #view .tw{overflow-x:auto}
+ #view .act .btn{flex:1 1 auto}
+ #view .shk{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+</head>.
   It only restyles. No JS, no DOM ids, no data-act / data-k hooks, no backend call is touched.
   Everything is inside @media screen, so printed forms, slips, ID cards and reports are unchanged.
 ============================================================ -->
@@ -1779,9 +1816,9 @@ function eventsPage(){head('Campus Bulletin',A()?'Post and manage events and ann
 
 I.users=ic('M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75');
 act.umtoggle=v=>{const q=String(v).split('|'),u=q[0],on=q[1]==='1';if(confirm((on?'Activate':'Deactivate')+' the account '+u+'?'+(on?'':' They will no longer be able to sign in until you activate it again.')))call('setStaffActive',[T(),u,on],r=>{toast(r.message||(on?'Account activated.':'Account deactivated.'));usersPage()})};
-function usersPage(){head('User Management','Create and manage staff accounts. Encoders have admin privileges.');call('listUsers',[T()],r=>{
- $('view').innerHTML=`<div class="card"><h3>Add staff user</h3><div class="g"><div class="f"><label>Full name</label><input id="uF"></div><div class="f"><label>Username (min. 4 characters)</label><input id="uU" autocomplete="off"></div><div class="f"><label>Email (required for sign-in codes)</label><input id="uE" type="email"></div><div class="f"><label>Department (optional)</label><input id="uD" maxlength="60" autocomplete="off"></div><div class="f"><label>Account type</label><select id="uT"><option>Encoder</option><option value="Manager">System Manager</option><option>Guidance</option><option>Accounting</option></select></div><div class="f"><label>Temporary password (blank = auto-generate)</label><input id="uP" type="password" autocomplete="new-password"></div></div><small style="color:var(--mut)">Teachers and Head Teachers are created under Academics &rarr; Staff accounts.</small><div class="act" style="position:static"><button class="btn" data-act="umcreate">Create account</button></div></div>
- <div class="card"><h3>Staff accounts</h3><div class="tw"><table><thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Department</th><th>Email</th><th>Status</th><th></th></tr></thead><tbody>${r.data.map(u=>{const off=u.Active==='0'||u.Active===false,f=u.Clearance==='Full';return `<tr${off?' style="opacity:.7"':''}><td><b>${esc(tc(u.FullName))}</b></td><td>${esc(u.Username)}</td><td><span class="chip ${f?'':'warn'}">${u.Clearance==='Manager'?'System Manager':f?'Administrator':u.Clearance==='HeadTeacher'?'Head Teacher':u.Clearance==='Teacher'?'Teacher':['Guidance','Accounting','Academic'].includes(u.Clearance)?u.Clearance+' Office':'Encoder'}</span></td><td>${esc(u.Department)}</td><td>${esc(u.Email)}</td><td><span class="chip ${off?'no':'ok'}">${off?'Deactivated':'Active'}</span></td><td style="white-space:nowrap">${f?'':`<button class="btn alt" data-act="umtoggle" data-v="${esc(u.Username)}|${off?1:0}">${off?'Activate':'Deactivate'}</button> <button class="btn alt" data-act="umreset" data-v="${esc(u.Username)}">Reset password</button> <button class="btn red" data-act="umdel" data-v="${esc(u.Username)}">Remove</button>`}</td></tr>`}).join('')}</tbody></table></div></div>`})}
+function usersPage(){head('User & Personnel Management','Manage staff access, account roles and personnel status across the admission portal.');call('listUsers',[T()],r=>{
+ $('view').innerHTML=`<div class="card"><h3>Create a personnel account</h3><div class="g"><div class="f"><label>Full name</label><input id="uF"></div><div class="f"><label>Username (min. 4 characters)</label><input id="uU" autocomplete="off"></div><div class="f"><label>Email (required for sign-in codes)</label><input id="uE" type="email"></div><div class="f"><label>Department (optional)</label><input id="uD" maxlength="60" autocomplete="off"></div><div class="f"><label>Account type</label><select id="uT"><option>Encoder</option><option value="Manager">System Manager</option><option>Guidance</option><option>Accounting</option></select></div><div class="f"><label>Temporary password (blank = auto-generate)</label><input id="uP" type="password" autocomplete="new-password"></div></div><small style="color:var(--mut)">Teachers and Head Teachers are created under Academics &rarr; Staff accounts.</small><div class="act" style="position:static"><button class="btn" data-act="umcreate">Create account</button></div></div>
+ <div class="card"><h3>Personnel directory</h3><div class="tw"><table><thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Department</th><th>Email</th><th>Status</th><th></th></tr></thead><tbody>${r.data.map(u=>{const off=u.Active==='0'||u.Active===false,f=u.Clearance==='Full';return `<tr${off?' style="opacity:.7"':''}><td><b>${esc(tc(u.FullName))}</b></td><td>${esc(u.Username)}</td><td><span class="chip ${f?'':'warn'}">${u.Clearance==='Manager'?'System Manager':f?'Administrator':u.Clearance==='HeadTeacher'?'Head Teacher':u.Clearance==='Teacher'?'Teacher':['Guidance','Accounting','Academic'].includes(u.Clearance)?u.Clearance+' Office':'Encoder'}</span></td><td>${esc(u.Department)}</td><td>${esc(u.Email)}</td><td><span class="chip ${off?'no':'ok'}">${off?'Deactivated':'Active'}</span></td><td style="white-space:nowrap">${f?'':`<button class="btn alt" data-act="umtoggle" data-v="${esc(u.Username)}|${off?1:0}">${off?'Activate':'Deactivate'}</button> <button class="btn alt" data-act="umreset" data-v="${esc(u.Username)}">Reset password</button> <button class="btn red" data-act="umdel" data-v="${esc(u.Username)}">Remove</button>`}</td></tr>`}).join('')}</tbody></table></div></div>`})}
 act.umteach = u => {
   const r = prompt('Convert ' + u + ' to:\n1 = Teacher\n2 = Head Teacher');
   if (r === null) return;
@@ -1874,7 +1911,7 @@ let IDLE=null,WARN=null,CD=null;
 function idleReset(){if(!S.token||$('idm'))return;clearTimeout(IDLE);clearTimeout(WARN);WARN=setTimeout(idleWarn,240000);IDLE=setTimeout(()=>act.out(),300000)}
 ['click','keydown','mousemove','touchstart','scroll'].forEach(e=>document.addEventListener(e,idleReset,{passive:true}));
 function idleWarn(){if(!S.token)return;const m=document.createElement('div');m.className='mod';m.id='idm';m.innerHTML='<div style="max-width:420px;padding:28px;text-align:center"><h3 style="color:var(--navy)">Are you still there?</h3><p style="color:var(--mut)">For your security you will be signed out in <b id="idc">60</b> seconds.</p><button class="btn" data-act="stay">Stay signed in</button></div>';document.body.appendChild(m);let n=60;clearInterval(CD);CD=setInterval(()=>{n--;if($('idc'))$('idc').textContent=n;if(n<=0)clearInterval(CD)},1000)}
-function settingsPage(){head('Enrollment Settings','Control the school year and who may register');call('getSettings',[T()],r=>{const d=r.data;$('view').innerHTML=`<div class="card"><h3>School year</h3><p>Active school year: <b>${esc(d.sy)}</b> &nbsp; <span class="chip ${d.mail?'ok':'warn'}">Automatic e-mails: ${d.mail?'ON':'OFF (reset and staff codes still work)'}</span></p><button class="btn" data-act="nextsy">Start enrollment for next school year</button></div>
+function settingsPage(){head('Enrollment & System Settings','Configure the active school year, registration access and returning-learner enrollment.');call('getSettings',[T()],r=>{const d=r.data;$('view').innerHTML=`<div class="card"><h3>School year</h3><p>Active school year: <b>${esc(d.sy)}</b> &nbsp; <span class="chip ${d.mail?'ok':'warn'}">Automatic e-mails: ${d.mail?'ON':'OFF (reset and staff codes still work)'}</span></p><button class="btn" data-act="nextsy">Start enrollment for next school year</button></div>
  <div class="card"><h3>Online registration</h3><label style="display:flex;gap:10px;align-items:center"><input type="checkbox" id="eo" ${d.open?'checked':''}> Enrollment is open (anyone can create an account)</label><div class="f" style="margin-top:14px"><label>When closed, only these emails may create an account (one per line)</label><textarea id="eal">${esc(d.allowed)}</textarea></div><p><button class="btn" data-act="savest">Save settings</button></p></div><div class="card"><h3>Re-enrollment of returning learners</h3><p style="color:var(--mut)">Carries Enrolled learners from earlier school years into the active year on the same record, and keeps their old year in the learner&rsquo;s history. Re-enroll learners who must repeat a grade first (open the record &gt; Re-enroll, retain grade).</p><div class="g"><div class="f"><label>Grade level</label><select id="rg"><option value="*">All grades</option>${S.grades.map(g=>`<option>${g}</option>`).join('')}</select></div></div><div class="act" style="position:static"><button class="btn alt" data-act="reenp">Preview</button><button class="btn" data-act="reenall">Re-enroll all eligible (promote one grade)</button></div><div id="reenout"></div></div>`})}
 try{google.script.run.withSuccessHandler(r=>{if(r&&r.success&&r.data)S.privHtml=r.data}).getPolicy()}catch(e){}
 function otpModal(d){const old=$('om');if(old)old.remove();S.otpc=d.challenge;const m=document.createElement('div');m.className='mod';m.id='om';
