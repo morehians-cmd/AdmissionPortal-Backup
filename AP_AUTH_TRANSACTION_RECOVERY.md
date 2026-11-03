@@ -138,7 +138,7 @@ A deeper fake-sheet integration harness has now been added at `tools/kdf-lab/gas
 2. `AP_DatabaseTransactions.gs`
 3. `tools/kdf-lab/gas/AP_DatabaseFakeSheetIntegrationTest.gs`
 
-Run `runDatabaseFakeSheetIntegrationTests()` and return the complete JSON report. The harness replaces `AP_getSpreadsheet_()` with in-memory Spreadsheet/Range test doubles and exercises the actual production append, schema-guard, and keyed-update helpers. It injects failures before a fake write commits and after a fake write commits but before acknowledgement, then checks whether the resulting state can be inspected by its planned ID. It never opens the live spreadsheet.
+Run `runDatabaseFakeSheetIntegrationTests()` and return the complete JSON report. The harness replaces `AP_getSpreadsheet_()` with in-memory Spreadsheet/Range test doubles and exercises the actual production append, schema-guard, and keyed-update helpers. Each test now receives a fresh fake workbook so one test cannot contaminate another. Dimension-mismatch errors include the requested range coordinates and dimensions plus the supplied values dimensions. It injects failures before a fake write commits and after a fake write commits but before acknowledgement, then checks whether the resulting state can be inspected by its planned ID. It never opens the live spreadsheet.
 
 This still does not prove real Google Sheets persistence, actual LockService contention, Apps Script process termination, or a production multi-tab transaction coordinator. The helpers are explicitly lock-held primitives; a separate transaction layer must acquire the lock once, revalidate all state under that lock, and perform recovery inspection. Do not claim concurrency safety from this harness.
 
