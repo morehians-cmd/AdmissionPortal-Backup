@@ -189,7 +189,60 @@ function AP_verifyLifecycleOtp(emailInput,codeInput,purpose) {
       throw new Error('The verification code is incorrect.');
     }
     sh.getRange(sheetRow,8).setValue('VERIFIED');
-    return {success:true,purpose:purpose,studentId:row[10]||'',schoolYear:row[11]||'',email:email};
+    return {success:true,verificationHandle:AP_authCreateVerificationHandle_(row[0],purpose)};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Creates a signed opaque handle. The random challenge ID is not sufficient on
+ * its own: the HMAC binds the handle to this verification purpose.
+ */
+function AP_authCreateVerificationHandle_(challengeId,purpose) {
+  const payload='VERIFICATION_HANDLE:v1:'+String(challengeId)+':'+String(purpose);
+  return String(challengeId)+'.'+AP_authHmac_(payload);
+}
+
+/**
+ * Internal, one-time resolver for downstream registration/acceptance handlers.
+ * It returns linkage context only to server-side code and consumes the verified
+ * challenge under a script lock. Never return this result directly to a client.
+ */
+function AP_authConsumeVerificationHandle_(handleInput,expectedPurpose) {
+  const handle=String(handleInput||'');
+  const allowed=['NEW_STUDENT_PARENT_VERIFY','PARENT_INVITATION_VERIFY'];
+  if(allowed.indexOf(String(expectedPurpose))<0 || handle.length>300) {
+    throw new Error('The verification is invalid or expired.');
+  }
+  const parts=handle.split('.');
+  if(parts.length!==2 || !/^[0-9a-fA-F-]{36}$/.test(parts[0]) || !parts[1]) {
+    throw new Error('The verification is invalid or expired.');
+  }
+  const challengeId=parts[0];
+  const expectedMac=AP_authHmac_('VERIFICATION_HANDLE:v1:'+challengeId+':'+expectedPurpose);
+  if(!AP_authConstantTimeEqual_(expectedMac,parts[1])) {
+    throw new Error('The verification is invalid or expired.');
+  }
+
+  const lock=LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    const sh=AP_getSpreadsheet_().getSheetByName('AuthChallenges');
+    if(sh.getLastRow()<2) throw new Error('The verification is invalid or expired.');
+    const rows=sh.getRange(2,1,sh.getLastRow()-1,12).getValues();
+    for(let i=rows.length-1;i>=0;i--) {
+      const row=rows[i];
+      if(String(row[0])!==challengeId) continue;
+      if(row[2]!==expectedPurpose || row[7]!=='VERIFIED' ||
+        !(row[4] instanceof Date) || row[4].getTime()<=Date.now()) {
+        throw new Error('The verification is invalid or expired.');
+      }
+      sh.getRange(i+2,8).setValue('CONSUMED');
+      return {purpose:expectedPurpose,email:String(row[1]),studentId:String(row[10]||''),
+        schoolYear:String(row[11]||'')};
+    }
+    throw new Error('The verification is invalid or expired.');
   } finally {
     lock.releaseLock();
   }
