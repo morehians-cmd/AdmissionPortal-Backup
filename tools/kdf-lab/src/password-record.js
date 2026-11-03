@@ -31,6 +31,7 @@ function createPasswordRecord(passwordBytes, saltBytes, iterations, base64Encode
   if (!(passwordBytes instanceof Uint8Array) || !(saltBytes instanceof Uint8Array)) {
     throw new TypeError('Password and salt must be Uint8Array values');
   }
+  if (passwordBytes.length === 0) throw new RangeError('Password must not be empty');
   if (saltBytes.length < MIN_SALT_BYTES) throw new RangeError('Salt must be at least 16 bytes');
   if (!Number.isSafeInteger(iterations) || iterations < MIN_ITERATIONS || iterations > MAX_ITERATIONS) {
     throw new RangeError('Iterations must be between 100000 and 2000000');
@@ -50,6 +51,7 @@ function createPasswordRecord(passwordBytes, saltBytes, iterations, base64Encode
 
 function verifyPasswordRecord(passwordBytes, record, base64Decode) {
   if (!(passwordBytes instanceof Uint8Array)) throw new TypeError('Password must be Uint8Array');
+  if (passwordBytes.length === 0) throw new RangeError('Password must not be empty');
   if (!record || typeof record.passwordHash !== 'string' || typeof record.passwordSalt !== 'string') {
     throw new TypeError('Password record is incomplete');
   }
