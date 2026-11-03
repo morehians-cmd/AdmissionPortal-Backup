@@ -144,6 +144,10 @@ This still does not prove real Google Sheets persistence, actual LockService con
 
 Keep account creation disabled until the transaction coordinator, KDF, authorization, and recovery gates are separately reviewed.
 
+### Recorded fake-sheet integration result — 2026-11-04
+
+The user reran `runDatabaseFakeSheetIntegrationTests()` in Google Apps Script V8 after the harness callback fix and returned **10 passed, 0 failed**. All ten cases passed, including append/update persistence to fake sheets, schema and unknown-field rejection, duplicate-key protection, pre-commit failure behavior, post-commit acknowledgement uncertainty, and planned-ID inspection. This confirms the tested production helpers against the in-memory fake Spreadsheet/Range interfaces. It is not evidence of actual Google Sheets persistence, lock contention, process termination, or multi-tab transaction safety.
+
 ## 9. Spreadsheet impact
 
 No spreadsheet changes are proposed at this stage. This design uses existing AuditLogs fields as a journal proposal. A dedicated transaction tab or schema change requires a separate decision and approval before implementation.
