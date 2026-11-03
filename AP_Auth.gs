@@ -54,6 +54,16 @@ function AP_authHmac_(value) {
   return Utilities.base64Encode(Utilities.computeHmacSha256Signature(String(value), AP_authSecret_()));
 }
 
+/** Compare fixed-format authentication MACs without early character exits. */
+function AP_authConstantTimeEqual_(expected, actual) {
+  if (typeof expected !== 'string' || typeof actual !== 'string' || expected.length !== actual.length) return false;
+  let difference = 0;
+  for (let i = 0; i < expected.length; i++) {
+    difference |= expected.charCodeAt(i) ^ actual.charCodeAt(i);
+  }
+  return difference === 0;
+}
+
 function AP_setupAuthSecret() {
   const props = PropertiesService.getScriptProperties();
   if (!props.getProperty('AP_AUTH_HMAC_SECRET')) {
@@ -84,7 +94,7 @@ function AP_requestParentInvitationOtp(invitationCode, parentEmail) {
   const match = rows.find(function(r) {
     return String(r.ParentEmail).toLowerCase() === email &&
       r.Status === 'PENDING' && new Date(r.ExpiresAt).getTime() > Date.now() &&
-      AP_authHmac_(code) === r.InviteCodeHash;
+      AP_authConstantTimeEqual_(r.InviteCodeHash, AP_authHmac_(code));
   });
   if (!match) throw new Error('The invitation is invalid or expired.');
   return AP_createEmailChallenge_(email,'PARENT_INVITATION_VERIFY',match.StudentID,'');
@@ -109,7 +119,7 @@ function AP_createEmailChallenge_(email,purpose,studentId,schoolYear) {
     if (recent.length >= AP_AUTH_POLICY.OTP_MAX_PER_HOUR) {
       throw new Error('Too many code requests. Try again later.');
     }
-    code = Utilities.getUuid().replace(/-/g,'').substring(0,8).toUpperCase();
+    code = Utilities.getUuid().replace(/-/g,'').substring(0,12).toUpperCase();
     challengeId = Utilities.getUuid();
     const expires = new Date(now + AP_AUTH_POLICY.PARENT_OTP_MINUTES*60000);
     sh.appendRow([challengeId,email,purpose,AP_authHmac_(challengeId+':'+code),expires,0,
@@ -149,7 +159,7 @@ function AP_verifyLifecycleOtp(emailInput,codeInput,purpose) {
   const email=AP_authRequireEmail_(emailInput);
   const code=String(codeInput||'').trim().toUpperCase();
   const allowed=['NEW_STUDENT_PARENT_VERIFY','PARENT_INVITATION_VERIFY'];
-  if (allowed.indexOf(String(purpose))<0 || !/^[A-F0-9]{8}$/.test(code)) {
+  if (allowed.indexOf(String(purpose))<0 || !/^[A-F0-9]{12}$/.test(code)) {
     throw new Error('The verification code is invalid or expired.');
   }
   const lock=LockService.getScriptLock();
@@ -172,7 +182,7 @@ function AP_verifyLifecycleOtp(emailInput,codeInput,purpose) {
       sh.getRange(sheetRow,8).setValue('LOCKED');
       throw new Error('Too many attempts. Request a new code.');
     }
-    if(AP_authHmac_(row[0]+':'+code)!==row[3]) {
+    if(!AP_authConstantTimeEqual_(row[3], AP_authHmac_(row[0]+':'+code))) {
       const attempts=Number(row[5])+1;
       sh.getRange(sheetRow,6).setValue(attempts);
       if(attempts>=Number(row[6])) sh.getRange(sheetRow,8).setValue('LOCKED');
