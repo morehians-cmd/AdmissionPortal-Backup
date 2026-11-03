@@ -6,7 +6,7 @@ Status: implementation plan; no public workflow enabled
 
 ## Purpose
 
-Define the transaction boundaries for parent-invitation acceptance and new-student registration before adding account-creation endpoints. The one-time verification-handle primitive has passed **12/12 isolated Apps Script V8 tests**. The new database write helpers have separate isolated tests; they have not yet been run by the user. That result validates the tested helper behavior only; it does not validate a complete registration transaction.
+Define the transaction boundaries for parent-invitation acceptance and new-student registration before adding account-creation endpoints. The one-time verification-handle primitive has passed **12/12 isolated Apps Script V8 tests**. The database write helpers have also passed **5/5 isolated Apps Script V8 tests**. Both suites validate primitives only, not a complete registration transaction. That result validates the tested helper behavior only; it does not validate a complete registration transaction.
 
 ## Shared transaction rules
 
@@ -99,7 +99,7 @@ Failure and recovery:
 
 ## Current implementation boundary
 
-The code now provides a one-time verification-handle consumer split into a lock-held resolver and a standalone lock-acquiring wrapper. The lock-held resolver passed its direct Apps Script regression test as part of the 11/11 suite. It is suitable as a primitive for composition inside a larger transaction, but does not itself implement or prove a complete transaction. Parent account creation also remains blocked on production approval of the PBKDF2 dependency, salt generation, reproducible build, and realistic runtime/load behavior.
+The code now provides a one-time verification-handle consumer split into a lock-held resolver and a standalone lock-acquiring wrapper. The lock-held resolver passed its direct Apps Script regression test as part of the 12/12 suite. It is suitable as a primitive for composition inside a larger transaction, but does not itself implement or prove a complete transaction. Parent account creation also remains blocked on production approval of the PBKDF2 dependency, salt generation, reproducible build, and realistic runtime/load behavior.
 
 No invitation-acceptance or new-student-registration endpoint should be exposed until the required transaction helpers, persistence/recovery design, authorization, and tests are complete.
 
