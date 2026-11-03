@@ -1,18 +1,19 @@
-# Install the clean GAS foundation
+# Install the Moreh Academy admission portal foundation
 
-The repository branch still contains legacy source files as historical reference. **Do not copy the legacy `.gs` or `.html` files into the new Apps Script project.** The legacy implementation remains available on `main`.
+The `rebuild/clean-start` branch contains the new AP_ implementation and legacy files for reference. **Copy only AP_ files.** The `main` branch remains untouched.
 
-## New Apps Script project
-1. Open the new database spreadsheet and choose Extensions → Apps Script.
-2. In that new, bound Apps Script project, create/copy only these files from `rebuild/clean-start`: `AP_Config.gs`, `AP_Database.gs`, `AP_Web.gs`, `AP_Auth.gs`, and `AP_Index.html`.
-3. Save the project.
-4. Select `AP_healthCheck` in the function selector, run it, and approve the Google authorization prompt.
-5. Create the `AuthChallenges` and `Sessions` tabs using the exact headers in `AP_AUTH_SETUP.md`.
-6. Run `AP_healthCheck` and confirm all 15 sheets return `OK`.
-7. Run `AP_setupAuthSecret` once and approve authorization. The secret is stored in Script Properties.
-8. Follow `AP_AUTH_SETUP.md` to understand the OTP endpoints and test-account requirements. Do not deploy publicly yet; the sign-in UI, registration, complete role enforcement, and production abuse controls are not implemented.
+## Account lifecycle schema v2.0.0
+1. Back up the spreadsheet before making structural changes.
+2. Update the `Users` and `AuthChallenges` headers exactly as listed in `AP_AUTH_SETUP.md`.
+3. Add `ParentInvitations` and `ParentLinkRequests` tabs with the exact headers in `AP_AUTH_SETUP.md`.
+4. Add the enrollment-control rows to `Settings`.
+5. Preserve existing user records by migrating columns by header name, not by shifting cells.
+6. Update `AP_Config.gs` and `AP_Auth.gs` in the bound Apps Script project.
+7. Run `AP_healthCheck`; it should validate all 18 tabs.
 
-The spreadsheet ID is configured in `AP_Config.gs`. The app uses `SpreadsheetApp.openById`, not active spreadsheet context.
+## Current implementation status
+The code contains the revised OTP challenge foundation for parent-email verification during new-student registration and invitation-based parent registration. The complete username/password login, password-change flow, admin account provisioning, invitation management, link-request management, session issuance, and authenticated UI are not yet complete.
 
-## Product boundaries
-No requirement-file uploads and no payment collection/recording/tracking. Payments remain in the official school system. Do not put real student data or secrets in GitHub.
+Do not deploy publicly. Read `AP_AUTH_SETUP.md` for the required password-KDF security gate and migration instructions. Do not copy legacy files into the new project.
+
+No requirement uploads or payment processing/recording/tracking. Never put real student data, passwords, OTPs, invitation codes, session tokens, or secrets in GitHub.
