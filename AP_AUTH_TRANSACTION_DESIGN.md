@@ -6,7 +6,7 @@ Status: implementation plan; no public workflow enabled
 
 ## Purpose
 
-Define the transaction boundaries for parent-invitation acceptance and new-student registration before adding account-creation endpoints. The one-time verification-handle primitive has now passed **11/11 isolated Apps Script V8 tests**. That result validates the tested helper behavior only; it does not validate a complete registration transaction.
+Define the transaction boundaries for parent-invitation acceptance and new-student registration before adding account-creation endpoints. The one-time verification-handle primitive has passed **12/12 isolated Apps Script V8 tests**. The new database write helpers have separate isolated tests; they have not yet been run by the user. That result validates the tested helper behavior only; it does not validate a complete registration transaction.
 
 ## Shared transaction rules
 
@@ -19,6 +19,19 @@ Define the transaction boundaries for parent-invitation acceptance and new-stude
 5. Validate all inputs and preconditions before the first persistent write. Where Apps Script/Sheets cannot provide a true multi-row database transaction, record enough before/after state to detect partial failure, and design a safe compensating/recovery path. Do not claim database atomicity merely because a script lock is used.
 6. Append an audit event for successful material changes, without recording passwords, OTPs, invitation codes, session tokens, or derived keys.
 7. Return only a minimal success response to the browser. Never return internal verification context, raw tokens, or full sheet rows.
+
+
+## Database write primitives added
+
+`AP_DatabaseTransactions.gs` now provides:
+- `AP_recordToRow_`: pure record-to-schema mapping, preserving exact column order and rejecting unknown field names.
+- `AP_assertSheetSchema_`: checks the target tab's exact column count and header names before a write.
+- `AP_appendRowsLocked_`: appends a contiguous batch to one tab using one `setValues` call. The caller must already hold the script lock.
+- `AP_appendRowLocked_`: single-record convenience wrapper for a caller that already holds the lock.
+
+The existing `AP_appendRow_` remains a standalone lock-acquiring helper. Do not call it from a transaction that already holds the script lock; use the lock-held helpers instead. These helpers are low-level persistence primitives only: they do not authorize users, validate business rules, create audit events automatically, or make writes across multiple tabs atomic.
+
+A new isolated harness, `tools/kdf-lab/gas/AP_DatabaseWriteTest.gs`, checks schema-order mapping, rejection of unknown fields and invalid inputs, contiguous batch writes, and rejection of header mismatches. It uses a fake in-memory sheet and must be run in a separate Apps Script project with `AP_Config.gs` and `AP_DatabaseTransactions.gs`; it does not touch the real admission spreadsheet.
 
 ## Parent invitation acceptance — required sequence
 
