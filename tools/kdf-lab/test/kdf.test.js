@@ -16,6 +16,13 @@ test('creates versioned record and verifies only the correct password', () => {
   assert.equal(verifyPasswordRecord(utf8('wrong password'), record, decode), false);
 });
 
+test('rejects empty passwords on creation and verification', () => {
+  const salt = new Uint8Array(32).fill(9);
+  assert.throws(() => createPasswordRecord(new Uint8Array(0), salt, 100000, encode), /must not be empty/);
+  const record = createPasswordRecord(utf8('valid password'), salt, 100000, encode);
+  assert.throws(() => verifyPasswordRecord(new Uint8Array(0), record, decode), /must not be empty/);
+});
+
 test('rejects short salts and out-of-policy work factors on creation', () => {
   assert.throws(() => createPasswordRecord(utf8('pw'), new Uint8Array(15), 100000, encode), /16 bytes/);
   assert.throws(() => createPasswordRecord(utf8('pw'), new Uint8Array(16), 99999, encode), /Iterations/);
