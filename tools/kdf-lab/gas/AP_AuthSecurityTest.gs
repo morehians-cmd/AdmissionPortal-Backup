@@ -75,6 +75,13 @@ function runAuthPrimitiveTests() {
         result.schoolYear==='2026-2027' && row[7]==='CONSUMED';
     });
   });
+  check('lock-held resolver consumes verified handle', function() {
+    return AP_testWithChallenge_(new Date(Date.now()+60000),function(handle,row) {
+      const result=AP_authResolveVerificationHandleLocked_(handle,'PARENT_INVITATION_VERIFY');
+      return result.email==='parent@example.test' && result.studentId==='STUDENT-TEST' &&
+        result.schoolYear==='2026-2027' && row[7]==='CONSUMED';
+    });
+  });
   check('verification handle cannot be replayed', function() {
     return AP_testWithChallenge_(new Date(Date.now()+60000),function(handle) {
       AP_authConsumeVerificationHandle_(handle,'PARENT_INVITATION_VERIFY');
