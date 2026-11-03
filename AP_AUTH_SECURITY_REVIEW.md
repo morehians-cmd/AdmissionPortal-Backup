@@ -18,7 +18,11 @@ No spreadsheet schema changes are required by this review.
 - OTP creation uses a script lock while checking resend/hourly limits and appending the challenge.
 - Logout accepts an opaque token and stores/looks up its SHA-256 digest rather than storing the raw token.
 - The isolated KDF helper rejects empty passwords, enforces salt and iteration bounds, stores algorithm/version metadata, and verifies derived keys using a byte-wise comparison.
-- The isolated Apps Script V8 authentication primitive suite has now passed **12 tests, 0 failed**. Coverage includes constant-time comparator checks, OTP format validation, verification-handle consumption, lock-held resolution, replay rejection, wrong-purpose rejection, expiry rejection, exact enrollment school-year matching, and legacy OTP format rejection. This validates the tested primitives only, not a complete registration transaction.
+- The isolated Apps Script V8 authentication primitive suite has passed **12 tests, 0 failed**. The separate database write primitive suite has passed **5 tests, 0 failed**. Coverage includes constant-time comparator checks, OTP format validation, verification-handle consumption, lock-held resolution, replay rejection, wrong-purpose rejection, expiry rejection, exact enrollment school-year matching, and legacy OTP format rejection. This validates the tested primitives only, not a complete registration transaction.
+
+### DB-01 — Schema-guarded write primitives
+
+**Implemented and validated:** `AP_DatabaseTransactions.gs` provides schema-ordered record mapping, rejects unknown fields, checks exact tab headers before writes, and appends batches with one contiguous `setValues` call while the caller holds the script lock. The isolated Apps Script V8 harness `tools/kdf-lab/gas/AP_DatabaseWriteTest.gs` passed **5/5 tests**. This does not establish multi-tab atomicity, rollback, authorization, or transaction recovery.
 
 ## Findings and required remediation
 
@@ -79,7 +83,7 @@ No spreadsheet schema changes are required by this review.
 ## Implementation order
 
 1. Resolve OTP generation/comparison and rate-limit design.
-2. Define and implement one-time invitation and enrollment completion transactions.
+2. Design and test failure-safe one-time invitation and enrollment completion transactions; keep account creation blocked until the password KDF gate is approved.
 3. Implement password record adapter only after KDF and salt review gates pass.
 4. Implement admin provisioning, login, forced password change, password reset, and lockout.
 5. Implement session issuance/validation/revocation and server-side authorization helpers.
