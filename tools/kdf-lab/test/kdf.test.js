@@ -1,4 +1,6 @@
 import test from 'node:test';
+import { pbkdf2Sync } from 'node:crypto';
+import { derivePasswordKey } from '../src/kdf-entry.js';
 import assert from 'node:assert/strict';
 import { createPasswordRecord, verifyPasswordRecord, constantTimeEqual } from '../src/password-record.js';
 
@@ -47,4 +49,23 @@ test('constant-time comparator returns expected results and rejects wrong types'
   assert.equal(constantTimeEqual(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2, 4)), false);
   assert.equal(constantTimeEqual(Uint8Array.of(1), Uint8Array.of(1, 0)), false);
   assert.throws(() => constantTimeEqual([1], [1]), /Uint8Array/);
+});
+
+
+test('matches RFC 7914 PBKDF2-HMAC-SHA256 vector 1 (32-byte prefix)', () => {
+  const actual = derivePasswordKey(utf8('passwd'), utf8('salt'), 1);
+  const expected = Buffer.from(
+    '55ac046e56e3089fec1691c22544b605f94185216dde0465e68b9d57c20dacbc',
+    'hex'
+  );
+  assert.deepEqual(Buffer.from(actual), expected);
+});
+
+test('matches Node crypto for a non-ASCII UTF-8 password', () => {
+  const password = utf8('Môrëh Academy 🔐');
+  const salt = utf8('independent UTF-8 cross-check salt');
+  const iterations = 120000;
+  const actual = derivePasswordKey(password, salt, iterations);
+  const expected = pbkdf2Sync(password, salt, iterations, 32, 'sha256');
+  assert.deepEqual(Buffer.from(actual), expected);
 });
