@@ -177,7 +177,13 @@ function quiz(){const q=$('qz');if(qi>=Q.length){const n={};sc.forEach(k=>n[k]=(
  q.innerHTML=`<div class="bar"><u style="width:${qi/Q.length*100}%"></u></div><h3 style="font-size:20px">${Q[qi][0]}</h3>`+Q[qi][1].map((o,i)=>`<button class="qo" data-i="${i}">${o}</button>`).join('');
  q.querySelectorAll('.qo').forEach(b=>b.onclick=()=>{sc.push(K[+b.dataset.i]);qi++;quiz()})}
 quiz();
-/* menu, lightbox, reveal */
+/* Sign-in links scroll within the homepage without changing the Apps Script URL hash. */
+ document.querySelectorAll('a[href="#signin"]').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();
+  const target=document.getElementById('signin');
+  if(target)target.scrollIntoView({behavior:'smooth',block:'center'});
+ }));
+ /* menu, lightbox, reveal */
 $('bm').onclick=()=>$('ms').classList.add('on');$('mx').onclick=()=>$('ms').classList.remove('on');$('ms').onclick=e=>{if(e.target.tagName==='A')$('ms').classList.remove('on')};
 $('lb').onclick=()=>$('lb').classList.remove('on');document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('lb').classList.remove('on');$('ms').classList.remove('on')}});
 const revealEls=document.querySelectorAll('.rv');
