@@ -463,6 +463,34 @@ main{max-width:1500px;padding:26px 30px 64px}
 @media(max-width:900px){main{padding:18px 16px 70px}aside{box-shadow:0 12px 38px #00152e55}.top{padding:12px 14px}.hello{padding:22px 18px}.hello h2{font-size:25px}}
 @media(max-width:600px){.card{padding:18px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpi{padding:13px}.kpi b{font-size:22px}.kpi small{font-size:12px}.dash{grid-template-columns:minmax(0,1fr)}.hello{align-items:flex-start}.hr{display:none}}
 
+
+/* Moreh Academy Admission Personnel Workspace — visual refresh */
+:root{--navy:#082957;--blue:#245CC5;--soft:#edf3ff;--line:#e5ebf4;--ink:#172943;--mut:#687890}
+#side{background:linear-gradient(180deg,#082957 0%,#061d3d 100%)}
+#nav .nav{border-radius:12px;margin:3px 0;padding:12px 14px;color:#c3d2eb;transition:background .18s,color .18s}
+#nav .nav:hover{background:#ffffff14;color:#fff}#nav .nav.on{background:#245CC5;color:#fff;box-shadow:0 6px 16px #001a4055}
+#main{background:#f4f6fb}#top{background:#fff;border:1px solid #e8edf5;border-radius:16px;box-shadow:0 8px 26px #0829570b}
+#view .shero{border:1px solid #dce7fa;background:linear-gradient(115deg,#e9f1ff 0%,#f7faff 60%,#fff5e7 100%);border-radius:20px;padding:26px 28px;margin-bottom:20px}
+#view .shero h2{color:#082957;letter-spacing:-.04em}#view .shero p{color:#536780;line-height:1.65}
+#view .shk{gap:12px}#view .shc{border:1px solid #e5ebf4;border-radius:16px;box-shadow:0 8px 26px #0829570b;transition:transform .15s,box-shadow .15s}
+#view .shc[data-act]:hover{transform:translateY(-3px);box-shadow:0 14px 30px #08295716}
+#view .card{border:1px solid #e8edf5;border-radius:18px;box-shadow:0 8px 26px #0829570b;padding:22px;margin-bottom:18px}
+#view .card h3{color:#082957;font-size:16px;letter-spacing:-.02em}
+#view .tabs{border-bottom:1px solid #e3eaf4;gap:8px;margin-bottom:18px}#view .tab{border-radius:10px 10px 0 0;padding:11px 15px}
+#view .tab.on{color:#245CC5;border-bottom:3px solid #245CC5;background:#edf3ff}
+#view .sb{gap:10px}#view .sb input,#view input:not([type=checkbox]):not([type=radio]),#view select,#view textarea{border:1px solid #dce4ef;border-radius:10px;background:#fff}
+#view input:focus,#view select:focus,#view textarea:focus{outline:3px solid #245cc51c;border-color:#245CC5}
+#view .btn{border-radius:10px;font-weight:700}#view .btn:not(.alt){background:#245CC5}#view .btn:not(.alt):hover{background:#194da9}
+#view .btn.alt{border:1px solid #dfe7f2;background:#fff;color:#082957}
+#view .pill{border-radius:999px;border:1px solid #e0e8f3;background:#fff}#view .pill.on,#view .pill.active{background:#edf3ff;color:#245CC5;border-color:#b9cff5}
+#view .at{border-collapse:separate;border-spacing:0;width:100%}#view .at th{background:#f4f7fc;color:#52647d;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:13px 12px}
+#view .at td{padding:13px 12px;border-bottom:1px solid #edf1f6;vertical-align:middle}#view .at tbody tr:hover{background:#f8faff}
+#view .chip{border-radius:999px;padding:5px 10px;font-weight:700}#view .lrn b{color:#102d54}#view .ki{border-radius:12px}
+#view .sht{align-items:center}#view .shbtn{border-radius:11px;background:#245CC5;box-shadow:0 8px 18px #245cc52a}
+#view .tw{border-radius:12px}#view .aemp{border:1px dashed #d5dfed;border-radius:14px;padding:30px;color:#71819a;background:#fafcff}
+@media(max-width:900px){#view .shero{padding:21px 18px}#view .card{padding:18px}#view .tw{overflow-x:auto}}
+@media(max-width:600px){#view .shk{grid-template-columns:repeat(2,minmax(0,1fr))}#view .sht{align-items:flex-start;gap:12px;flex-wrap:wrap}#view .shbtn{width:100%;justify-content:center}#view .tabs{overflow-x:auto;white-space:nowrap}}
+
 </style><style>
 /* UI refinement pass */
 :root{--mut:#475569}
@@ -1314,12 +1342,12 @@ function wCheck(t){const r=t.rec,bad=x=>{toast(x,false);return false},ph=/^\d{11
  return true}
 function wGo(n){const t=S.t;collect(t);if(t.edit&&n>t.step&&!wCheck(t))return;t.step=Math.max(1,Math.min(5,n));paint();window.scrollTo(0,0)}
 
-function adm(){head('Admission','Search, register and update enrollees');S.cur=S.cur||'search';
+function adm(){head('Admission Workspace','Review applications, verify requirements and manage enrollment');S.cur=S.cur||'search';
  const tabs=`<div class="tabs"><button class="tab ${S.cur==='search'?'on':''}" data-act="tab" data-v="search">${I.search} Search</button>${S.tabs.map(t=>`<button class="tab ${S.cur===t.key?'on':''}" data-act="tab" data-v="${t.key}">${esc(t.rec.FullName||'New enrollee')}<i data-act="close" data-v="${t.key}">${I.x}</i></button>`).join('')}</div>`;
  const cur=S.tabs.find(t=>t.key===S.cur);S.t=cur||null;
  if(!cur){S.cur='search';const D=S.dsh&&S.dsh.stats,v=k=>D?nfmt(D[k]):'\u2013';
   const kc=[['ks0','c1',I.adm,'Total Applicants','total','All','All records'],['ks1','c2',I.home,'Enrolled','enrolled','Enrolled','Show enrolled only'],['ks2','c3',I.rep,'Not Yet Enrolled','pending','Not Enrolled','Show pending only'],['ks3','c4',I.cal,'New Today','today','','Registered today']].map(x=>`<div class="shc ${x[5]?'':'nc'}"${x[5]?` data-act="flt" data-v="${x[5]}"`:''}><div class="shh"><span class="ki ${x[1]}">${x[2]}</span><span>${x[3]}</span></div><div class="shv" id="${x[0]}">${v(x[4])}</div><div class="shs" style="color:var(--mut)">${x[6]}</div></div>`).join('');
-  $('view').innerHTML=tabs+`<div class="shero"><div class="sht"><div><h2>Admission</h2><p>Search, register and update enrollees for the current school year. Click a card to filter the list.</p></div><button class="shbtn" data-act="new">+ New enrollee</button></div><div class="shk">${kc}</div></div>
+  $('view').innerHTML=tabs+`<div class="shero"><div class="sht"><div><h2>Admission Operations</h2><p>Your workspace for reviewing learner applications, checking records and processing enrollment for the current school year.</p></div><button class="shbtn" data-act="new">+ New enrollee</button></div><div class="shk">${kc}</div></div>
   <div class="card"><div class="sb"><input id="q" value="${esc(S.q||'')}" placeholder="Search by name, LRN or Enrollment ID" onkeydown="if(event.key==='Enter')act.search()"><button class="btn" data-act="search">${I.search} Search</button></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">${['All','Not Enrolled','Enrolled','Temporary','Transferred Out','Cancelled'].map(p=>`<button class="pill ${(S.flt||'All')===p?'on':''}" data-act="flt" data-v="${p}">${p}</button>`).join('')}</div></div>
   <div class="card"><div class="ch"><h3>Search results</h3><span id="admn" style="color:var(--mut);font-size:13px"></span></div><div id="bulk"></div><div class="tw" id="hits"></div></div>`;act.search();admStats()}
  else $('view').innerHTML=tabs+formHTML(cur)}
