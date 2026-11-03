@@ -34,7 +34,7 @@ Schema version: 2.0.0
 - Parent login: username/email + password after invitation-based account creation (not OTP-only login).
 - New-student registration: OTP to parent/guardian email, gated by admin enrollment setting.
 - Staff accounts: admin-provisioned only; staff role is assigned server-side.
-- OTP is not the general sign-in method for existing students or parents.
+- OTP is not the general sign-in method for existing students or parents. The current OTP challenge is a 12-character hexadecimal code; existing challenge rows from older formats should be treated as disposable during controlled migration.
 - Never trust a role, student ID, parent ID, or account type supplied by the browser.
 - Every protected endpoint must validate session and authorize the requested record on the server.
 
