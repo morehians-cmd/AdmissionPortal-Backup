@@ -93,3 +93,41 @@ Do not implement password storage using plain SHA-256 or a homemade repeated-has
 9. Do not deploy publicly. Password login, invitation acceptance, admin workflows, session issuance, and complete authorization remain unfinished.
 
 Never put actual student data, credentials, OTPs, invitation codes, session tokens, or secrets in GitHub. No requirement uploads or payment processing/tracking are part of this portal.
+
+## Approved password-KDF direction (2026-11-03)
+
+The project has selected **PBKDF2-HMAC-SHA256** as its password-storage direction. This is an algorithm decision, not permission to enable password login before implementation validation.
+
+### Required password record format
+
+- Algorithm: PBKDF2-HMAC-SHA256.
+- Work factor: target 600,000 iterations, subject to Apps Script runtime benchmarking.
+- Salt: independently generated for every account, with at least 128 bits of entropy.
+- Derived key: 32 bytes.
+- Store the algorithm/version, iteration count, salt, and derived key in a versioned, parseable representation in the existing PasswordHash and PasswordSalt fields. Do not add spreadsheet columns solely for these parameters unless the final format requires it.
+- Never store plaintext passwords. Never log passwords, salts, derived keys, OTPs, or session tokens.
+
+### Library integration requirements
+
+`@noble/hashes` is a candidate implementation, not yet an approved production dependency. Its current package is ESM-based, so it must be bundled into an Apps Script-compatible source file through a reproducible build. Pin the exact dependency version and integrity hash; do not load cryptographic code from a runtime CDN.
+
+Before use:
+1. Review the exact pinned release, its license, release provenance, and applicable audit scope.
+2. Bundle only PBKDF2, HMAC, and SHA-256 dependencies needed by the adapter.
+3. Add a thin Apps Script adapter for UTF-8 conversion, byte/base64 encoding, salt generation, and constant-time derived-key comparison.
+4. Verify the adapter against independent published PBKDF2-HMAC-SHA256 test vectors, including edge cases for UTF-8 passwords and salts.
+5. Benchmark the target work factor in the actual Apps Script runtime and confirm it fits execution limits under expected concurrent usage.
+6. Test account creation, successful verification, incorrect-password rejection, and parameter/version parsing.
+7. Keep login disabled until all checks pass.
+
+Apps Script Utilities exposes HMAC-SHA256 and UUID helpers, but these helpers alone are not a PBKDF2 implementation. Do not replace the reviewed library with an improvised repeated-hash routine. If the bundled implementation cannot be made reliable or fast enough, use a managed authentication service instead.
+
+### Current status
+
+- Algorithm direction: approved.
+- Candidate library: identified; exact release not yet pinned or approved.
+- Apps Script bundle: not yet built.
+- Published test vectors: not yet executed in Apps Script.
+- Runtime benchmark: not yet performed.
+- Username/password login: NOT READY; keep disabled.
+- Spreadsheet schema: unchanged; existing PasswordHash and PasswordSalt columns are retained.
