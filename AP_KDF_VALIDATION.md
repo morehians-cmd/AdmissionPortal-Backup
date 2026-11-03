@@ -161,3 +161,29 @@ Latest five-sample timing report:
 The 600,000-iteration median is approximately 3.49 seconds, but the observed 7.97-second outlier is significant. Compared with the prior five-sample session, the median is in a similar range while the worst observed time is substantially higher. This reinforces that the runtime has variability and that a single local session is insufficient to establish a predictable login latency.
 
 **Decision:** retain 600,000 iterations as a provisional security target, not a production approval. Before final adoption, repeat tests across multiple sessions/days and assess full login latency, concurrency, Apps Script quotas, and user experience. Do not reduce the work factor merely to improve speed; if the latency is unacceptable, review the authentication architecture or a managed authentication service.
+
+
+### Apps Script adapter and password-record results — follow-up run (2026-11-03)
+
+A further run of the expanded harness in the isolated Google Apps Script V8 project again passed all six functional tests:
+
+- RFC 7914 PBKDF2-HMAC-SHA256 vector 1 (32-byte prefix)
+- UTF-8 conversion and 32-byte derived-key length
+- Apps Script Base64 adapter round-trip
+- UUIDv4 salt adapter produced distinct 32-byte salts in the smoke test
+- Versioned password-record creation and verification using the Apps Script adapters
+- Invalid iteration count rejected
+
+Latest five-sample timing report:
+
+| Iterations | Samples (ms) | Median | Worst |
+|---:|---|---:|---:|
+| 100,000 | 512, 462, 516, 546, 535 | 516 ms | 546 ms |
+| 300,000 | 1,381, 1,461, 1,390, 1,272, 1,372 | 1,381 ms | 1,461 ms |
+| 600,000 | 3,075, 2,934, 3,630, 3,403, 2,965 | 3,075 ms | 3,630 ms |
+
+In this session, 600,000 iterations had a median of approximately 3.08 seconds and a worst observed time of 3.63 seconds. This is faster and less variable than the immediately preceding session (3.49-second median and 7.97-second worst sample). Across sessions, the timing still varies, so these results are evidence of feasibility rather than a production latency guarantee.
+
+**Decision:** keep 600,000 iterations as the provisional target. The functional tests and repeated local timing runs are encouraging, but production approval remains blocked on independent review of the salt-generation assumption, dependency/build provenance and generated bundle, full authentication-flow testing, and realistic concurrency/quota/user-experience testing. Do not lower the work factor solely to improve latency.
+
+The harness ran in a separate Apps Script project. No live portal code or spreadsheet was changed by this test.
