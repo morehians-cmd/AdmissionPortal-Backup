@@ -24,9 +24,9 @@ No spreadsheet schema changes are required by this review.
 
 ### AUTH-01 — OTP entropy and verification comparison
 
-**Observed:** OTPs are generated from the first eight hexadecimal characters of a UUID after removing hyphens (32 bits of code space). Verification compares HMAC strings with ordinary string equality.
+**Implemented for review:** OTPs now use 12 hexadecimal characters from a UUIDv4 value (48 bits of code space), and invitation/OTP HMAC strings are compared with a fixed-length character loop. A standalone Apps Script primitive test file was added at `tools/kdf-lab/gas/AP_AuthSecurityTest.gs`.
 
-**Required:** Use a cryptographically secure random source with an explicitly reviewed code-space size; use a constant-time comparison for fixed-length MAC values. Preserve attempt limits, expiry, resend throttling, and generic external error messages. Review whether rate limits need additional IP/device or global controls to resist distributed abuse.
+**Still required:** Run the new primitive tests in an isolated Apps Script project; obtain security review of the UUID-backed code-generation assumption and 48-bit code space; assess IP/device or global rate limits against distributed abuse. Existing attempt limits, expiry, resend throttling, and generic external errors remain in place.
 
 ### AUTH-02 — Invitation lifecycle must be atomic and one-time
 
