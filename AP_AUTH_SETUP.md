@@ -40,7 +40,7 @@ Schema version: 2.0.0
 
 ## Schema version 2.0.0
 
-The schema now expects 18 tabs.
+The schema now expects 17 tabs.
 
 ### Updated Users headers
 `UserID | Username | Email | AccountType | PasswordHash | PasswordSalt | Role | AccountStatus | EmailVerifiedAt | MustChangePassword | PasswordChangeRequired | FailedLoginCount | LockedUntil | LastLoginAt | CreatedAt | UpdatedAt`
@@ -89,7 +89,7 @@ Do not implement password storage using plain SHA-256 or a homemade repeated-has
 5. Add ParentInvitations and ParentLinkRequests tabs with the exact headers above.
 6. Add the two Settings rows above.
 7. Keep Sessions headers unchanged.
-8. Run AP_healthCheck and confirm all 18 tabs are OK.
+8. Run AP_healthCheck and confirm all 17 tabs are OK.
 9. Do not deploy publicly. Password login, invitation acceptance, admin workflows, session issuance, and complete authorization remain unfinished.
 
 Never put actual student data, credentials, OTPs, invitation codes, session tokens, or secrets in GitHub. No requirement uploads or payment processing/tracking are part of this portal.
