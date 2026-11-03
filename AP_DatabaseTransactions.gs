@@ -57,3 +57,47 @@ function AP_appendRowsLocked_(tableName, records) {
 function AP_appendRowLocked_(tableName, record) {
   return AP_appendRowsLocked_(tableName, [record]).startRow;
 }
+
+/**
+ * Update exactly one existing row by a unique key. Caller MUST already hold
+ * the script lock. Key fields cannot be changed by this helper. The full row
+ * is rewritten once after validating the target and update fields.
+ */
+function AP_updateOneLocked_(tableName, keyField, keyValue, updates) {
+  const headers = AP_SCHEMA[tableName];
+  if (!headers || headers.indexOf(keyField) === -1 || keyValue === '' ||
+      keyValue === null || keyValue === undefined ||
+      !updates || typeof updates !== 'object' || Array.isArray(updates)) {
+    throw new Error('Invalid update target.');
+  }
+  const updateKeys = Object.keys(updates);
+  if (!updateKeys.length) throw new Error('At least one update field is required.');
+  updateKeys.forEach(function (key) {
+    if (headers.indexOf(key) === -1) throw new Error('Unknown field for ' + tableName + ': ' + key);
+    if (key === keyField) throw new Error('The record key cannot be changed.');
+  });
+
+  const sheet = AP_getSpreadsheet_().getSheetByName(tableName);
+  AP_assertSheetSchema_(tableName, sheet);
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) throw new Error('Target record was not found.');
+
+  const values = sheet.getRange(2, 1, lastRow - 1, headers.length).getValues();
+  const keyIndex = headers.indexOf(keyField);
+  const matches = [];
+  values.forEach(function (row, index) {
+    if (String(row[keyIndex]) === String(keyValue)) matches.push(index);
+  });
+  if (matches.length !== 1) {
+    throw new Error(matches.length ? 'Target key is not unique.' : 'Target record was not found.');
+  }
+
+  const rowIndex = matches[0];
+  const updated = values[rowIndex].slice();
+  updateKeys.forEach(function (key) {
+    updated[headers.indexOf(key)] = updates[key];
+  });
+  const sheetRow = rowIndex + 2;
+  sheet.getRange(sheetRow, 1, 1, headers.length).setValues([updated]);
+  return { row: sheetRow, updatedFields: updateKeys.length };
+}
