@@ -27,20 +27,28 @@ The build output is written to `dist/AP_KdfBundle.gs`. The generated bundle is i
 
 ## Current test coverage
 
-- RFC 7914 PBKDF2-HMAC-SHA256 known-answer vector (1 iteration)
-- RFC 7914 PBKDF2-HMAC-SHA256 known-answer vector (80,000 iterations)
+- RFC 7914 PBKDF2-HMAC-SHA256 known-answer vectors (1 and 80,000 iterations)
 - UTF-8 cross-check against Node.js `crypto.pbkdf2Sync`
-- Invalid iteration count rejection
+- Invalid KDF input rejection
+- Versioned password record serialization using existing PasswordHash / PasswordSalt fields
+- Correct-password and wrong-password verification
+- Strict algorithm/version/iteration/Base64/length validation
+- Constant-time byte comparison behavior
 
 ## Not covered yet
 
-- Apps Script V8 compatibility and runtime benchmark
 - Cryptographically secure salt generation in Apps Script
-- Constant-time comparison adapter
-- Versioned storage serialization and parsing
-- Account creation, login, reset, or migration
+- Apps Script Base64 and UTF-8 adapter compatibility
+- Full Apps Script record creation/verification integration
+- Account creation, login, reset, session issuance, or migration
 
-Do not enable authentication based on these Node.js tests alone.
+The storage format is currently:
+- `PasswordHash`: `pbkdf2-sha256$v1$<iterations>$<base64-derived-key>`
+- `PasswordSalt`: Base64-encoded random salt bytes (minimum 16 bytes; target 32 bytes)
+
+The 600,000 iteration setting remains provisional. The parser accepts 100,000 through 2,000,000 iterations to allow explicit future migration policy; creation must use the configured approved work factor. No login endpoint should call this module yet.
+
+Do not enable authentication based on these lab tests alone.
 
 
 ## Google Apps Script compatibility check
@@ -54,6 +62,6 @@ A separate, non-production harness is provided at `gas/AP_KdfCompatibilityTest.g
 5. Select and run `runKdfCompatibilityTests`, authorize the test project if prompted, and inspect the execution log.
 6. Send the complete JSON report, including benchmark timings, for review.
 
-The harness checks a published known-answer vector, a UTF-8 test vector, key length, rejection of zero iterations, and one timing sample at 100k, 300k, and 600k iterations. It does not generate production salts, store passwords, create sessions, or change any admission data. Do not connect this test project to the admission spreadsheet.
+The compatibility harness checks published KDF vectors, UTF-8 conversion, key length, invalid iteration rejection, and preliminary performance. It does not generate production salts, store passwords, create sessions, or change admission data. Do not connect this test project to the admission spreadsheet.
 
 The benchmark is preliminary. We will assess whether 600k iterations is operationally practical after seeing the actual Apps Script timings. No authentication code should be enabled from this test alone.
