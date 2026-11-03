@@ -209,7 +209,12 @@ function AP_authCreateVerificationHandle_(challengeId,purpose) {
  * It returns linkage context only to server-side code and consumes the verified
  * challenge under a script lock. Never return this result directly to a client.
  */
-function AP_authConsumeVerificationHandle_(handleInput,expectedPurpose) {
+/**
+ * Lock-held resolver for composition inside a larger registration transaction.
+ * The caller MUST already hold the script lock and MUST NOT release it here.
+ * Re-reads and consumes the challenge; returns context only to server code.
+ */
+function AP_authResolveVerificationHandleLocked_(handleInput,expectedPurpose) {
   const handle=String(handleInput||'');
   const allowed=['NEW_STUDENT_PARENT_VERIFY','PARENT_INVITATION_VERIFY'];
   if(allowed.indexOf(String(expectedPurpose))<0 || handle.length>300) {
@@ -225,24 +230,32 @@ function AP_authConsumeVerificationHandle_(handleInput,expectedPurpose) {
     throw new Error('The verification is invalid or expired.');
   }
 
+  const sh=AP_getSpreadsheet_().getSheetByName('AuthChallenges');
+  if(sh.getLastRow()<2) throw new Error('The verification is invalid or expired.');
+  const rows=sh.getRange(2,1,sh.getLastRow()-1,12).getValues();
+  for(let i=rows.length-1;i>=0;i--) {
+    const row=rows[i];
+    if(String(row[0])!==challengeId) continue;
+    if(row[2]!==expectedPurpose || row[7]!=='VERIFIED' ||
+      !(row[4] instanceof Date) || row[4].getTime()<=Date.now()) {
+      throw new Error('The verification is invalid or expired.');
+    }
+    sh.getRange(i+2,8).setValue('CONSUMED');
+    return {purpose:expectedPurpose,email:String(row[1]),studentId:String(row[10]||''),
+      schoolYear:String(row[11]||'')};
+  }
+  throw new Error('The verification is invalid or expired.');
+}
+
+/**
+ * Standalone one-time consumer. Transaction handlers should acquire the script
+ * lock once and call AP_authResolveVerificationHandleLocked_ directly.
+ */
+function AP_authConsumeVerificationHandle_(handleInput,expectedPurpose) {
   const lock=LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    const sh=AP_getSpreadsheet_().getSheetByName('AuthChallenges');
-    if(sh.getLastRow()<2) throw new Error('The verification is invalid or expired.');
-    const rows=sh.getRange(2,1,sh.getLastRow()-1,12).getValues();
-    for(let i=rows.length-1;i>=0;i--) {
-      const row=rows[i];
-      if(String(row[0])!==challengeId) continue;
-      if(row[2]!==expectedPurpose || row[7]!=='VERIFIED' ||
-        !(row[4] instanceof Date) || row[4].getTime()<=Date.now()) {
-        throw new Error('The verification is invalid or expired.');
-      }
-      sh.getRange(i+2,8).setValue('CONSUMED');
-      return {purpose:expectedPurpose,email:String(row[1]),studentId:String(row[10]||''),
-        schoolYear:String(row[11]||'')};
-    }
-    throw new Error('The verification is invalid or expired.');
+    return AP_authResolveVerificationHandleLocked_(handleInput,expectedPurpose);
   } finally {
     lock.releaseLock();
   }
