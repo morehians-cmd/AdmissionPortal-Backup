@@ -187,3 +187,29 @@ In this session, 600,000 iterations had a median of approximately 3.08 seconds a
 **Decision:** keep 600,000 iterations as the provisional target. The functional tests and repeated local timing runs are encouraging, but production approval remains blocked on independent review of the salt-generation assumption, dependency/build provenance and generated bundle, full authentication-flow testing, and realistic concurrency/quota/user-experience testing. Do not lower the work factor solely to improve latency.
 
 The harness ran in a separate Apps Script project. No live portal code or spreadsheet was changed by this test.
+
+
+### Apps Script adapter and password-record results — additional follow-up run (2026-11-04)
+
+A further run of the expanded harness in the isolated Google Apps Script V8 project again passed all six functional tests:
+
+- RFC 7914 PBKDF2-HMAC-SHA256 vector 1 (32-byte prefix)
+- UTF-8 conversion and 32-byte derived-key length
+- Apps Script Base64 adapter round-trip
+- UUIDv4 salt adapter produced distinct 32-byte salts in the smoke test
+- Versioned password-record creation and verification using the Apps Script adapters
+- Invalid iteration count rejected
+
+Latest five-sample timing report:
+
+| Iterations | Samples (ms) | Median | Worst |
+|---:|---|---:|---:|
+| 100,000 | 660, 1,151, 798, 771, 911 | 798 ms | 1,151 ms |
+| 300,000 | 1,884, 1,623, 1,741, 1,653, 2,536 | 1,741 ms | 2,536 ms |
+| 600,000 | 4,194, 4,402, 6,113, 4,321, 3,888 | 4,321 ms | 6,113 ms |
+
+The latest 600,000-iteration median is approximately 4.32 seconds, with a worst observed sample of 6.11 seconds. All six functional checks passed, but timing variation across sessions remains material. These local measurements do not establish production capacity, concurrent-login performance, or quota safety.
+
+**Decision:** retain 600,000 iterations as a provisional security target, not a production approval. The repeated runs support technical compatibility, while the variable latency requires full login-flow and realistic concurrency/quota/user-experience testing. The salt-generation assumption, dependency/build provenance, and generated bundle still require independent review. Do not reduce the work factor solely to improve latency.
+
+The harness ran in a separate Apps Script project. No live portal code or spreadsheet was changed by this test.
