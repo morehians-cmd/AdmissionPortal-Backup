@@ -18,7 +18,7 @@ No spreadsheet schema changes are required by this review.
 - OTP creation uses a script lock while checking resend/hourly limits and appending the challenge.
 - Logout accepts an opaque token and stores/looks up its SHA-256 digest rather than storing the raw token.
 - The isolated KDF helper rejects empty passwords, enforces salt and iteration bounds, stores algorithm/version metadata, and verifies derived keys using a byte-wise comparison.
-- The latest GitHub Actions run for commit `1c33670a6af998526144ac7cab1773ca37a2a9de` completed successfully.
+- The latest recorded KDF lab workflow run (#21) passed its test-and-build job. The current 10-case authentication primitive suite was also run by the user in an isolated Google Apps Script V8 project and returned 10 passed, 0 failed. A subsequent refactor split lock-held verification-handle resolution from the standalone lock-acquiring wrapper; the user reran the existing 10-case suite against that refactor with 10 passed, 0 failed.
 
 ## Findings and required remediation
 
@@ -26,7 +26,7 @@ No spreadsheet schema changes are required by this review.
 
 **Implemented for review:** OTPs now use 12 hexadecimal characters from a UUIDv4 value (48 bits of code space), and invitation/OTP HMAC strings are compared with a fixed-length character loop. A standalone Apps Script primitive test file was added at `tools/kdf-lab/gas/AP_AuthSecurityTest.gs`.
 
-**Still required:** Run the new primitive tests in an isolated Apps Script project; obtain security review of the UUID-backed code-generation assumption and 48-bit code space; assess IP/device or global rate limits against distributed abuse. Existing attempt limits, expiry, resend throttling, and generic external errors remain in place.
+**Validated:** The user ran the isolated Apps Script V8 primitive suite after the lock-helper refactor: 10 passed, 0 failed. **Still required:** Obtain security review of the UUID-backed code-generation assumption and 48-bit code space; assess IP/device or global rate limits against distributed abuse. Existing attempt limits, expiry, resend throttling, and generic external errors remain in place.
 
 ### AUTH-02 — Invitation lifecycle must be atomic and one-time
 
@@ -42,9 +42,9 @@ No spreadsheet schema changes are required by this review.
 
 ### AUTH-04 — OTP verification response exposes internal linkage context
 
-**Implemented for review:** `AP_verifyLifecycleOtp` now returns only a success flag and a signed opaque verification handle. The new internal `AP_authConsumeVerificationHandle_` helper validates the handle's HMAC, expected purpose, verified status, and original expiry under a script lock, then changes the challenge status to `CONSUMED`. Student ID, school year, and verified email are returned only to the downstream server-side caller.
+**Implemented for review:** `AP_verifyLifecycleOtp` now returns only a success flag and a signed opaque verification handle. The internal `AP_authConsumeVerificationHandle_` wrapper validates and consumes the handle under a script lock. The lower-level `AP_authResolveVerificationHandleLocked_` performs the same validation and state change without acquiring a lock, for use by future transaction handlers that already hold the script lock. Student ID, school year, and verified email are returned only to the downstream server-side caller.
 
-**Still required:** Add workflow-specific tests proving that handles cannot be replayed, used for the wrong purpose, used after expiry, or used to select a different student. Every consumer must independently authorize the target record and must never return the helper's internal context directly to the browser.
+**Validated:** The isolated Apps Script suite covers replay, wrong-purpose use, and expiry rejection. The user reran the suite after the lock-held resolver refactor with 10 passed, 0 failed. **Still required:** Add transaction-level tests for target-student binding, invitation revalidation, and complete enrollment/acceptance flows. Every consumer must independently authorize the target record and must never return the helper's internal context directly to the browser.
 
 ### AUTH-05 — HMAC secret lifecycle and deployment setup
 
