@@ -1,0 +1,52 @@
+name: KDF lab validation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - rebuild/clean-start
+    paths:
+      - "tools/kdf-lab/**"
+      - ".github/workflows/kdf-lab.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/kdf-lab
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up pinned Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.16.0"
+          cache: npm
+          cache-dependency-path: tools/kdf-lab/package.json
+
+      - name: Generate lockfile for this validation run
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Install exact locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run known-answer and cross-implementation tests
+        run: npm test
+
+      - name: Build Apps Script-format bundle (not for deployment)
+        run: npm run build
+
+      - name: Upload validation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kdf-lab-validation
+          path: |
+            tools/kdf-lab/package-lock.json
+            tools/kdf-lab/dist/AP_KdfBundle.gs
+          if-no-files-found: error
+          retention-days: 7
