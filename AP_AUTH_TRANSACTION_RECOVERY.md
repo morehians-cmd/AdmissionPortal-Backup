@@ -112,6 +112,28 @@ If the existing AuditLogs structure proves insufficient for operational recovery
 - Keep public deployment disabled while session validation and protected endpoint authorization are incomplete.
 - Do not use the live admission spreadsheet for failure-injection tests. Use a separate Apps Script project with fake in-memory sheets.
 
-## 8. Isolated recovery-model harness\n\nA first fake-state harness is available at `tools/kdf-lab/gas/AP_TransactionRecoveryTest.gs`. It injects failures around journal, challenge, record, invitation, and audit phases; checks planned-ID idempotency, completion recognition, partial-link escalation, no premature success response, and journal secret exclusion. Run it in a separate Apps Script V8 project with `runTransactionRecoveryTests`.\n\nImportant limitation: this harness exercises an in-memory recovery model, not Google Sheets persistence, actual lock contention, Apps Script process termination, or a production transaction coordinator. A passing result is necessary but not sufficient. The next implementation step must adapt the model to fake sheet interfaces and test the real persistence helpers without touching the live spreadsheet.\n\n## 9. Spreadsheet impact
+## 8. Isolated recovery-model harness
+
+The first fake-state harness is available at `tools/kdf-lab/gas/AP_TransactionRecoveryTest.gs`. It injects failures around journal, challenge, record, invitation, and audit phases; checks planned-ID idempotency, completion recognition, partial-link escalation, no premature success response, and journal secret exclusion. Run it in a separate Apps Script V8 project with `runTransactionRecoveryTests`.
+
+### Recorded result — 2026-11-04
+
+The user ran the harness in Google Apps Script V8 and returned **13 passed, 0 failed**:
+
+- Failure before journal creation leaves no transaction state.
+- Failure after journal creation, challenge consumption, user append, parent profile append, parent-student link append, invitation update, and final audit append leaves inspectable state.
+- Retry after challenge consumption does not duplicate planned records.
+- A completed transaction is recognized without repeating writes.
+- A partial link without required parent records is escalated.
+- Success is never returned before the committed marker.
+- The journal model excludes credential and verification secrets.
+
+This confirms the modeled recovery behavior only. It does not test Google Sheets persistence, actual lock contention, Apps Script process termination, or a production transaction coordinator. A passing result is necessary but not sufficient.
+
+### Next validation step
+
+Adapt the model to fake sheet interfaces and exercise the actual persistence helpers and recovery protocol without touching the live spreadsheet. Include concurrent-attempt tests around the same invitation and verification handle. Keep account creation disabled until the transaction coordinator, KDF, authorization, and recovery gates are separately reviewed.
+
+## 9. Spreadsheet impact
 
 No spreadsheet changes are proposed at this stage. This design uses existing AuditLogs fields as a journal proposal. A dedicated transaction tab or schema change requires a separate decision and approval before implementation.
