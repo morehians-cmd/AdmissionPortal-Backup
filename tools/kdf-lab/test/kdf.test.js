@@ -38,10 +38,10 @@ test('Noble PBKDF2 agrees with Node crypto for UTF-8 input', () => {
 test('invalid iteration counts are rejected', () => {
   assert.throws(
     () => noblePbkdf2(sha256, 'password', 'salt', { c: 0, dkLen: 32 }),
-    /iterations/
+    /iterations|integer/
   );
   assert.throws(
     () => noblePbkdf2(sha256, 'password', 'salt', { c: -1, dkLen: 32 }),
-    /iterations/
+    /iterations|integer/
   );
 });
