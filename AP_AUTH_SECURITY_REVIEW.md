@@ -42,9 +42,9 @@ No spreadsheet schema changes are required by this review.
 
 ### AUTH-04 — OTP verification response exposes internal linkage context
 
-**Observed:** `AP_verifyLifecycleOtp` returns `studentId` and `schoolYear` to its caller after verification.
+**Implemented for review:** `AP_verifyLifecycleOtp` now returns only a success flag and a signed opaque verification handle. The new internal `AP_authConsumeVerificationHandle_` helper validates the handle's HMAC, expected purpose, verified status, and original expiry under a script lock, then changes the challenge status to `CONSUMED`. Student ID, school year, and verified email are returned only to the downstream server-side caller.
 
-**Required:** Keep internal identifiers server-side where possible. Return only a short-lived opaque verification handle or minimum client-required confirmation. Any later action must independently re-read the challenge and authorize the target record; never accept a client-supplied student ID as proof of authorization.
+**Still required:** Add workflow-specific tests proving that handles cannot be replayed, used for the wrong purpose, used after expiry, or used to select a different student. Every consumer must independently authorize the target record and must never return the helper's internal context directly to the browser.
 
 ### AUTH-05 — HMAC secret lifecycle and deployment setup
 
