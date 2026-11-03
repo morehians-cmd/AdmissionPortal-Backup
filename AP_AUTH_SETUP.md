@@ -70,7 +70,8 @@ Only an authorized admin workflow may change these values. Do not expose these s
 The revised `AP_Auth.gs` currently provides:
 - OTP challenge creation for new-student parent-email verification, gated by enrollment settings.
 - OTP challenge creation after validating a pending parent invitation.
-- OTP verification bound to purpose and (where applicable) student/school year.
+- OTP verification bound to purpose and (where applicable) student/school year; successful verification returns a signed opaque handle rather than internal student/school-year identifiers.
+- An internal one-time handle consumer validates the HMAC, purpose, verified status, and expiry under a script lock, then marks the challenge CONSUMED and returns linkage context only to server-side code.
 - OTP hashes, expiry, attempt limits, resend throttling, and a Script Properties HMAC secret.
 - Logout helper for existing session records.
 
