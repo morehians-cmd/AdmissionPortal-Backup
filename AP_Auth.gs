@@ -33,7 +33,10 @@ function AP_authGetSetting_(key) {
 function AP_isNewEnrollmentOpen_(schoolYear) {
   const active = AP_authGetSetting_('NEW_STUDENT_ENROLLMENT_ENABLED') === 'TRUE';
   const configuredYear = AP_authGetSetting_('NEW_STUDENT_ENROLLMENT_SCHOOL_YEAR');
-  return active && (!schoolYear || !configuredYear || configuredYear === String(schoolYear));
+  // Fail closed: enrollment is open only for an explicitly configured year
+  // that exactly matches the requested school year.
+  return active && !!schoolYear && !!configuredYear &&
+    configuredYear === String(schoolYear);
 }
 
 function AP_authRequireEmail_(value) {
