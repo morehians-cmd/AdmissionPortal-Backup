@@ -6,7 +6,7 @@ Status: implementation plan; no public workflow enabled
 
 ## Purpose
 
-Define the transaction boundaries for parent-invitation acceptance and new-student registration before adding account-creation endpoints. The one-time verification-handle primitive has passed **12/12 isolated Apps Script V8 tests**. The database write helpers have also passed **5/5 isolated Apps Script V8 tests**. Both suites validate primitives only, not a complete registration transaction. That result validates the tested helper behavior only; it does not validate a complete registration transaction.
+Define the transaction boundaries for parent-invitation acceptance and new-student registration before adding account-creation endpoints. The one-time verification-handle primitive has passed **12/12 isolated Apps Script V8 tests**. The database write helpers have also passed **7/7 isolated Apps Script V8 tests**. Both suites validate primitives only, not a complete registration transaction. That result validates the tested helper behavior only; it does not validate a complete registration transaction.
 
 ## Shared transaction rules
 
@@ -38,9 +38,9 @@ A new isolated harness, `tools/kdf-lab/gas/AP_DatabaseWriteTest.gs`, checks sche
 
 `AP_updateOneLocked_(tableName, keyField, keyValue, updates)` updates exactly one existing row while the caller holds the script lock. It validates the schema, rejects unknown fields and attempts to change the key, and rejects both missing and duplicate keys before writing. It rewrites the matched row in one `setValues` call while preserving untouched fields. This is a persistence primitive, not a transaction or authorization boundary.
 
-The database primitive harness now includes checks for preserving other fields, successful single-row update, duplicate-key rejection, and immutable key enforcement. The updated harness must be rerun in the separate Apps Script test project.
+The database primitive harness now includes checks for preserving other fields, successful single-row update, duplicate-key rejection, and immutable key enforcement. The user reran the updated harness in Google Apps Script V8: **7 passed, 0 failed**. The seven cases cover mapping, invalid fields/inputs, batch append, header validation, unique keyed update, preservation of untouched fields, duplicate-key rejection, and key immutability.
 
-## Parent invitation acceptance — required sequence
+## Transaction recovery design — next gate\n\nThe append and keyed-update helpers do not provide rollback across tabs. Before an acceptance orchestrator is implemented, define a recoverable write protocol and failure-injection tests. The protocol must identify the exact records created/changed by one attempt, distinguish an incomplete attempt from a completed one, and prevent a retry from duplicating a user/profile/link. Do not assume that a script lock protects against process termination or a Sheets service error after a write. A durable journal must use existing schema only if its fields can represent transaction identity and state unambiguously; otherwise propose a schema change for approval before implementation.\n\n## Parent invitation acceptance — required sequence
 
 Preconditions:
 - The invitation is found by its server-side identifier or a hash-verified invitation code.
