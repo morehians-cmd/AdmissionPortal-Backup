@@ -33,6 +33,13 @@ The existing `AP_appendRow_` remains a standalone lock-acquiring helper. Do not 
 
 A new isolated harness, `tools/kdf-lab/gas/AP_DatabaseWriteTest.gs`, checks schema-order mapping, rejection of unknown fields and invalid inputs, contiguous batch writes, and rejection of header mismatches. It uses a fake in-memory sheet and must be run in a separate Apps Script project with `AP_Config.gs` and `AP_DatabaseTransactions.gs`; it does not touch the real admission spreadsheet.
 
+
+### Existing-record update primitive added
+
+`AP_updateOneLocked_(tableName, keyField, keyValue, updates)` updates exactly one existing row while the caller holds the script lock. It validates the schema, rejects unknown fields and attempts to change the key, and rejects both missing and duplicate keys before writing. It rewrites the matched row in one `setValues` call while preserving untouched fields. This is a persistence primitive, not a transaction or authorization boundary.
+
+The database primitive harness now includes checks for preserving other fields, successful single-row update, duplicate-key rejection, and immutable key enforcement. The updated harness must be rerun in the separate Apps Script test project.
+
 ## Parent invitation acceptance — required sequence
 
 Preconditions:
