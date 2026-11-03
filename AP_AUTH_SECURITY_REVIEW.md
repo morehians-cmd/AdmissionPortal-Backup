@@ -32,7 +32,15 @@ No spreadsheet schema changes are required by this review.
 
 **Validated:** The user ran the isolated Apps Script V8 primitive suite: 12 passed, 0 failed. **Still required:** Obtain security review of the UUID-backed code-generation assumption and 48-bit code space; assess IP/device or global rate limits against distributed abuse. Existing attempt limits, expiry, resend throttling, and generic external errors remain in place.
 
-### DB-02 — Multi-tab transaction recovery remains unresolved\n\n**Observed:** The append and keyed-update helpers each perform a single-sheet write, but a parent acceptance flow spans Users, ParentProfiles, ParentStudentLinks, ParentInvitations, AuthChallenges, and AuditLogs. Google Sheets does not provide a multi-tab transaction or guaranteed rollback through these helpers.\n\n**Required:** Define and test a durable transaction journal or compensating recovery protocol, including injected failures after each write and process-interruption scenarios. Do not expose an acceptance endpoint until retries are idempotent and incomplete attempts can be safely reconciled. No schema change is approved or currently required; reassess only after the journal design is concrete.\n\n### AUTH-02 — Invitation lifecycle must be atomic and one-time
+### DB-02 — Multi-tab transaction recovery remains unresolved
+
+**Observed:** The append and keyed-update helpers each perform a single-sheet write, but a parent acceptance flow spans Users, ParentProfiles, ParentStudentLinks, ParentInvitations, AuthChallenges, and AuditLogs. Google Sheets does not provide a multi-tab transaction or guaranteed rollback through these helpers.
+
+**Design and model validation:** A recovery-journal proposal is documented in `AP_AUTH_TRANSACTION_RECOVERY.md`. The isolated in-memory Apps Script V8 recovery-model harness passed **13/13 tests** on 2026-11-04, covering injected failures at each modeled stage, planned-ID idempotency, completed-transaction recognition, partial-record escalation, no premature success, and journal secret exclusion.
+
+**Still required:** The passing harness does not exercise Google Sheets persistence, actual lock contention, Apps Script process termination, or a production transaction coordinator. Adapt the protocol to fake sheet interfaces and test the actual persistence helpers, including concurrent attempts and journal-update failures. Do not expose an acceptance endpoint until retries are idempotent and incomplete attempts can be safely reconciled. No schema change is approved or currently required; reassess only if implementation demonstrates a concrete schema gap.
+
+### AUTH-02 — Invitation lifecycle must be atomic and one-time
 
 **Observed:** The current OTP-request function validates a pending invitation, but invitation acceptance/account creation is not implemented.
 
