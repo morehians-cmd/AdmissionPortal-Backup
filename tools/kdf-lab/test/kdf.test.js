@@ -9,25 +9,25 @@ const decode = (value) => new Uint8Array(Buffer.from(value, 'base64'));
 test('creates versioned record and verifies only the correct password', () => {
   const password = utf8('Môrëh Academy 🔐');
   const salt = Uint8Array.from({ length: 32 }, (_, index) => index + 1);
-  const record = createPasswordRecord(password, salt, 1200, encode);
-  assert.match(record.passwordHash, /^pbkdf2-sha256\$v1\$1200\$/);
+  const record = createPasswordRecord(password, salt, 100000, encode);
+  assert.match(record.passwordHash, /^pbkdf2-sha256\$v1\$100000\$/);
   assert.equal(record.passwordSalt, encode(salt));
   assert.equal(verifyPasswordRecord(password, record, decode), true);
   assert.equal(verifyPasswordRecord(utf8('wrong password'), record, decode), false);
 });
 
 test('rejects short salts and out-of-policy work factors on creation', () => {
-  assert.throws(() => createPasswordRecord(utf8('pw'), new Uint8Array(15), 1200, encode), /16 bytes/);
+  assert.throws(() => createPasswordRecord(utf8('pw'), new Uint8Array(15), 100000, encode), /16 bytes/);
   assert.throws(() => createPasswordRecord(utf8('pw'), new Uint8Array(16), 99999, encode), /Iterations/);
 });
 
 test('rejects malformed, unsupported, and tampered stored records', () => {
-  const record = createPasswordRecord(utf8('pw'), new Uint8Array(32).fill(7), 1200, encode);
+  const record = createPasswordRecord(utf8('pw'), new Uint8Array(32).fill(7), 100000, encode);
   for (const bad of [
-    { ...record, passwordHash: 'sha256$v1$1200$AAAA' },
-    { ...record, passwordHash: 'pbkdf2-sha256$v2$1200$AAAA' },
+    { ...record, passwordHash: 'sha256$v1$100000$AAAA' },
+    { ...record, passwordHash: 'pbkdf2-sha256$v2$100000$AAAA' },
     { ...record, passwordHash: 'pbkdf2-sha256$v1$0$AAAA' },
-    { ...record, passwordHash: 'pbkdf2-sha256$v1$1200$***' },
+    { ...record, passwordHash: 'pbkdf2-sha256$v1$100000$***' },
     { ...record, passwordSalt: 'not-base64' },
     { ...record, passwordHash: record.passwordHash.replace(/\$[^$]+$/, '$AAAA') }
   ]) {
