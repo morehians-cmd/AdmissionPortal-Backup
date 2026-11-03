@@ -95,6 +95,63 @@ function runDatabaseWritePrimitiveTests() {
     }
   });
 
+
+  check('keyed update changes exactly one matching row and preserves other fields', function () {
+    const original = globalThis.AP_getSpreadsheet_;
+    const headers = AP_SCHEMA.Settings;
+    const row = ['FEATURE_X', 'OLD', 'description', true, '', ''];
+    let written = null;
+    const sheet = {
+      getLastColumn: function () { return headers.length; },
+      getLastRow: function () { return 2; },
+      getRange: function (startRow, startCol, numRows, numCols) {
+        if (startRow === 1) return { getDisplayValues: function () { return [headers]; } };
+        return {
+          getValues: function () { return [row.slice()]; },
+          setValues: function (values) { written = values[0]; }
+        };
+      }
+    };
+    globalThis.AP_getSpreadsheet_ = function () {
+      return { getSheetByName: function () { return sheet; } };
+    };
+    try {
+      const result = AP_updateOneLocked_('Settings', 'SettingKey', 'FEATURE_X', { SettingValue: 'NEW' });
+      return result.row === 2 && result.updatedFields === 1 &&
+        written[0] === 'FEATURE_X' && written[1] === 'NEW' && written[2] === 'description';
+    } finally {
+      globalThis.AP_getSpreadsheet_ = original;
+    }
+  });
+
+  check('keyed update rejects duplicate keys and key mutation', function () {
+    const original = globalThis.AP_getSpreadsheet_;
+    const headers = AP_SCHEMA.Settings;
+    const rows = [
+      ['DUP', '1', '', true, '', ''],
+      ['DUP', '2', '', true, '', '']
+    ];
+    const sheet = {
+      getLastColumn: function () { return headers.length; },
+      getLastRow: function () { return 3; },
+      getRange: function (startRow) {
+        if (startRow === 1) return { getDisplayValues: function () { return [headers]; } };
+        return { getValues: function () { return rows; }, setValues: function () {} };
+      }
+    };
+    globalThis.AP_getSpreadsheet_ = function () { return { getSheetByName: function () { return sheet; } }; };
+    try {
+      let duplicateRejected = false, keyRejected = false;
+      try { AP_updateOneLocked_('Settings', 'SettingKey', 'DUP', { SettingValue: '3' }); }
+      catch (err) { duplicateRejected = /not unique/.test(String(err.message)); }
+      try { AP_updateOneLocked_('Settings', 'SettingKey', 'DUP', { SettingKey: 'OTHER' }); }
+      catch (err) { keyRejected = /cannot be changed/.test(String(err.message)); }
+      return duplicateRejected && keyRejected;
+    } finally {
+      globalThis.AP_getSpreadsheet_ = original;
+    }
+  });
+
   const report = {
     runtime: 'Google Apps Script V8',
     passed: results.filter(function (r) { return r.status === 'PASS'; }).length,
