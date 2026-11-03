@@ -107,6 +107,25 @@ function runAuthPrimitiveTests() {
       } catch(err) { return true; }
     });
   });
+  check('new-student enrollment requires an explicit exact school-year match', function() {
+    const root=globalThis;
+    const original=root.AP_authGetSetting_;
+    try {
+      let settings={NEW_STUDENT_ENROLLMENT_ENABLED:'TRUE',NEW_STUDENT_ENROLLMENT_SCHOOL_YEAR:'2026-2027'};
+      root.AP_authGetSetting_=function(key){return settings[key]||'';};
+      if(!AP_isNewEnrollmentOpen_('2026-2027')) return false;
+      if(AP_isNewEnrollmentOpen_('2027-2028')) return false;
+      if(AP_isNewEnrollmentOpen_('')) return false;
+      settings.NEW_STUDENT_ENROLLMENT_SCHOOL_YEAR='';
+      if(AP_isNewEnrollmentOpen_('2026-2027')) return false;
+      settings.NEW_STUDENT_ENROLLMENT_ENABLED='FALSE';
+      settings.NEW_STUDENT_ENROLLMENT_SCHOOL_YEAR='2026-2027';
+      if(AP_isNewEnrollmentOpen_('2026-2027')) return false;
+      return true;
+    } finally {
+      root.AP_authGetSetting_=original;
+    }
+  });
   check('legacy 8-character OTP format is rejected', function() {
     return !/^[A-F0-9]{12}$/.test('A1B2C3D4');
   });
