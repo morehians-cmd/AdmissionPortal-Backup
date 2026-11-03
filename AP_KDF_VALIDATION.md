@@ -120,3 +120,18 @@ All three compatibility checks passed in that run: RFC 7914 vector 1 (32-byte pr
 This is one sample per work factor, not a production benchmark. It is encouraging evidence that the 600,000-iteration target is technically feasible in the tested Apps Script runtime, but it does not establish median/worst-case latency, concurrency behavior, or production suitability. The target remains provisional.
 
 The Apps Script harness has been updated to warm up each work factor and collect five samples, reporting median and worst observed time. Run the updated harness in the same isolated test project and provide the complete JSON report before approving the work factor.
+
+
+### Repeated Apps Script benchmark results (2026-11-03)
+
+The updated harness was run in the isolated Apps Script V8 project. All three compatibility checks passed again.
+
+| Iterations | Samples (ms) | Median | Worst |
+|---:|---|---:|---:|
+| 100,000 | 607, 630, 597, 551, 573 | 597 ms | 630 ms |
+| 300,000 | 1,845, 1,758, 1,910, 1,895, 1,825 | 1,845 ms | 1,910 ms |
+| 600,000 | 3,864, 3,677, 3,884, 3,843, 3,746 | 3,843 ms | 3,884 ms |
+
+Across these five samples per work factor, 600,000 iterations took a median of approximately 3.84 seconds and a worst observed time of approximately 3.88 seconds. This is a useful repeatability check, but it is still a single test session on one Apps Script project. It does not measure concurrent login load, cold starts, service contention, or execution quotas.
+
+**Decision:** retain 600,000 iterations as the provisional target for further design and testing. Do not yet call it production-approved. A roughly four-second derivation may be noticeable to users and must be assessed in the complete login flow and under realistic load. Do not reduce the work factor without a documented security review.
