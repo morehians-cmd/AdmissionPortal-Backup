@@ -103,3 +103,20 @@ Do not enable password creation, login, password reset, or account provisioning 
 - A reviewer inspects the final generated bundle.
 
 No spreadsheet schema change is expected: the current `Users` sheet already has `PasswordHash` and `PasswordSalt`. The final serialized format must be confirmed before implementation; add columns only if a genuine schema need is identified.
+
+
+## Preliminary Apps Script measurement (2026-11-03)
+
+A user-run test in a separate Google Apps Script V8 project reported:
+
+| Iterations | Single observed run |
+|---:|---:|
+| 100,000 | 468 ms |
+| 300,000 | 1,441 ms |
+| 600,000 | 2,816 ms |
+
+All three compatibility checks passed in that run: RFC 7914 vector 1 (32-byte prefix), UTF-8 byte conversion/derived-key length, and rejection of zero iterations.
+
+This is one sample per work factor, not a production benchmark. It is encouraging evidence that the 600,000-iteration target is technically feasible in the tested Apps Script runtime, but it does not establish median/worst-case latency, concurrency behavior, or production suitability. The target remains provisional.
+
+The Apps Script harness has been updated to warm up each work factor and collect five samples, reporting median and worst observed time. Run the updated harness in the same isolated test project and provide the complete JSON report before approving the work factor.
