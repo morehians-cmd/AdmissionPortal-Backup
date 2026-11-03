@@ -4,11 +4,13 @@ The repository branch still contains legacy source files as historical reference
 
 ## New Apps Script project
 1. Open the new database spreadsheet and choose Extensions → Apps Script.
-2. In that new, bound Apps Script project, create/copy only these files from `rebuild/clean-start`: `AP_Config.gs`, `AP_Database.gs`, `AP_Web.gs`, and `AP_Index.html`.
+2. In that new, bound Apps Script project, create/copy only these files from `rebuild/clean-start`: `AP_Config.gs`, `AP_Database.gs`, `AP_Web.gs`, `AP_Auth.gs`, and `AP_Index.html`.
 3. Save the project.
 4. Select `AP_healthCheck` in the function selector, run it, and approve the Google authorization prompt.
-5. Confirm all 13 sheets return `OK`. The check is read-only and does not alter spreadsheet contents.
-6. Do not deploy publicly yet. Authentication, role enforcement, input validation, and audit integration are not implemented.
+5. Create the `AuthChallenges` and `Sessions` tabs using the exact headers in `AP_AUTH_SETUP.md`.
+6. Run `AP_healthCheck` and confirm all 15 sheets return `OK`.
+7. Run `AP_setupAuthSecret` once and approve authorization. The secret is stored in Script Properties.
+8. Follow `AP_AUTH_SETUP.md` to understand the OTP endpoints and test-account requirements. Do not deploy publicly yet; the sign-in UI, registration, complete role enforcement, and production abuse controls are not implemented.
 
 The spreadsheet ID is configured in `AP_Config.gs`. The app uses `SpreadsheetApp.openById`, not active spreadsheet context.
 
