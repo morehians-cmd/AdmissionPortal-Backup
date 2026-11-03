@@ -54,8 +54,11 @@ function runDatabaseFakeSheetIntegrationTests() {
     return out;
   };
   FakeRange.prototype.setValues = function (values) {
+    // Capture dimensions before entering Array#some: callback `this` is not
+    // the FakeRange instance (and is undefined in strict mode).
+    const expectedCols = this.numCols;
     if (!Array.isArray(values) || values.length !== this.numRows ||
-        values.some(function (row) { return !Array.isArray(row) || row.length !== this.numCols; })) {
+        values.some(function (row) { return !Array.isArray(row) || row.length !== expectedCols; })) {
       const actualRows = Array.isArray(values) ? values.length : 'non-array';
       const actualCols = Array.isArray(values) && Array.isArray(values[0]) ? values[0].length : 'n/a';
       throw new Error(
