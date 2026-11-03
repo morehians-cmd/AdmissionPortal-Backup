@@ -62,7 +62,7 @@ The vector above must be normalized by removing whitespace before comparison. Fo
 
 ## Required adapter and storage tests
 
-- Salt generation produces 16 or more cryptographically random bytes; do not assume `Utilities.getUuid()` alone is a cryptographic random source without a documented guarantee.
+- Salt generation produces at least 16 cryptographically random bytes. The current Apps Script lab adapter concatenates two UUIDv4 values from `Utilities.getUuid()` to form 32 bytes. Apps Script documents this method as equivalent to Java `UUID.randomUUID()`, whose Java contract specifies a cryptographically strong pseudorandom number generator. Treat this as a documented-equivalence assumption requiring security review; the smoke test does not prove entropy or certify Google's implementation.
 - Password and salt encoding is UTF-8 and deterministic.
 - Derived output is exactly 32 bytes.
 - Stored metadata identifies algorithm, version, iteration count, and encoding unambiguously.
@@ -135,3 +135,29 @@ The updated harness was run in the isolated Apps Script V8 project. All three co
 Across these five samples per work factor, 600,000 iterations took a median of approximately 3.84 seconds and a worst observed time of approximately 3.88 seconds. This is a useful repeatability check, but it is still a single test session on one Apps Script project. It does not measure concurrent login load, cold starts, service contention, or execution quotas.
 
 **Decision:** retain 600,000 iterations as the provisional target for further design and testing. Do not yet call it production-approved. A roughly four-second derivation may be noticeable to users and must be assessed in the complete login flow and under realistic load. Do not reduce the work factor without a documented security review.
+
+
+### Apps Script adapter and password-record results (2026-11-03)
+
+The expanded harness was run in the isolated Google Apps Script V8 project. All six tests passed:
+
+- RFC 7914 PBKDF2-HMAC-SHA256 vector 1 (32-byte prefix)
+- UTF-8 conversion and 32-byte derived-key length
+- Apps Script Base64 adapter round-trip, including high-bit byte values
+- UUIDv4 salt adapter returned distinct 32-byte values in the smoke test
+- Versioned record creation and verification through the Apps Script adapters; correct password accepted and wrong password rejected
+- Invalid KDF iteration count rejected
+
+The salt smoke test confirms output shape and that two sampled salts differed. It is not an entropy test and does not prove the underlying random-number generator's security. The two-UUID construction remains subject to review of the documented-equivalence assumption above.
+
+Latest five-sample timing report:
+
+| Iterations | Samples (ms) | Median | Worst |
+|---:|---|---:|---:|
+| 100,000 | 467, 531, 572, 565, 534 | 534 ms | 572 ms |
+| 300,000 | 1,374, 1,744, 1,677, 1,967, 2,377 | 1,744 ms | 2,377 ms |
+| 600,000 | 7,973, 3,645, 3,083, 3,197, 3,485 | 3,485 ms | 7,973 ms |
+
+The 600,000-iteration median is approximately 3.49 seconds, but the observed 7.97-second outlier is significant. Compared with the prior five-sample session, the median is in a similar range while the worst observed time is substantially higher. This reinforces that the runtime has variability and that a single local session is insufficient to establish a predictable login latency.
+
+**Decision:** retain 600,000 iterations as a provisional security target, not a production approval. Before final adoption, repeat tests across multiple sessions/days and assess full login latency, concurrency, Apps Script quotas, and user experience. Do not reduce the work factor merely to improve speed; if the latency is unacceptable, review the authentication architecture or a managed authentication service.
