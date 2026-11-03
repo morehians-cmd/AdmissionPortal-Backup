@@ -18,11 +18,11 @@ No spreadsheet schema changes are required by this review.
 - OTP creation uses a script lock while checking resend/hourly limits and appending the challenge.
 - Logout accepts an opaque token and stores/looks up its SHA-256 digest rather than storing the raw token.
 - The isolated KDF helper rejects empty passwords, enforces salt and iteration bounds, stores algorithm/version metadata, and verifies derived keys using a byte-wise comparison.
-- The isolated Apps Script V8 authentication primitive suite has passed **12 tests, 0 failed**. The separate database write primitive suite has passed **5 tests, 0 failed**. Coverage includes constant-time comparator checks, OTP format validation, verification-handle consumption, lock-held resolution, replay rejection, wrong-purpose rejection, expiry rejection, exact enrollment school-year matching, and legacy OTP format rejection. This validates the tested primitives only, not a complete registration transaction.
+- The isolated Apps Script V8 authentication primitive suite has passed **12 tests, 0 failed**. The separate database write primitive suite has passed **7 tests, 0 failed**. Coverage includes constant-time comparator checks, OTP format validation, verification-handle consumption, lock-held resolution, replay rejection, wrong-purpose rejection, expiry rejection, exact enrollment school-year matching, and legacy OTP format rejection. This validates the tested primitives only, not a complete registration transaction.
 
 ### DB-01 — Schema-guarded write primitives
 
-**Implemented and validated:** `AP_DatabaseTransactions.gs` provides schema-ordered record mapping, rejects unknown fields, checks exact tab headers before writes, and appends batches with one contiguous `setValues` call while the caller holds the script lock. The isolated Apps Script V8 harness `tools/kdf-lab/gas/AP_DatabaseWriteTest.gs` passed **5/5 tests**. This does not establish multi-tab atomicity, rollback, authorization, or transaction recovery.
+**Implemented and validated:** `AP_DatabaseTransactions.gs` provides schema-ordered record mapping, rejects unknown fields, checks exact tab headers before writes, appends batches with one contiguous `setValues` call, and updates exactly one uniquely keyed row while the caller holds the script lock. The isolated Apps Script V8 harness `tools/kdf-lab/gas/AP_DatabaseWriteTest.gs` passed **5/5 tests**. The expanded isolated Apps Script V8 harness passed **7/7** after the keyed-update helper was added. This does not establish multi-tab atomicity, rollback, authorization, or transaction recovery.
 
 ## Findings and required remediation
 
@@ -32,7 +32,7 @@ No spreadsheet schema changes are required by this review.
 
 **Validated:** The user ran the isolated Apps Script V8 primitive suite: 12 passed, 0 failed. **Still required:** Obtain security review of the UUID-backed code-generation assumption and 48-bit code space; assess IP/device or global rate limits against distributed abuse. Existing attempt limits, expiry, resend throttling, and generic external errors remain in place.
 
-### AUTH-02 — Invitation lifecycle must be atomic and one-time
+### DB-02 — Multi-tab transaction recovery remains unresolved\n\n**Observed:** The append and keyed-update helpers each perform a single-sheet write, but a parent acceptance flow spans Users, ParentProfiles, ParentStudentLinks, ParentInvitations, AuthChallenges, and AuditLogs. Google Sheets does not provide a multi-tab transaction or guaranteed rollback through these helpers.\n\n**Required:** Define and test a durable transaction journal or compensating recovery protocol, including injected failures after each write and process-interruption scenarios. Do not expose an acceptance endpoint until retries are idempotent and incomplete attempts can be safely reconciled. No schema change is approved or currently required; reassess only after the journal design is concrete.\n\n### AUTH-02 — Invitation lifecycle must be atomic and one-time
 
 **Observed:** The current OTP-request function validates a pending invitation, but invitation acceptance/account creation is not implemented.
 
