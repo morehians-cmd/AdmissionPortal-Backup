@@ -62,9 +62,23 @@ function runKdfCompatibilityTests() {
 
   var benchmarks = [];
   [100000, 300000, 600000].forEach(function (iterations) {
-    var started = Date.now();
-    AP_KDF.derivePasswordKey(utf8Bytes('benchmark-only-password'), utf8Bytes('benchmark-salt-16b'), iterations);
-    benchmarks.push({ iterations: iterations, elapsedMs: Date.now() - started });
+    var passwordBytes = utf8Bytes('benchmark-only-password');
+    var saltBytes = utf8Bytes('benchmark-salt-16b');
+    // Warm up the code path once, then collect five independent samples.
+    AP_KDF.derivePasswordKey(passwordBytes, saltBytes, iterations);
+    var samples = [];
+    for (var sample = 0; sample < 5; sample++) {
+      var started = Date.now();
+      AP_KDF.derivePasswordKey(passwordBytes, saltBytes, iterations);
+      samples.push(Date.now() - started);
+    }
+    var sorted = samples.slice().sort(function (a, b) { return a - b; });
+    benchmarks.push({
+      iterations: iterations,
+      samplesMs: samples,
+      medianMs: sorted[2],
+      worstMs: sorted[sorted.length - 1]
+    });
   });
 
   var passed = results.filter(function (item) { return item.status === 'PASS'; }).length;
