@@ -180,8 +180,15 @@ quiz();
 /* menu, lightbox, reveal */
 $('bm').onclick=()=>$('ms').classList.add('on');$('mx').onclick=()=>$('ms').classList.remove('on');$('ms').onclick=e=>{if(e.target.tagName==='A')$('ms').classList.remove('on')};
 $('lb').onclick=()=>$('lb').classList.remove('on');document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('lb').classList.remove('on');$('ms').classList.remove('on')}});
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
-document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+const revealEls=document.querySelectorAll('.rv');
+if('IntersectionObserver' in window){
+ try{
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+  revealEls.forEach(el=>io.observe(el));
+ }catch(err){revealEls.forEach(el=>el.classList.add('in'))}
+}else{
+ revealEls.forEach(el=>el.classList.add('in'));
+}
 /* live content */
 google.script.run.withSuccessHandler(r=>{if(!r||!r.success)return;const d=r.data;
  if(d.portal)document.querySelectorAll('.pl').forEach(a=>{a.href=d.portal});$('sy').textContent='SY '+String(d.sy).replace('-','\u2013');
