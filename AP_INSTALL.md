@@ -9,7 +9,7 @@ The `rebuild/clean-start` branch contains the new AP_ implementation and legacy 
 4. Add the enrollment-control rows to `Settings`.
 5. Preserve existing user records by migrating columns by header name, not by shifting cells.
 6. Update `AP_Config.gs` and `AP_Auth.gs` in the bound Apps Script project.
-7. Run `AP_healthCheck`; it should validate all 18 tabs.
+7. Run `AP_healthCheck`; it should validate all 17 tabs.
 
 ## Current implementation status
 The code contains the revised OTP challenge foundation for parent-email verification during new-student registration and invitation-based parent registration. The complete username/password login, password-change flow, admin account provisioning, invitation management, link-request management, session issuance, and authenticated UI are not yet complete.
