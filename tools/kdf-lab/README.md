@@ -38,7 +38,7 @@ The build output is written to `dist/AP_KdfBundle.gs`. The generated bundle is i
 ## Not covered yet
 
 - Cryptographically secure salt generation in Apps Script
-- Apps Script Base64 and UTF-8 adapter compatibility
+- Apps Script Base64 and UTF-8 adapter compatibility (harness added; must be run manually in isolated GAS project)
 - Full Apps Script record creation/verification integration
 - Account creation, login, reset, session issuance, or migration
 
@@ -46,7 +46,7 @@ The storage format is currently:
 - `PasswordHash`: `pbkdf2-sha256$v1$<iterations>$<base64-derived-key>`
 - `PasswordSalt`: Base64-encoded random salt bytes (minimum 16 bytes; target 32 bytes)
 
-The 600,000 iteration setting remains provisional. The parser accepts 100,000 through 2,000,000 iterations to allow explicit future migration policy; creation must use the configured approved work factor. No login endpoint should call this module yet.
+The isolated Apps Script harness now tests a 32-byte salt adapter made by concatenating two UUIDv4 values from `Utilities.getUuid()`. Apps Script documents this method as equivalent to Java `UUID.randomUUID()`, and Java documents that method as using a cryptographically strong pseudorandom number generator. This is a documented-equivalence assumption, not an independent certification of Google's implementation; the harness validates UUIDv4 shape and distinct outputs but cannot prove entropy. A security review must approve this assumption before production use. Do not substitute `Math.random()`, timestamps, or predictable values for salt generation.\n\nThe 600,000 iteration setting remains provisional. The parser accepts 100,000 through 2,000,000 iterations to allow explicit future migration policy; creation must use the configured approved work factor. No login endpoint should call this module yet.
 
 Do not enable authentication based on these lab tests alone.
 
