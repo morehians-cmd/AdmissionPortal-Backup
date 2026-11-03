@@ -20,6 +20,7 @@
 function runDatabaseFakeSheetIntegrationTests() {
   const results = [];
   function check(name, fn) {
+    resetFakeBook();
     try {
       if (fn() !== true) throw new Error('Assertion returned false');
       results.push({ test: name, status: 'PASS' });
@@ -55,7 +56,13 @@ function runDatabaseFakeSheetIntegrationTests() {
   FakeRange.prototype.setValues = function (values) {
     if (!Array.isArray(values) || values.length !== this.numRows ||
         values.some(function (row) { return !Array.isArray(row) || row.length !== this.numCols; })) {
-      throw new Error('FakeRange setValues dimensions do not match range.');
+      const actualRows = Array.isArray(values) ? values.length : 'non-array';
+      const actualCols = Array.isArray(values) && Array.isArray(values[0]) ? values[0].length : 'n/a';
+      throw new Error(
+        'FakeRange setValues dimensions do not match range: requested range ' +
+        this.numRows + 'x' + this.numCols + ' at R' + this.row + 'C' + this.col +
+        ', supplied values ' + actualRows + 'x' + actualCols + '.'
+      );
     }
     if (this.sheet.failBeforeNextWrite) {
       this.sheet.failBeforeNextWrite = false;
@@ -105,10 +112,15 @@ function runDatabaseFakeSheetIntegrationTests() {
     return this.sheets[name] || null;
   };
 
-  const fakeBook = new FakeSpreadsheet();
-  Object.keys(AP_SCHEMA).forEach(function (table) {
-    fakeBook.addSheet(table, AP_SCHEMA[table]);
-  });
+  let fakeBook = null;
+  function resetFakeBook() {
+    fakeBook = new FakeSpreadsheet();
+    Object.keys(AP_SCHEMA).forEach(function (table) {
+      fakeBook.addSheet(table, AP_SCHEMA[table]);
+    });
+  }
+  resetFakeBook();
+
   const originalGetSpreadsheet = globalThis.AP_getSpreadsheet_;
   globalThis.AP_getSpreadsheet_ = function () { return fakeBook; };
 
@@ -213,6 +225,10 @@ function runDatabaseFakeSheetIntegrationTests() {
     });
 
     check('post-commit update acknowledgement failure leaves updated state inspectable', function () {
+      AP_appendRowLocked_('Settings', {
+        SettingKey: 'ENROLLMENT_OPEN', SettingValue: 'TRUE',
+        Description: 'test setting', IsActive: true
+      });
       const sheet = fakeBook.getSheetByName('Settings');
       sheet.failAfterNextWrite = true;
       let failed = false;
