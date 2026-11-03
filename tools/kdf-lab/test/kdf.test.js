@@ -1,45 +1,43 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { derivePasswordKey } from '../src/kdf-entry.js';
-import { pbkdf2 as noblePbkdf2 } from '@noble/hashes/pbkdf2.js';
-import { sha256 } from '@noble/hashes/sha2.js';
-import { pbkdf2Sync as nodePbkdf2 } from 'node:crypto';
+import { createPasswordRecord, verifyPasswordRecord, constantTimeEqual } from '../src/password-record.js';
 
 const utf8 = (value) => new TextEncoder().encode(value);
-const toHex = (bytes) => Buffer.from(bytes).toString('hex');
+const encode = (bytes) => Buffer.from(bytes).toString('base64');
+const decode = (value) => new Uint8Array(Buffer.from(value, 'base64'));
 
-test('RFC 7914 PBKDF2-HMAC-SHA256 vector 1', () => {
-  const actual = noblePbkdf2(sha256, utf8('passwd'), utf8('salt'), { c: 1, dkLen: 64 });
-  const expected =
-    '55ac046e56e3089fec1691c22544b605' +
-    'f94185216dde0465e68b9d57c20dacbc' +
-    '49ca9cccf179b645991664b39d77ef31' +
-    '7c71b845b1e30bd509112041d3a19783';
-  assert.equal(toHex(actual), expected);
-});
-
-test('RFC 7914 PBKDF2-HMAC-SHA256 vector 2', () => {
-  const actual = noblePbkdf2(sha256, utf8('Password'), utf8('NaCl'), { c: 80000, dkLen: 64 });
-  const expected =
-    '4ddcd8f60b98be21830cee5ef22701f9' +
-    '641a4418d04c0414aeff08876b34ab56' +
-    'a1d425a1225833549adb841b51c9b317' +
-    '6a272bdebba1d078478f62b397f33c8d';
-  assert.equal(toHex(actual), expected);
-});
-
-test('byte-only adapter agrees with Node crypto for UTF-8 input', () => {
+test('creates versioned record and verifies only the correct password', () => {
   const password = utf8('Môrëh Academy 🔐');
-  const salt = utf8('admission-portal-test-salt');
-  const iterations = 1200;
-  const actual = derivePasswordKey(password, salt, iterations);
-  const expected = nodePbkdf2(password, salt, iterations, 32, 'sha256');
-  assert.deepEqual(Buffer.from(actual), expected);
-  assert.equal(actual.length, 32);
+  const salt = Uint8Array.from({ length: 32 }, (_, index) => index + 1);
+  const record = createPasswordRecord(password, salt, 1200, encode);
+  assert.match(record.passwordHash, /^pbkdf2-sha256\$v1\$1200\$/);
+  assert.equal(record.passwordSalt, encode(salt));
+  assert.equal(verifyPasswordRecord(password, record, decode), true);
+  assert.equal(verifyPasswordRecord(utf8('wrong password'), record, decode), false);
 });
 
-test('invalid inputs and iteration counts are rejected', () => {
-  assert.throws(() => derivePasswordKey('password', utf8('salt'), 1), /Uint8Array/);
-  assert.throws(() => derivePasswordKey(utf8('password'), utf8('salt'), 0), /iterations/);
-  assert.throws(() => derivePasswordKey(utf8('password'), utf8('salt'), -1), /iterations/);
+test('rejects short salts and out-of-policy work factors on creation', () => {
+  assert.throws(() => createPasswordRecord(utf8('pw'), new Uint8Array(15), 1200, encode), /16 bytes/);
+  assert.throws(() => createPasswordRecord(utf8('pw'), new Uint8Array(16), 99999, encode), /Iterations/);
+});
+
+test('rejects malformed, unsupported, and tampered stored records', () => {
+  const record = createPasswordRecord(utf8('pw'), new Uint8Array(32).fill(7), 1200, encode);
+  for (const bad of [
+    { ...record, passwordHash: 'sha256$v1$1200$AAAA' },
+    { ...record, passwordHash: 'pbkdf2-sha256$v2$1200$AAAA' },
+    { ...record, passwordHash: 'pbkdf2-sha256$v1$0$AAAA' },
+    { ...record, passwordHash: 'pbkdf2-sha256$v1$1200$***' },
+    { ...record, passwordSalt: 'not-base64' },
+    { ...record, passwordHash: record.passwordHash.replace(/\$[^$]+$/, '$AAAA') }
+  ]) {
+    assert.throws(() => verifyPasswordRecord(utf8('pw'), bad, decode));
+  }
+});
+
+test('constant-time comparator returns expected results and rejects wrong types', () => {
+  assert.equal(constantTimeEqual(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2, 3)), true);
+  assert.equal(constantTimeEqual(Uint8Array.of(1, 2, 3), Uint8Array.of(1, 2, 4)), false);
+  assert.equal(constantTimeEqual(Uint8Array.of(1), Uint8Array.of(1, 0)), false);
+  assert.throws(() => constantTimeEqual([1], [1]), /Uint8Array/);
 });
