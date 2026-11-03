@@ -112,6 +112,6 @@ If the existing AuditLogs structure proves insufficient for operational recovery
 - Keep public deployment disabled while session validation and protected endpoint authorization are incomplete.
 - Do not use the live admission spreadsheet for failure-injection tests. Use a separate Apps Script project with fake in-memory sheets.
 
-## 8. Spreadsheet impact
+## 8. Isolated recovery-model harness\n\nA first fake-state harness is available at `tools/kdf-lab/gas/AP_TransactionRecoveryTest.gs`. It injects failures around journal, challenge, record, invitation, and audit phases; checks planned-ID idempotency, completion recognition, partial-link escalation, no premature success response, and journal secret exclusion. Run it in a separate Apps Script V8 project with `runTransactionRecoveryTests`.\n\nImportant limitation: this harness exercises an in-memory recovery model, not Google Sheets persistence, actual lock contention, Apps Script process termination, or a production transaction coordinator. A passing result is necessary but not sufficient. The next implementation step must adapt the model to fake sheet interfaces and test the real persistence helpers without touching the live spreadsheet.\n\n## 9. Spreadsheet impact
 
 No spreadsheet changes are proposed at this stage. This design uses existing AuditLogs fields as a journal proposal. A dedicated transaction tab or schema change requires a separate decision and approval before implementation.
