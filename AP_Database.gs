@@ -25,7 +25,7 @@ function AP_readRows_(name) {
     const out={}; headers.forEach(function(h,i){out[h]=row[i] instanceof Date?row[i].toISOString():row[i];}); return out;
   });
 }
-/** Internal append primitive. Call only after authorization and validation. */
+/** Internal append primitive. Call only after authorization and validation. Never call from a transaction that already holds the script lock. */
 function AP_appendRow_(name,record) {
   const headers=AP_SCHEMA[name]; if(!headers||!record||typeof record!=='object') throw new Error('Invalid table or record.');
   const sh=AP_getSpreadsheet_().getSheetByName(name); if(!sh) throw new Error('Missing sheet: '+name);
