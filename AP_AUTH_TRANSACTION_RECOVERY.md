@@ -132,7 +132,17 @@ This confirms the modeled recovery behavior only. It does not test Google Sheets
 
 ### Next validation step
 
-Adapt the model to fake sheet interfaces and exercise the actual persistence helpers and recovery protocol without touching the live spreadsheet. Include concurrent-attempt tests around the same invitation and verification handle. Keep account creation disabled until the transaction coordinator, KDF, authorization, and recovery gates are separately reviewed.
+A deeper fake-sheet integration harness has now been added at `tools/kdf-lab/gas/AP_DatabaseFakeSheetIntegrationTest.gs`. In a separate, empty Apps Script V8 project, copy exactly these three files from the same branch:
+
+1. `AP_Config.gs`
+2. `AP_DatabaseTransactions.gs`
+3. `tools/kdf-lab/gas/AP_DatabaseFakeSheetIntegrationTest.gs`
+
+Run `runDatabaseFakeSheetIntegrationTests()` and return the complete JSON report. The harness replaces `AP_getSpreadsheet_()` with in-memory Spreadsheet/Range test doubles and exercises the actual production append, schema-guard, and keyed-update helpers. It injects failures before a fake write commits and after a fake write commits but before acknowledgement, then checks whether the resulting state can be inspected by its planned ID. It never opens the live spreadsheet.
+
+This still does not prove real Google Sheets persistence, actual LockService contention, Apps Script process termination, or a production multi-tab transaction coordinator. The helpers are explicitly lock-held primitives; a separate transaction layer must acquire the lock once, revalidate all state under that lock, and perform recovery inspection. Do not claim concurrency safety from this harness.
+
+Keep account creation disabled until the transaction coordinator, KDF, authorization, and recovery gates are separately reviewed.
 
 ## 9. Spreadsheet impact
 
