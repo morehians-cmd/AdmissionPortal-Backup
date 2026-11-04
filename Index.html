@@ -643,7 +643,74 @@ aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
 </style>
 <!-- ============================================================
   MOREH ACADEMY PORTAL - MODERN UI THEME (CSS only)
-  INSTALL: paste this whole <style> block in Index.html, in <head>, AFTER the last existing </style> and before </head>.
+  INSTALL: paste this whole <style> block in Index.html, in <head>, AFTER the last existing </style> and before 
+<style id="public-admissions-sections">
+#login .lp-hdr{z-index:30}
+#login .lp-links{gap:22px}
+#login .lp-public-section{padding:72px 0;background:#f5f8fc;border-top:1px solid var(--lp-line)}
+#login .lp-public-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+#login .lp-public-card,#login .lp-sch-card,#login .lp-enroll-card{background:#fff;border:1px solid var(--lp-line);border-radius:17px;padding:22px;box-shadow:0 8px 25px #102a5609}
+#login .lp-public-card h3,#login .lp-sch-card h3,#login .lp-enroll-card h3{font:700 17px var(--lp-disp);color:var(--lp-navy);margin:0 0 8px}
+#login .lp-public-card p,#login .lp-sch-card p,#login .lp-enroll-card p{font-size:13px;line-height:1.75;color:var(--lp-mut);margin:0;white-space:pre-line}
+#login .lp-card-label{display:block;color:var(--lp-blue);font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+#login .lp-leader-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:17px}
+#login .lp-leader{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--lp-line);border-radius:14px;background:#fff}
+#login .lp-leader img,#login .lp-leader .lp-avatar{width:42px;height:42px;flex:none;border-radius:50%;object-fit:cover;background:#eaf2ff;color:#155eef;display:grid;place-items:center;font-weight:800}
+#login .lp-leader b{display:block;color:var(--lp-navy);font-size:12px}
+#login .lp-leader small{display:block;color:var(--lp-mut);font-size:10px}
+#login .lp-timeline-wrap{margin-top:30px}
+#login .lp-timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#login .lp-milestone{border-left:3px solid var(--lp-blue);background:#fff;border-radius:0 14px 14px 0;padding:16px 18px;box-shadow:0 6px 20px #102a5608}
+#login .lp-milestone b{color:var(--lp-blue);font-size:12px;letter-spacing:.06em}
+#login .lp-milestone h4{font:700 15px var(--lp-disp);color:var(--lp-navy);margin:5px 0}
+#login .lp-milestone p{font-size:12px;color:var(--lp-mut);margin:0;line-height:1.65}
+#login .lp-scholarship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+#login .lp-sch-card .lp-sch-code{font-size:10px;color:var(--lp-blue);font-weight:800;letter-spacing:.16em}
+#login .lp-sch-card h3{font-size:20px;margin:7px 0}
+#login .lp-sch-card details{border-top:1px solid var(--lp-line);margin-top:13px;padding-top:10px}
+#login .lp-sch-card summary{cursor:pointer;color:var(--lp-blue);font-size:12px;font-weight:700}
+#login .lp-sch-card .lp-sch-copy{font-size:12px;color:var(--lp-mut);line-height:1.75;margin-top:10px;white-space:pre-line}
+#login .lp-public-note{font-size:11px;line-height:1.7;color:var(--lp-mut);margin:18px 0 0;padding:13px 15px;background:#eaf2ff;border:1px solid #d8e6ff;border-radius:12px}
+#login .lp-campus{padding:72px 0;background:#102a56;color:#fff}
+#login .lp-campus .lp-shead h2{color:#fff}
+#login .lp-campus .lp-shead p{color:#dce9ff}
+#login .lp-campus-content{color:#fff}
+#login .lp-campus-copy{background:#ffffff12;border:1px solid #ffffff24;border-radius:17px;padding:22px;color:#e3edff;font-size:13px;line-height:1.8}
+#login .lp-campus-copy h3,#login .lp-campus-copy h4{color:#fff;margin:12px 0 5px}
+#login .lp-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+#login .lp-gallery figure{margin:0;border-radius:14px;overflow:hidden;background:#183b70;border:1px solid #ffffff24}
+#login .lp-gallery img{width:100%;height:150px;object-fit:cover;display:block}
+#login .lp-gallery figcaption{padding:9px 11px;font-size:11px;color:#e3edff}
+#login .lp-enroll-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+#login .lp-enroll-card span{font:800 12px var(--lp-disp);color:var(--lp-blue)}
+#login .lp-enrollment-detail{margin-top:18px;background:#fff;border:1px solid var(--lp-line);border-radius:17px;padding:22px;color:var(--lp-mut);font-size:13px;line-height:1.8}
+#login .lp-enrollment-detail h3,#login .lp-enrollment-detail h4{color:var(--lp-navy);font-family:var(--lp-disp);margin:10px 0 5px}
+#login .lp-loading{color:var(--lp-mut);font-size:13px;padding:18px;border:1px dashed var(--lp-line);border-radius:14px;background:#fff}
+#login .lp-campus .lp-loading{color:#dce9ff;background:#ffffff10;border-color:#ffffff35}
+#login .lp-journey{padding:0 0 65px}
+#login [id]{scroll-margin-top:90px}
+html[data-theme=dark] #login .lp-public-section,html[data-theme=dark] #login .lp-info{background:#0b1033;border-color:var(--line)}
+html[data-theme=dark] #login .lp-public-card,html[data-theme=dark] #login .lp-sch-card,html[data-theme=dark] #login .lp-enroll-card,html[data-theme=dark] #login .lp-milestone,html[data-theme=dark] #login .lp-enrollment-detail{background:#10173a;border-color:var(--line)}
+html[data-theme=dark] #login .lp-public-card h3,html[data-theme=dark] #login .lp-sch-card h3,html[data-theme=dark] #login .lp-enroll-card h3,html[data-theme=dark] #login .lp-enrollment-detail h3,html[data-theme=dark] #login .lp-enrollment-detail h4{color:#e9edff}
+html[data-theme=dark] #login .lp-public-card p,html[data-theme=dark] #login .lp-sch-card p,html[data-theme=dark] #login .lp-enroll-card p,html[data-theme=dark] #login .lp-enrollment-detail{color:#aab7dc}
+html[data-theme=dark] #login .lp-leader{background:#10173a;border-color:var(--line)}
+html[data-theme=dark] #login .lp-leader b{color:#e9edff}
+html[data-theme=dark] #login .lp-public-note{background:#18234a;border-color:#293a70;color:#c4d0f4}
+@media(max-width:900px){#login .lp-leader-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#login .lp-enroll-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#login .lp-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#login .lp-wrap{width:calc(100% - 32px)}#login .lp-nav{flex-wrap:wrap;gap:10px;padding:10px 0}#login .lp-links{display:flex;order:3;flex:0 0 100%;gap:18px;overflow-x:auto;white-space:nowrap;padding:7px 0 3px;scrollbar-width:thin}#login .lp-nav>.lp-btn{margin-left:auto;min-height:40px;padding:0 12px;font-size:11px}#login .lp-public-grid,#login .lp-scholarship-grid,#login .lp-timeline{grid-template-columns:1fr}#login .lp-leader-grid{grid-template-columns:1fr}#login .lp-enroll-grid{grid-template-columns:1fr 1fr}#login .lp-public-section,#login .lp-campus{padding:54px 0}#login .lp-gallery img{height:125px}}
+@media(prefers-reduced-motion:reduce){#login *{scroll-behavior:auto!important;transition:none!important}}
+</style>
+<style id="public-admissions-mobile-timeline">
+#login .lp-milestone{border:0;border-left:3px solid var(--lp-blue);padding:0;background:#fff}
+#login .lp-milestone summary{list-style:none;cursor:pointer;padding:16px 18px}
+#login .lp-milestone summary::-webkit-details-marker{display:none}
+#login .lp-milestone summary:after{content:"＋";float:right;color:var(--lp-blue);font-weight:800}
+#login .lp-milestone[open] summary:after{content:"−"}
+#login .lp-milestone h4{margin:5px 0 0}
+#login .lp-milestone>p{padding:0 18px 16px}
+html[data-theme=dark] #login .lp-milestone{background:#10173a}
+</style>
+</head>.
   It only restyles. No JS, no DOM ids, no data-act / data-k hooks, no backend call is touched.
   Everything is inside @media screen, so printed forms, slips, ID cards and reports are unchanged.
 ============================================================ -->
@@ -918,7 +985,6 @@ aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
 @media(max-width:900px){
  .lp-hero{padding:44px 0 52px}.lp-grid{grid-template-columns:1fr;gap:30px}.lp-links{display:none}
  .lp-steps,.lp-igrid{grid-template-columns:1fr}.lp-step+.lp-step{border-left:0;border-top:1px solid var(--lp-line)}
- <div class="lp-orb lp-o1"></div><div class="lp-orb lp-o2"></div><div class="lp-orb lp-o3"></div>
 }
 @media(max-width:600px){
  .lp-wrap{width:calc(100% - 32px)}.lp-hdr{height:68px}.lp-card{padding:22px}.lp-trust{gap:12px}
@@ -1057,37 +1123,33 @@ html[data-theme=dark] .shchip.sh-pending{
 <body>
 <div id="login">
  <div class="lp-hdr"><div class="lp-wrap lp-nav">
-  <a class="lp-brand" href="javascript:void(0)" onclick="window.scrollTo({top:0,behavior:'smooth'})"><span class="lp-mark">A</span><span>ADMISSION PORTAL</span></a>
+  <a class="lp-brand" href="#lp-home" aria-label="Moreh Academy home"><img class="lp-logo" src="https://i.imgur.com/roCMSYf.jpeg" alt="Moreh Academy crest"><span>MOREH ACADEMY</span></a>
   <nav class="lp-links" aria-label="Main navigation">
-   <a href="javascript:void(0)" onclick="document.getElementById('lp-journey').scrollIntoView({behavior:'smooth'})">How it works</a>
-   <a href="javascript:void(0)" onclick="document.getElementById('lp-info').scrollIntoView({behavior:'smooth'})">Admission information</a>
-   <a href="javascript:void(0)" onclick="document.getElementById('lp-contact').scrollIntoView({behavior:'smooth'})">Contact</a>
+   <a href="#lp-about">About</a><a href="#lp-timeline">History</a><a href="#lp-scholarships">Scholarships</a><a href="#lp-campus">Campus</a><a href="#lp-enrollment">Enrollment Guide</a>
   </nav>
-  <a class="lp-btn" href="javascript:void(0)" onclick="var i=document.getElementById('u');i.scrollIntoView({behavior:'smooth',block:'center'});i.focus()">Sign in <span aria-hidden="true">→</span></a>
+  <a class="lp-btn" href="#lp-signin" onclick="setTimeout(function(){var i=document.getElementById('u');if(i)i.focus()},250)">Applicant Sign In <span aria-hidden="true">→</span></a>
  </div></div>
 
- <section class="lp-hero"><div class="lp-wrap lp-grid">
+ <section class="lp-hero" id="lp-home"><div class="lp-wrap lp-grid">
   <div>
-   <span class="lp-eyebrow">A simpler admission experience</span>
-   <h1 class="lp-h1">A clearer path to your next chapter.</h1>
-   <p class="lp-lead">A welcoming place for families to explore admission, complete student information, and follow application progress with confidence.</p>
+   <span class="lp-eyebrow">Moreh Academy · Admissions</span>
+   <h1 class="lp-h1">A brighter future begins with <span style="color:var(--lp-blue)">Moreh.</span></h1>
+   <p class="lp-lead">Discover a learning community where knowledge, character, and purpose come together. Explore our school, review admission opportunities, and begin your family's Moreh journey.</p>
    <div class="lp-actions">
-    <a class="lp-btn" href="javascript:void(0)" onclick="document.getElementById('lp-journey').scrollIntoView({behavior:'smooth'})">Discover the process <span aria-hidden="true">→</span></a>
-    <a class="lp-btn light" href="javascript:void(0)" onclick="document.getElementById('lp-info').scrollIntoView({behavior:'smooth'})">View admission information</a>
+    <a class="lp-btn" href="#lp-enrollment">Explore Enrollment <span aria-hidden="true">→</span></a>
+    <a class="lp-btn light" href="#lp-about">Discover Moreh Academy</a>
    </div>
-   <div class="lp-trust"><span>Family-friendly experience</span><span>Clear application steps</span><span>Staff-verified requirements</span></div>
+   <div class="lp-trust"><span>Preschool to Senior High School</span><span>Student-centered learning</span><span>Guided admissions</span></div>
   </div>
-
-  <div class="lp-side">
+  <div class="lp-side" id="lp-signin">
    <div class="lp-orb main"></div><div class="lp-orb top"></div><div class="lp-orb bottom"></div>
    <div class="lp-card">
-    <h2>Welcome back</h2>
-    <p class="lp-sub">Sign in to continue</p>
+    <h2>Welcome back</h2><p class="lp-sub">Sign in to continue your admission journey.</p>
     <label class="sec" for="u">USERNAME</label><input id="u" autocomplete="username">
     <label class="sec" for="p">PASSWORD</label><input id="p" type="password" autocomplete="current-password">
-    <button class="lp-btn lp-full" id="go">Sign in</button>
+    <button class="lp-btn lp-full" id="go">Sign in securely</button>
     <p class="lp-links2"><a href="javascript:void(0)" data-act="forgot">Forgot password?</a></p>
-    <p class="lp-links2"><a href="javascript:void(0)" data-act="showreg">New enrollee? Create an account</a></p>
+    <p class="lp-links2"><a href="javascript:void(0)" data-act="showreg">New applicant? Create an account</a></p>
     <div id="regbox" class="hidden">
      <label class="sec" for="rs">SURNAME</label><input id="rs">
      <label class="sec" for="rf">FIRST NAME</label><input id="rf">
@@ -1109,26 +1171,45 @@ html[data-theme=dark] .shchip.sh-pending{
  </div></section>
 
  <section class="lp-journey" id="lp-journey"><div class="lp-wrap"><div class="lp-steps">
-  <article class="lp-step"><div class="lp-num">01 · EXPLORE</div><h2>Know what to prepare</h2><p>Review admission information and the requirements for your application.</p></article>
-  <article class="lp-step"><div class="lp-num">02 · APPLY</div><h2>Complete student details</h2><p>Provide accurate applicant and student information through a guided process.</p></article>
-  <article class="lp-step"><div class="lp-num">03 · FOLLOW</div><h2>Stay informed</h2><p>Check application updates and requirements verified by admissions personnel.</p></article>
+  <article class="lp-step"><div class="lp-num">01 · EXPLORE</div><h2>Discover Moreh</h2><p>Learn about our mission, values, leadership, and campus community.</p></article>
+  <article class="lp-step"><div class="lp-num">02 · APPLY</div><h2>Prepare your application</h2><p>Understand the enrollment steps and prepare the required student information.</p></article>
+  <article class="lp-step"><div class="lp-num">03 · FOLLOW</div><h2>Stay informed</h2><p>Sign in to follow your application and review verified admissions updates.</p></article>
  </div></div></section>
 
- <section class="lp-info" id="lp-info"><div class="lp-wrap">
-  <div class="lp-shead"><span class="lp-eyebrow">Your admission journey</span><h2>Everything starts with clear information.</h2><p>Find the guidance you need at each stage of the admission process.</p></div>
-  <div class="lp-igrid">
-   <article class="lp-icard"><div class="lp-ibox">◎</div><h3>Explore programs</h3><p>Learn about available academic offerings and find the right path for your goals.</p></article>
-   <article class="lp-icard"><div class="lp-ibox">▤</div><h3>Prepare requirements</h3><p>Review the admission checklist. Physical requirements are submitted to the school for staff verification.</p></article>
-   <article class="lp-icard"><div class="lp-ibox">↗</div><h3>Track your progress</h3><p>Follow application updates and see the next steps from your applicant account.</p></article>
+ <section class="lp-info" id="lp-about"><div class="lp-wrap">
+  <div class="lp-shead"><span class="lp-eyebrow">Institutional resources</span><h2>Get to know Moreh Academy.</h2><p>Explore the vision, mission, core values, leadership, and history that shape our learning community.</p></div>
+  <div id="lp-about-content" class="lp-public-grid"><div class="lp-loading">Loading institutional information…</div></div>
+  <div id="lp-timeline" class="lp-timeline-wrap"></div>
+ </div></section>
+
+ <section class="lp-public-section" id="lp-scholarships"><div class="lp-wrap">
+  <div class="lp-shead"><span class="lp-eyebrow">Opportunities & support</span><h2>Scholarship Programs</h2><p>Explore the scholarship and voucher programs presented by Moreh Academy. Eligibility and current-year requirements should be confirmed with the Admissions Office.</p></div>
+  <div id="lp-scholarship-content" class="lp-scholarship-grid"><div class="lp-loading">Loading scholarship information…</div></div>
+  <p class="lp-public-note">Program availability, eligibility, benefits, funding, and deadlines may change. Please confirm current requirements with Moreh Academy before applying.</p>
+ </div></section>
+
+ <section class="lp-campus" id="lp-campus"><div class="lp-wrap">
+  <div class="lp-shead"><span class="lp-eyebrow">Explore Moreh</span><h2>Facilities & Campus Tour</h2><p>Take a closer look at our facilities and learning spaces.</p></div>
+  <div id="lp-facilities-content" class="lp-campus-content"><div class="lp-loading">Loading campus information…</div></div>
+  <div id="lp-facilities-gallery" class="lp-gallery"></div>
+ </div></section>
+
+ <section class="lp-info" id="lp-enrollment"><div class="lp-wrap">
+  <div class="lp-shead"><span class="lp-eyebrow">Your next chapter</span><h2>Enrollment Guide</h2><p>A clear overview of the admission journey, from preparation to application updates.</p></div>
+  <div class="lp-enroll-grid">
+   <article class="lp-enroll-card"><span>01</span><h3>Explore</h3><p>Review the grade levels, admission information, and scholarship opportunities.</p></article>
+   <article class="lp-enroll-card"><span>02</span><h3>Create an account</h3><p>Register securely using the applicant details and guardian information when required.</p></article>
+   <article class="lp-enroll-card"><span>03</span><h3>Complete your application</h3><p>Provide accurate student information and follow the portal's application steps.</p></article>
+   <article class="lp-enroll-card"><span>04</span><h3>Submit & track</h3><p>Submit documents for staff verification and monitor your status in the applicant portal.</p></article>
   </div>
+  <div id="lp-enrollment-detail" class="lp-enrollment-detail"></div>
  </div></section>
 
  <section class="lp-cta" id="lp-contact"><div class="lp-wrap lp-ctai">
-  <div><h2>Ready to take the next step?</h2><p>Sign in, or create your account to begin your application.</p></div>
-  <a class="lp-btn" href="javascript:void(0)" onclick="var i=document.getElementById('u');i.scrollIntoView({behavior:'smooth',block:'center'});i.focus()">Sign in now <span aria-hidden="true">→</span></a>
+  <div><h2>Begin your Moreh journey.</h2><p>Access your applicant account to continue or start your admission application.</p></div>
+  <a class="lp-btn" href="#lp-signin" onclick="setTimeout(function(){var i=document.getElementById('u');if(i)i.focus()},250)">Applicant Sign In <span aria-hidden="true">→</span></a>
  </div></section>
-
- <div class="lp-foot"><div class="lp-wrap lp-footi"><span>Admission Portal · Temporary identity</span><span>Preview interface · School details to be confirmed</span></div></div>
+ <div class="lp-foot"><div class="lp-wrap lp-footi"><span>MOREH ACADEMY · Admissions Portal</span><span>Upper Bicutan, Taguig City · Contact: info@morehacademy.com</span></div></div>
 </div>
 <div id="app" class="hidden"><button class="skip" data-act="skip">Skip to main content</button><aside id="side" role="navigation" aria-label="Main Navigation"><div class="brand"><img src="https://i.imgur.com/roCMSYf.jpeg" alt=""><div><b>Moreh Academy</b><small id="role"></small></div></div><div id="nav"></div><div class="me"><div id="who"></div><button class="nav" data-act="out" style="margin-top:8px"></button></div></aside><div id="sbbd" data-act="menu"></div>
 <main id="main"><div class="top" role="banner"><div class="tl" style="display:flex;gap:14px;align-items:center"><button id="menu" data-act="menu" aria-label="Toggle navigation" aria-controls="side" aria-expanded="true" title="Toggle navigation">&#9776;</button><img class="tlogo" src="https://i.imgur.com/roCMSYf.jpeg" alt=""><div><h1 id="title"></h1><p id="sub"></p></div></div><div id="gsw" class="gsw hidden"><input id="gs" type="text" autocomplete="off" placeholder="Search" aria-label="Global search" role="combobox" aria-autocomplete="list" aria-controls="gsr" aria-expanded="false"><div id="gsr" class="gsr hidden" role="listbox"></div></div><div class="tr" style="display:flex;gap:12px;align-items:center;position:relative"><button class="av" id="gsb" data-act="gsopen" aria-label="Search" title="Search" style="background:#fff;color:var(--navy);border:1px solid var(--line)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"/></svg></button><span id="rbd" class="rbd hidden"></span><span style="position:relative"><button class="av" style="background:#fff;color:var(--navy);border:1px solid var(--line)" data-act="bell" title="Notifications" aria-label="Notifications">&#128276;</button><span id="nb" class="hidden" style="position:absolute;top:-4px;right:-4px;background:#d93025;color:#fff;border-radius:999px;min-width:20px;height:20px;font:700 11px/20px Inter,sans-serif;text-align:center;padding:0 5px"></span></span><div class="dd hidden" id="np" style="width:340px;right:56px;max-height:70vh;overflow:auto"></div><div class="uchip" data-act="dd"><b id="uname"></b><small id="urole"></small></div><button class="av" id="av" data-act="dd" title="Account" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"></button><div class="dd hidden" id="dd" role="menu"></div></div></div><div id="view" tabindex="-1"></div><footer id="ftr" class="ftr"><div class="fl1"><span>&copy; <span id="fyr"></span> Moreh Academy</span><span>v1.0</span><a href="javascript:void(0)" data-act="nav" data-v="pp">Data Privacy Policy</a></div><div class="fl1"><span id="fst" class="fst on"><i></i><span>Online</span></span><a href="mailto:morehians@gmail.com">morehians@gmail.com</a><a href="tel:09618766886">0961 876 6886</a></div></footer></main><nav id="bnav" aria-label="Quick navigation"></nav></div>
@@ -4595,4 +4676,165 @@ dxDraw=function(X,H){_dxDrawTh(X,H);
  rec.insertAdjacentHTML('beforebegin','<div id="maov"></div>');
  if(S.dsh&&S.dsh.stats)maDraw(S.dsh.stats);
  else google.script.run.withSuccessHandler(r=>{if(r&&r.success){S.dsh=r.data;maDraw(r.data.stats)}}).withFailureHandler(()=>{}).dashboard(S.token)};
-</script></body></html>
+
+
+/* ===== Public admissions homepage content (no applicant session required) ===== */
+(function(){
+  const host=id=>document.getElementById(id);
+  const textFmt=v=>esc(String(v==null?'':v)).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/\n/g,'<br>');
+  const imageCall=(fn,index,slot)=>{
+    google.script.run.withSuccessHandler(r=>{
+      if(!r||!r.success||!r.data)return;
+      const el=host(slot);if(!el)return;
+      const img=el.querySelector('img');if(img)img.src=r.data;
+    }).withFailureHandler(()=>{})[fn](index);
+  };
+  function aboutDraw(d){
+    const el=host('lp-about-content'),tl=host('lp-timeline');if(!el||!d)return;
+    const card=(label,x)=>'<article class="lp-public-card"><span class="lp-card-label">'+label+'</span><h3>'+esc(x&&x.title||label)+'</h3><p>'+esc(x&&x.text||'Institutional information will be published here once confirmed by the Academy.')+'</p></article>';
+    const values=(d.values||[]).map(v=>'<article class="lp-public-card"><span class="lp-card-label">Core Value</span><h3>'+esc(v.title)+'</h3><p>'+esc(v.text||'')+'</p></article>').join('');
+    const leaders=(d.leaders||[]).map((l,i)=>'<div class="lp-leader" id="lp-leader-'+i+'"><img alt="" src="" style="display:'+(l.hasPhoto?'block':'none')+'"><span class="lp-avatar" style="display:'+(l.hasPhoto?'none':'grid')+'">'+esc((l.name||'?').charAt(0).toUpperCase())+'</span><div><b>'+esc(l.name)+'</b><small>'+esc(l.title||'')+'</small></div></div>').join('');
+    el.innerHTML=card('Our Vision',d.vision)+card('Our Mission',d.mission)+(values?'<div class="lp-public-card" style="grid-column:1/-1"><span class="lp-card-label">Guiding Principles</span><div class="lp-public-grid">'+values+'</div></div>':'')+(leaders?'<div style="grid-column:1/-1"><span class="lp-card-label">Key Leadership Team</span><div class="lp-leader-grid">'+leaders+'</div></div>':'');
+    (d.leaders||[]).forEach((l,i)=>{if(!l.hasPhoto)return;google.script.run.withSuccessHandler(r=>{if(!r||!r.success||!r.data)return;const box=host('lp-leader-'+i);if(!box)return;const im=box.querySelector('img'),av=box.querySelector('.lp-avatar');im.src=r.data;im.style.display='block';av.style.display='none'}).withFailureHandler(()=>{}).getPublicAboutPhoto(i)});
+    const milestones=(d.timeline||[]).map(t=>'<details class="lp-milestone"><summary><b>'+esc(t.year)+'</b><h4>'+esc(t.title||'Institutional milestone')+'</h4></summary><p>'+esc(t.text||'')+'</p></details>').join('');
+    tl.innerHTML=milestones?'<div class="lp-card-label">Interactive History Timeline · Select a milestone to explore</div><div class="lp-timeline">'+milestones+'</div>':'';
+    if(host('lp-legacy-about')&&window.MRH_PUBLIC_LEGACY)host('lp-legacy-about').innerHTML=window.MRH_PUBLIC_LEGACY;
+  }
+  function scholarshipsDraw(list){
+    const el=host('lp-scholarship-content');if(!el)return;
+    const names={TLC:'TLC Scholarship',ESC:'ESC Program',QVR:'Senior High School Voucher · QVR',QVA:'Senior High School Voucher · QVA'};
+    el.innerHTML=(list||[]).map(p=>{
+      const sections=(p.sections||[]).map((s,i)=>'<details '+(i===0?'':'')+'><summary>'+esc(s.title)+'</summary><div class="lp-sch-copy">'+textFmt(s.items)+'</div></details>').join('');
+      return '<article class="lp-sch-card"><span class="lp-sch-code">'+esc(p.program)+'</span><h3>'+esc(names[p.program]||p.program)+'</h3>'+sections+'</article>';
+    }).join('')||'<div class="lp-loading">Scholarship information will be published here.</div>';
+  }
+  function facilitiesDraw(data){
+    const el=host('lp-facilities-content'),gallery=host('lp-facilities-gallery');if(!el)return;
+    el.innerHTML='<div class="lp-campus-copy">'+(data.facilitiesHtml||'<p>Campus facilities and learning spaces will be introduced here.</p>')+'</div>';
+    const items=data.facilitiesGallery||[];
+    gallery.innerHTML=items.map((x,i)=>'<figure id="lp-facility-'+i+'"><img alt="'+esc(x.caption||'Moreh Academy facility')+'" src="" loading="lazy"><figcaption>'+esc(x.caption||'Moreh Academy facility')+'</figcaption></figure>').join('');
+    items.forEach((x,i)=>imageCall('getPublicFacilitiesPhoto',i,'lp-facility-'+i));
+  }
+  function enrollmentDraw(html){const el=host('lp-enrollment-detail');if(el)el.innerHTML=html||'<p>For current requirements and grade-level guidance, please contact the Admissions Office.</p>'}
+  function load(){
+    if(!host('login')||!host('lp-about-content'))return;
+    google.script.run.withSuccessHandler(r=>{
+      if(!r||!r.success){['lp-about-content','lp-scholarship-content','lp-facilities-content'].forEach(id=>{const e=host(id);if(e)e.innerHTML='<div class="lp-loading">Information is temporarily unavailable. Please contact the Admissions Office.</div>'});return}
+      const d=r.data||{};
+      aboutDraw(d.about||{});
+      if(d.legacyAbout){const legacy=document.createElement('div');legacy.className='lp-public-card';legacy.innerHTML=d.legacyAbout;host('lp-about-content').appendChild(legacy)}
+      scholarshipsDraw(d.scholarships||[]);
+      facilitiesDraw(d);
+      enrollmentDraw(d.enrollmentGuide||'');
+    }).withFailureHandler(()=>{
+      ['lp-about-content','lp-scholarship-content','lp-facilities-content'].forEach(id=>{const e=host(id);if(e)e.innerHTML='<div class="lp-loading">Information is temporarily unavailable. Please contact the Admissions Office.</div>'});
+    }).getPublicAdmissionContent();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load);else load();
+})();
+</script><style id="moreh-admissions-visual-refinement">
+/* Moreh Academy admissions homepage — responsive visual refinement */
+#login{scroll-behavior:smooth}
+#login .lp-hdr{height:auto;min-height:78px;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 5px 24px rgba(16,42,86,.045)}
+#login .lp-nav{min-height:78px}
+#login .lp-brand{gap:12px;white-space:nowrap}
+#login .lp-logo{width:43px;height:43px;object-fit:contain;border-radius:12px;background:#fff;box-shadow:0 5px 16px rgba(16,42,86,.12)}
+#login .lp-links{align-items:center;gap:clamp(12px,1.8vw,24px);overflow:visible}
+#login .lp-links a{position:relative;padding:9px 0;transition:color .18s ease}
+#login .lp-links a:after{content:"";position:absolute;left:0;right:100%;bottom:2px;height:2px;border-radius:2px;background:var(--lp-blue);transition:right .2s ease}
+#login .lp-links a:hover:after,#login .lp-links a:focus-visible:after{right:0}
+#login .lp-nav>.lp-btn{white-space:nowrap;flex:none}
+#login .lp-hero{isolation:isolate;padding:clamp(54px,6vw,82px) 0 clamp(58px,6vw,86px)}
+#login .lp-hero:after{content:"";position:absolute;z-index:-1;width:420px;height:420px;left:-260px;bottom:-300px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.18),transparent 70%);pointer-events:none}
+#login .lp-grid{gap:clamp(30px,5vw,70px)}
+#login .lp-h1{max-width:680px}
+#login .lp-side{min-height:460px;perspective:1000px}
+#login .lp-card{width:min(410px,100%);border-radius:24px;padding:clamp(24px,3vw,34px);box-shadow:0 28px 70px rgba(16,42,86,.18),0 2px 8px rgba(16,42,86,.06);transform:translateZ(0);transition:transform .25s ease,box-shadow .25s ease}
+#login .lp-card:hover{transform:translateY(-3px);box-shadow:0 34px 82px rgba(16,42,86,.2),0 2px 8px rgba(16,42,86,.06)}
+#login .lp-card h2{font-size:28px}
+#login .lp-card input{min-height:48px}
+#login .lp-journey{position:relative;z-index:1}
+#login .lp-steps{box-shadow:0 18px 48px rgba(16,42,86,.075);border-radius:22px}
+#login .lp-step{transition:background .2s ease}
+#login .lp-step:hover{background:#f8fbff}
+#login .lp-info,#login .lp-public-section,#login .lp-campus{scroll-margin-top:120px}
+#login .lp-public-card,#login .lp-sch-card,#login .lp-enroll-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+#login .lp-public-card:hover,#login .lp-sch-card:hover,#login .lp-enroll-card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(16,42,86,.10);border-color:#cbdaf4}
+#login .lp-leader{min-width:0}
+#login .lp-leader img{width:48px;height:48px}
+#login .lp-gallery figure{transition:transform .22s ease,box-shadow .22s ease}
+#login .lp-gallery figure:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(0,0,0,.2)}
+#login .lp-gallery img{transition:transform .35s ease}
+#login .lp-gallery figure:hover img{transform:scale(1.035)}
+#login .lp-cta{position:relative;overflow:hidden}
+#login .lp-cta:after{content:"";position:absolute;width:360px;height:360px;right:-120px;top:-220px;border:1px solid rgba(255,255,255,.18);border-radius:50%;box-shadow:0 0 0 32px rgba(255,255,255,.035),0 0 0 64px rgba(255,255,255,.025);pointer-events:none}
+#login .lp-ctai{position:relative;z-index:1}
+#login a,#login button,#login summary{touch-action:manipulation}
+@media(max-width:1024px){
+ #login .lp-nav{gap:12px}
+ #login .lp-links{gap:15px}
+ #login .lp-links a{font-size:12px}
+ #login .lp-brand{font-size:12px}
+}
+@media(max-width:900px){
+ #login .lp-hdr{min-height:0}
+ #login .lp-nav{min-height:0;display:flex;flex-wrap:wrap;gap:8px 12px;padding:10px 0}
+ #login .lp-brand{order:1}
+ #login .lp-nav>.lp-btn{order:2;margin-left:auto;min-height:40px;padding:0 14px;font-size:11px}
+ #login .lp-links{display:flex!important;order:3;flex:0 0 100%;width:100%;gap:22px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:7px 2px 9px;scrollbar-width:thin;overscroll-behavior-x:contain}
+ #login .lp-links a{flex:none;font-size:12px}
+ #login .lp-grid{grid-template-columns:minmax(0,1fr);gap:26px}
+ #login .lp-hero{padding-top:48px}
+ #login .lp-side{min-height:420px}
+ #login .lp-steps{grid-template-columns:1fr}
+ #login .lp-step+.lp-step{border-left:0;border-top:1px solid var(--lp-line)}
+ #login .lp-public-grid,#login .lp-scholarship-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #login .lp-leader-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #login .lp-enroll-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+ #login .lp-wrap{width:calc(100% - 32px)}
+ #login .lp-logo{width:37px;height:37px}
+ #login .lp-brand{font-size:11px;gap:8px}
+ #login .lp-hdr{position:sticky;top:0}
+ #login .lp-nav{gap:7px 8px}
+ #login .lp-links{gap:19px;padding:6px 2px 8px}
+ #login .lp-nav>.lp-btn{min-height:38px;padding:0 11px;font-size:10px}
+ #login .lp-hero{padding:40px 0 46px}
+ #login .lp-h1{font-size:clamp(34px,10vw,46px);margin:14px 0}
+ #login .lp-lead{font-size:14px;line-height:1.75}
+ #login .lp-actions{display:grid;grid-template-columns:1fr}
+ #login .lp-actions .lp-btn{width:100%}
+ #login .lp-side{min-height:390px}
+ #login .lp-o1{width:250px;height:250px}
+ #login .lp-o2{width:92px;height:92px}
+ #login .lp-o3{width:68px;height:68px}
+ #login .lp-card{padding:22px;border-radius:20px}
+ #login .lp-card h2{font-size:24px}
+ #login .lp-trust{gap:9px 14px;margin-top:22px}
+ #login .lp-public-grid,#login .lp-scholarship-grid,#login .lp-leader-grid{grid-template-columns:1fr}
+ #login .lp-enroll-grid{grid-template-columns:1fr 1fr}
+ #login .lp-public-section,#login .lp-campus,#login .lp-info{padding:52px 0}
+ #login .lp-shead{margin-bottom:25px}
+ #login .lp-shead h2{font-size:27px}
+ #login .lp-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #login .lp-gallery img{height:125px}
+ #login .lp-cta{padding:48px 0}
+ #login .lp-foot{padding:22px 0}
+ #login .lp-info,#login .lp-public-section,#login .lp-campus{scroll-margin-top:112px}
+}
+@media(max-width:380px){
+ #login .lp-brand{font-size:10px}
+ #login .lp-nav>.lp-btn{font-size:9px;padding:0 9px}
+ #login .lp-enroll-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+ #login *,#login *:before,#login *:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}
+html[data-theme=dark] #login .lp-hdr{background:rgba(10,16,48,.94);border-color:rgba(150,170,255,.18)}
+html[data-theme=dark] #login .lp-logo{background:#fff}
+html[data-theme=dark] #login .lp-step:hover{background:#151f48}
+html[data-theme=dark] #login .lp-public-card:hover,html[data-theme=dark] #login .lp-sch-card:hover,html[data-theme=dark] #login .lp-enroll-card:hover{border-color:#40558a}
+</style>
+
+</body></html>
