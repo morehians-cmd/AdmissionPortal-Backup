@@ -697,10 +697,19 @@ html[data-theme=dark] #login .lp-leader{background:#10173a;border-color:var(--li
 html[data-theme=dark] #login .lp-leader b{color:#e9edff}
 html[data-theme=dark] #login .lp-public-note{background:#18234a;border-color:#293a70;color:#c4d0f4}
 @media(max-width:900px){#login .lp-leader-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#login .lp-enroll-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#login .lp-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){#login .lp-wrap{width:calc(100% - 32px)}#login .lp-links{display:none}#login .lp-public-grid,#login .lp-scholarship-grid,#login .lp-timeline{grid-template-columns:1fr}#login .lp-leader-grid{grid-template-columns:1fr}#login .lp-enroll-grid{grid-template-columns:1fr 1fr}#login .lp-public-section,#login .lp-campus{padding:54px 0}#login .lp-gallery img{height:125px}}
+@media(max-width:600px){#login .lp-wrap{width:calc(100% - 32px)}#login .lp-nav{flex-wrap:wrap;gap:10px;padding:10px 0}#login .lp-links{display:flex;order:3;flex:0 0 100%;gap:18px;overflow-x:auto;white-space:nowrap;padding:7px 0 3px;scrollbar-width:thin}#login .lp-nav>.lp-btn{margin-left:auto;min-height:40px;padding:0 12px;font-size:11px}#login .lp-public-grid,#login .lp-scholarship-grid,#login .lp-timeline{grid-template-columns:1fr}#login .lp-leader-grid{grid-template-columns:1fr}#login .lp-enroll-grid{grid-template-columns:1fr 1fr}#login .lp-public-section,#login .lp-campus{padding:54px 0}#login .lp-gallery img{height:125px}}
 @media(prefers-reduced-motion:reduce){#login *{scroll-behavior:auto!important;transition:none!important}}
 </style>
-</head>.
+<style id="public-admissions-mobile-timeline">
+#login .lp-milestone{border:0;border-left:3px solid var(--lp-blue);padding:0;background:#fff}
+#login .lp-milestone summary{list-style:none;cursor:pointer;padding:16px 18px}
+#login .lp-milestone summary::-webkit-details-marker{display:none}
+#login .lp-milestone summary:after{content:"＋";float:right;color:var(--lp-blue);font-weight:800}
+#login .lp-milestone[open] summary:after{content:"−"}
+#login .lp-milestone h4{margin:5px 0 0}
+#login .lp-milestone>p{padding:0 18px 16px}
+html[data-theme=dark] #login .lp-milestone{background:#10173a}
+</style></head>.
   It only restyles. No JS, no DOM ids, no data-act / data-k hooks, no backend call is touched.
   Everything is inside @media screen, so printed forms, slips, ID cards and reports are unchanged.
 ============================================================ -->
