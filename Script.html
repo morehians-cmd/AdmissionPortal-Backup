@@ -1314,7 +1314,7 @@ document.addEventListener('change',e=>{if(e.target.id!=='abf')return;const f=e.t
 /* ===== Public admissions homepage content (no applicant session required) ===== */
 (function(){
   const host=id=>document.getElementById(id);
-  const textFmt=v=>esc(String(v==null?'':v))
+  const textFmt=v=>esc(String(v==null?'':v)).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/\n/g,'<br>');
     .replace(/\\*\\*(.+?)\\*\\*/g,'<b>$1</b>')
     .replace(/__(.+?)__/g,'<u>$1</u>')
     .replace(/\\n/g,'<br>');
