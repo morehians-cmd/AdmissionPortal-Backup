@@ -1315,9 +1315,6 @@ document.addEventListener('change',e=>{if(e.target.id!=='abf')return;const f=e.t
 (function(){
   const host=id=>document.getElementById(id);
   const textFmt=v=>esc(String(v==null?'':v)).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/\n/g,'<br>');
-    .replace(/\\*\\*(.+?)\\*\\*/g,'<b>$1</b>')
-    .replace(/__(.+?)__/g,'<u>$1</u>')
-    .replace(/\\n/g,'<br>');
   const imageCall=(fn,index,slot)=>{
     google.script.run.withSuccessHandler(r=>{
       if(!r||!r.success||!r.data)return;
