@@ -643,7 +643,64 @@ aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
 </style>
 <!-- ============================================================
   MOREH ACADEMY PORTAL - MODERN UI THEME (CSS only)
-  INSTALL: paste this whole <style> block in Index.html, in <head>, AFTER the last existing </style> and before </head>.
+  INSTALL: paste this whole <style> block in Index.html, in <head>, AFTER the last existing </style> and before 
+<style id="public-admissions-sections">
+#login .lp-hdr{z-index:30}
+#login .lp-links{gap:22px}
+#login .lp-public-section{padding:72px 0;background:#f5f8fc;border-top:1px solid var(--lp-line)}
+#login .lp-public-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+#login .lp-public-card,#login .lp-sch-card,#login .lp-enroll-card{background:#fff;border:1px solid var(--lp-line);border-radius:17px;padding:22px;box-shadow:0 8px 25px #102a5609}
+#login .lp-public-card h3,#login .lp-sch-card h3,#login .lp-enroll-card h3{font:700 17px var(--lp-disp);color:var(--lp-navy);margin:0 0 8px}
+#login .lp-public-card p,#login .lp-sch-card p,#login .lp-enroll-card p{font-size:13px;line-height:1.75;color:var(--lp-mut);margin:0;white-space:pre-line}
+#login .lp-card-label{display:block;color:var(--lp-blue);font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px}
+#login .lp-leader-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:17px}
+#login .lp-leader{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--lp-line);border-radius:14px;background:#fff}
+#login .lp-leader img,#login .lp-leader .lp-avatar{width:42px;height:42px;flex:none;border-radius:50%;object-fit:cover;background:#eaf2ff;color:#155eef;display:grid;place-items:center;font-weight:800}
+#login .lp-leader b{display:block;color:var(--lp-navy);font-size:12px}
+#login .lp-leader small{display:block;color:var(--lp-mut);font-size:10px}
+#login .lp-timeline-wrap{margin-top:30px}
+#login .lp-timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#login .lp-milestone{border-left:3px solid var(--lp-blue);background:#fff;border-radius:0 14px 14px 0;padding:16px 18px;box-shadow:0 6px 20px #102a5608}
+#login .lp-milestone b{color:var(--lp-blue);font-size:12px;letter-spacing:.06em}
+#login .lp-milestone h4{font:700 15px var(--lp-disp);color:var(--lp-navy);margin:5px 0}
+#login .lp-milestone p{font-size:12px;color:var(--lp-mut);margin:0;line-height:1.65}
+#login .lp-scholarship-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+#login .lp-sch-card .lp-sch-code{font-size:10px;color:var(--lp-blue);font-weight:800;letter-spacing:.16em}
+#login .lp-sch-card h3{font-size:20px;margin:7px 0}
+#login .lp-sch-card details{border-top:1px solid var(--lp-line);margin-top:13px;padding-top:10px}
+#login .lp-sch-card summary{cursor:pointer;color:var(--lp-blue);font-size:12px;font-weight:700}
+#login .lp-sch-card .lp-sch-copy{font-size:12px;color:var(--lp-mut);line-height:1.75;margin-top:10px;white-space:pre-line}
+#login .lp-public-note{font-size:11px;line-height:1.7;color:var(--lp-mut);margin:18px 0 0;padding:13px 15px;background:#eaf2ff;border:1px solid #d8e6ff;border-radius:12px}
+#login .lp-campus{padding:72px 0;background:#102a56;color:#fff}
+#login .lp-campus .lp-shead h2{color:#fff}
+#login .lp-campus .lp-shead p{color:#dce9ff}
+#login .lp-campus-content{color:#fff}
+#login .lp-campus-copy{background:#ffffff12;border:1px solid #ffffff24;border-radius:17px;padding:22px;color:#e3edff;font-size:13px;line-height:1.8}
+#login .lp-campus-copy h3,#login .lp-campus-copy h4{color:#fff;margin:12px 0 5px}
+#login .lp-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+#login .lp-gallery figure{margin:0;border-radius:14px;overflow:hidden;background:#183b70;border:1px solid #ffffff24}
+#login .lp-gallery img{width:100%;height:150px;object-fit:cover;display:block}
+#login .lp-gallery figcaption{padding:9px 11px;font-size:11px;color:#e3edff}
+#login .lp-enroll-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+#login .lp-enroll-card span{font:800 12px var(--lp-disp);color:var(--lp-blue)}
+#login .lp-enrollment-detail{margin-top:18px;background:#fff;border:1px solid var(--lp-line);border-radius:17px;padding:22px;color:var(--lp-mut);font-size:13px;line-height:1.8}
+#login .lp-enrollment-detail h3,#login .lp-enrollment-detail h4{color:var(--lp-navy);font-family:var(--lp-disp);margin:10px 0 5px}
+#login .lp-loading{color:var(--lp-mut);font-size:13px;padding:18px;border:1px dashed var(--lp-line);border-radius:14px;background:#fff}
+#login .lp-campus .lp-loading{color:#dce9ff;background:#ffffff10;border-color:#ffffff35}
+#login .lp-journey{padding:0 0 65px}
+#login [id]{scroll-margin-top:90px}
+html[data-theme=dark] #login .lp-public-section,html[data-theme=dark] #login .lp-info{background:#0b1033;border-color:var(--line)}
+html[data-theme=dark] #login .lp-public-card,html[data-theme=dark] #login .lp-sch-card,html[data-theme=dark] #login .lp-enroll-card,html[data-theme=dark] #login .lp-milestone,html[data-theme=dark] #login .lp-enrollment-detail{background:#10173a;border-color:var(--line)}
+html[data-theme=dark] #login .lp-public-card h3,html[data-theme=dark] #login .lp-sch-card h3,html[data-theme=dark] #login .lp-enroll-card h3,html[data-theme=dark] #login .lp-enrollment-detail h3,html[data-theme=dark] #login .lp-enrollment-detail h4{color:#e9edff}
+html[data-theme=dark] #login .lp-public-card p,html[data-theme=dark] #login .lp-sch-card p,html[data-theme=dark] #login .lp-enroll-card p,html[data-theme=dark] #login .lp-enrollment-detail{color:#aab7dc}
+html[data-theme=dark] #login .lp-leader{background:#10173a;border-color:var(--line)}
+html[data-theme=dark] #login .lp-leader b{color:#e9edff}
+html[data-theme=dark] #login .lp-public-note{background:#18234a;border-color:#293a70;color:#c4d0f4}
+@media(max-width:900px){#login .lp-leader-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#login .lp-enroll-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#login .lp-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#login .lp-wrap{width:calc(100% - 32px)}#login .lp-links{display:none}#login .lp-public-grid,#login .lp-scholarship-grid,#login .lp-timeline{grid-template-columns:1fr}#login .lp-leader-grid{grid-template-columns:1fr}#login .lp-enroll-grid{grid-template-columns:1fr 1fr}#login .lp-public-section,#login .lp-campus{padding:54px 0}#login .lp-gallery img{height:125px}}
+@media(prefers-reduced-motion:reduce){#login *{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>.
   It only restyles. No JS, no DOM ids, no data-act / data-k hooks, no backend call is touched.
   Everything is inside @media screen, so printed forms, slips, ID cards and reports are unchanged.
 ============================================================ -->
@@ -1057,37 +1114,33 @@ html[data-theme=dark] .shchip.sh-pending{
 <body>
 <div id="login">
  <div class="lp-hdr"><div class="lp-wrap lp-nav">
-  <a class="lp-brand" href="javascript:void(0)" onclick="window.scrollTo({top:0,behavior:'smooth'})"><span class="lp-mark">A</span><span>ADMISSION PORTAL</span></a>
+  <a class="lp-brand" href="#lp-home" aria-label="Moreh Academy home"><span class="lp-mark">M</span><span>MOREH ACADEMY</span></a>
   <nav class="lp-links" aria-label="Main navigation">
-   <a href="javascript:void(0)" onclick="document.getElementById('lp-journey').scrollIntoView({behavior:'smooth'})">How it works</a>
-   <a href="javascript:void(0)" onclick="document.getElementById('lp-info').scrollIntoView({behavior:'smooth'})">Admission information</a>
-   <a href="javascript:void(0)" onclick="document.getElementById('lp-contact').scrollIntoView({behavior:'smooth'})">Contact</a>
+   <a href="#lp-about">About</a><a href="#lp-scholarships">Scholarships</a><a href="#lp-campus">Campus</a><a href="#lp-enrollment">Enrollment Guide</a>
   </nav>
-  <a class="lp-btn" href="javascript:void(0)" onclick="var i=document.getElementById('u');i.scrollIntoView({behavior:'smooth',block:'center'});i.focus()">Sign in <span aria-hidden="true">→</span></a>
+  <a class="lp-btn" href="#lp-signin" onclick="setTimeout(function(){var i=document.getElementById('u');if(i)i.focus()},250)">Applicant Sign In <span aria-hidden="true">→</span></a>
  </div></div>
 
- <section class="lp-hero"><div class="lp-wrap lp-grid">
+ <section class="lp-hero" id="lp-home"><div class="lp-wrap lp-grid">
   <div>
-   <span class="lp-eyebrow">A simpler admission experience</span>
-   <h1 class="lp-h1">A clearer path to your next chapter.</h1>
-   <p class="lp-lead">A welcoming place for families to explore admission, complete student information, and follow application progress with confidence.</p>
+   <span class="lp-eyebrow">Moreh Academy · Admissions</span>
+   <h1 class="lp-h1">A brighter future begins with <span style="color:var(--lp-blue)">Moreh.</span></h1>
+   <p class="lp-lead">Discover a learning community where knowledge, character, and purpose come together. Explore our school, review admission opportunities, and begin your family's Moreh journey.</p>
    <div class="lp-actions">
-    <a class="lp-btn" href="javascript:void(0)" onclick="document.getElementById('lp-journey').scrollIntoView({behavior:'smooth'})">Discover the process <span aria-hidden="true">→</span></a>
-    <a class="lp-btn light" href="javascript:void(0)" onclick="document.getElementById('lp-info').scrollIntoView({behavior:'smooth'})">View admission information</a>
+    <a class="lp-btn" href="#lp-enrollment">Explore Enrollment <span aria-hidden="true">→</span></a>
+    <a class="lp-btn light" href="#lp-about">Discover Moreh Academy</a>
    </div>
-   <div class="lp-trust"><span>Family-friendly experience</span><span>Clear application steps</span><span>Staff-verified requirements</span></div>
+   <div class="lp-trust"><span>Preschool to Senior High School</span><span>Student-centered learning</span><span>Guided admissions</span></div>
   </div>
-
-  <div class="lp-side">
+  <div class="lp-side" id="lp-signin">
    <div class="lp-orb main"></div><div class="lp-orb top"></div><div class="lp-orb bottom"></div>
    <div class="lp-card">
-    <h2>Welcome back</h2>
-    <p class="lp-sub">Sign in to continue</p>
+    <h2>Welcome back</h2><p class="lp-sub">Sign in to continue your admission journey.</p>
     <label class="sec" for="u">USERNAME</label><input id="u" autocomplete="username">
     <label class="sec" for="p">PASSWORD</label><input id="p" type="password" autocomplete="current-password">
-    <button class="lp-btn lp-full" id="go">Sign in</button>
+    <button class="lp-btn lp-full" id="go">Sign in securely</button>
     <p class="lp-links2"><a href="javascript:void(0)" data-act="forgot">Forgot password?</a></p>
-    <p class="lp-links2"><a href="javascript:void(0)" data-act="showreg">New enrollee? Create an account</a></p>
+    <p class="lp-links2"><a href="javascript:void(0)" data-act="showreg">New applicant? Create an account</a></p>
     <div id="regbox" class="hidden">
      <label class="sec" for="rs">SURNAME</label><input id="rs">
      <label class="sec" for="rf">FIRST NAME</label><input id="rf">
@@ -1109,26 +1162,45 @@ html[data-theme=dark] .shchip.sh-pending{
  </div></section>
 
  <section class="lp-journey" id="lp-journey"><div class="lp-wrap"><div class="lp-steps">
-  <article class="lp-step"><div class="lp-num">01 · EXPLORE</div><h2>Know what to prepare</h2><p>Review admission information and the requirements for your application.</p></article>
-  <article class="lp-step"><div class="lp-num">02 · APPLY</div><h2>Complete student details</h2><p>Provide accurate applicant and student information through a guided process.</p></article>
-  <article class="lp-step"><div class="lp-num">03 · FOLLOW</div><h2>Stay informed</h2><p>Check application updates and requirements verified by admissions personnel.</p></article>
+  <article class="lp-step"><div class="lp-num">01 · EXPLORE</div><h2>Discover Moreh</h2><p>Learn about our mission, values, leadership, and campus community.</p></article>
+  <article class="lp-step"><div class="lp-num">02 · APPLY</div><h2>Prepare your application</h2><p>Understand the enrollment steps and prepare the required student information.</p></article>
+  <article class="lp-step"><div class="lp-num">03 · FOLLOW</div><h2>Stay informed</h2><p>Sign in to follow your application and review verified admissions updates.</p></article>
  </div></div></section>
 
- <section class="lp-info" id="lp-info"><div class="lp-wrap">
-  <div class="lp-shead"><span class="lp-eyebrow">Your admission journey</span><h2>Everything starts with clear information.</h2><p>Find the guidance you need at each stage of the admission process.</p></div>
-  <div class="lp-igrid">
-   <article class="lp-icard"><div class="lp-ibox">◎</div><h3>Explore programs</h3><p>Learn about available academic offerings and find the right path for your goals.</p></article>
-   <article class="lp-icard"><div class="lp-ibox">▤</div><h3>Prepare requirements</h3><p>Review the admission checklist. Physical requirements are submitted to the school for staff verification.</p></article>
-   <article class="lp-icard"><div class="lp-ibox">↗</div><h3>Track your progress</h3><p>Follow application updates and see the next steps from your applicant account.</p></article>
+ <section class="lp-info" id="lp-about"><div class="lp-wrap">
+  <div class="lp-shead"><span class="lp-eyebrow">Institutional resources</span><h2>Get to know Moreh Academy.</h2><p>Explore the vision, mission, core values, leadership, and history that shape our learning community.</p></div>
+  <div id="lp-about-content" class="lp-public-grid"><div class="lp-loading">Loading institutional information…</div></div>
+  <div id="lp-timeline" class="lp-timeline-wrap"></div>
+ </div></section>
+
+ <section class="lp-public-section" id="lp-scholarships"><div class="lp-wrap">
+  <div class="lp-shead"><span class="lp-eyebrow">Opportunities & support</span><h2>Scholarship Programs</h2><p>Explore the scholarship and voucher programs presented by Moreh Academy. Eligibility and current-year requirements should be confirmed with the Admissions Office.</p></div>
+  <div id="lp-scholarship-content" class="lp-scholarship-grid"><div class="lp-loading">Loading scholarship information…</div></div>
+  <p class="lp-public-note">Program availability, eligibility, benefits, funding, and deadlines may change. Please confirm current requirements with Moreh Academy before applying.</p>
+ </div></section>
+
+ <section class="lp-campus" id="lp-campus"><div class="lp-wrap">
+  <div class="lp-shead"><span class="lp-eyebrow">Explore Moreh</span><h2>Facilities & Campus Tour</h2><p>Take a closer look at our facilities and learning spaces.</p></div>
+  <div id="lp-facilities-content" class="lp-campus-content"><div class="lp-loading">Loading campus information…</div></div>
+  <div id="lp-facilities-gallery" class="lp-gallery"></div>
+ </div></section>
+
+ <section class="lp-info" id="lp-enrollment"><div class="lp-wrap">
+  <div class="lp-shead"><span class="lp-eyebrow">Your next chapter</span><h2>Enrollment Guide</h2><p>A clear overview of the admission journey, from preparation to application updates.</p></div>
+  <div class="lp-enroll-grid">
+   <article class="lp-enroll-card"><span>01</span><h3>Explore</h3><p>Review the grade levels, admission information, and scholarship opportunities.</p></article>
+   <article class="lp-enroll-card"><span>02</span><h3>Create an account</h3><p>Register securely using the applicant details and guardian information when required.</p></article>
+   <article class="lp-enroll-card"><span>03</span><h3>Complete your application</h3><p>Provide accurate student information and follow the portal's application steps.</p></article>
+   <article class="lp-enroll-card"><span>04</span><h3>Submit & track</h3><p>Submit documents for staff verification and monitor your status in the applicant portal.</p></article>
   </div>
+  <div id="lp-enrollment-detail" class="lp-enrollment-detail"></div>
  </div></section>
 
  <section class="lp-cta" id="lp-contact"><div class="lp-wrap lp-ctai">
-  <div><h2>Ready to take the next step?</h2><p>Sign in, or create your account to begin your application.</p></div>
-  <a class="lp-btn" href="javascript:void(0)" onclick="var i=document.getElementById('u');i.scrollIntoView({behavior:'smooth',block:'center'});i.focus()">Sign in now <span aria-hidden="true">→</span></a>
+  <div><h2>Begin your Moreh journey.</h2><p>Access your applicant account to continue or start your admission application.</p></div>
+  <a class="lp-btn" href="#lp-signin" onclick="setTimeout(function(){var i=document.getElementById('u');if(i)i.focus()},250)">Applicant Sign In <span aria-hidden="true">→</span></a>
  </div></section>
-
- <div class="lp-foot"><div class="lp-wrap lp-footi"><span>Admission Portal · Temporary identity</span><span>Preview interface · School details to be confirmed</span></div></div>
+ <div class="lp-foot"><div class="lp-wrap lp-footi"><span>MOREH ACADEMY · Admissions Portal</span><span>Upper Bicutan, Taguig City · Contact: info@morehacademy.com</span></div></div>
 </div>
 <div id="app" class="hidden"><button class="skip" data-act="skip">Skip to main content</button><aside id="side" role="navigation" aria-label="Main Navigation"><div class="brand"><img src="https://i.imgur.com/roCMSYf.jpeg" alt=""><div><b>Moreh Academy</b><small id="role"></small></div></div><div id="nav"></div><div class="me"><div id="who"></div><button class="nav" data-act="out" style="margin-top:8px"></button></div></aside><div id="sbbd" data-act="menu"></div>
 <main id="main"><div class="top" role="banner"><div class="tl" style="display:flex;gap:14px;align-items:center"><button id="menu" data-act="menu" aria-label="Toggle navigation" aria-controls="side" aria-expanded="true" title="Toggle navigation">&#9776;</button><img class="tlogo" src="https://i.imgur.com/roCMSYf.jpeg" alt=""><div><h1 id="title"></h1><p id="sub"></p></div></div><div id="gsw" class="gsw hidden"><input id="gs" type="text" autocomplete="off" placeholder="Search" aria-label="Global search" role="combobox" aria-autocomplete="list" aria-controls="gsr" aria-expanded="false"><div id="gsr" class="gsr hidden" role="listbox"></div></div><div class="tr" style="display:flex;gap:12px;align-items:center;position:relative"><button class="av" id="gsb" data-act="gsopen" aria-label="Search" title="Search" style="background:#fff;color:var(--navy);border:1px solid var(--line)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"/></svg></button><span id="rbd" class="rbd hidden"></span><span style="position:relative"><button class="av" style="background:#fff;color:var(--navy);border:1px solid var(--line)" data-act="bell" title="Notifications" aria-label="Notifications">&#128276;</button><span id="nb" class="hidden" style="position:absolute;top:-4px;right:-4px;background:#d93025;color:#fff;border-radius:999px;min-width:20px;height:20px;font:700 11px/20px Inter,sans-serif;text-align:center;padding:0 5px"></span></span><div class="dd hidden" id="np" style="width:340px;right:56px;max-height:70vh;overflow:auto"></div><div class="uchip" data-act="dd"><b id="uname"></b><small id="urole"></small></div><button class="av" id="av" data-act="dd" title="Account" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"></button><div class="dd hidden" id="dd" role="menu"></div></div></div><div id="view" tabindex="-1"></div><footer id="ftr" class="ftr"><div class="fl1"><span>&copy; <span id="fyr"></span> Moreh Academy</span><span>v1.0</span><a href="javascript:void(0)" data-act="nav" data-v="pp">Data Privacy Policy</a></div><div class="fl1"><span id="fst" class="fst on"><i></i><span>Online</span></span><a href="mailto:morehians@gmail.com">morehians@gmail.com</a><a href="tel:09618766886">0961 876 6886</a></div></footer></main><nav id="bnav" aria-label="Quick navigation"></nav></div>
