@@ -4676,6 +4676,62 @@ dxDraw=function(X,H){_dxDrawTh(X,H);
  rec.insertAdjacentHTML('beforebegin','<div id="maov"></div>');
  if(S.dsh&&S.dsh.stats)maDraw(S.dsh.stats);
  else google.script.run.withSuccessHandler(r=>{if(r&&r.success){S.dsh=r.data;maDraw(r.data.stats)}}).withFailureHandler(()=>{}).dashboard(S.token)};
+
+
+/* ===== Public admissions homepage content (no applicant session required) ===== */
+(function(){
+  const host=id=>document.getElementById(id);
+  const textFmt=v=>esc(String(v==null?'':v)).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/__(.+?)__/g,'<u>$1</u>').replace(/\n/g,'<br>');
+  const imageCall=(fn,index,slot)=>{
+    google.script.run.withSuccessHandler(r=>{
+      if(!r||!r.success||!r.data)return;
+      const el=host(slot);if(!el)return;
+      const img=el.querySelector('img');if(img)img.src=r.data;
+    }).withFailureHandler(()=>{})[fn](index);
+  };
+  function aboutDraw(d){
+    const el=host('lp-about-content'),tl=host('lp-timeline');if(!el||!d)return;
+    const card=(label,x)=>'<article class="lp-public-card"><span class="lp-card-label">'+label+'</span><h3>'+esc(x&&x.title||label)+'</h3><p>'+esc(x&&x.text||'Institutional information will be published here once confirmed by the Academy.')+'</p></article>';
+    const values=(d.values||[]).map(v=>'<article class="lp-public-card"><span class="lp-card-label">Core Value</span><h3>'+esc(v.title)+'</h3><p>'+esc(v.text||'')+'</p></article>').join('');
+    const leaders=(d.leaders||[]).map((l,i)=>'<div class="lp-leader" id="lp-leader-'+i+'"><img alt="" src="" style="display:'+(l.hasPhoto?'block':'none')+'"><span class="lp-avatar" style="display:'+(l.hasPhoto?'none':'grid')+'">'+esc((l.name||'?').charAt(0).toUpperCase())+'</span><div><b>'+esc(l.name)+'</b><small>'+esc(l.title||'')+'</small></div></div>').join('');
+    el.innerHTML=card('Our Vision',d.vision)+card('Our Mission',d.mission)+(values?'<div class="lp-public-card" style="grid-column:1/-1"><span class="lp-card-label">Guiding Principles</span><div class="lp-public-grid">'+values+'</div></div>':'')+(leaders?'<div style="grid-column:1/-1"><span class="lp-card-label">Key Leadership Team</span><div class="lp-leader-grid">'+leaders+'</div></div>':'');
+    (d.leaders||[]).forEach((l,i)=>{if(!l.hasPhoto)return;google.script.run.withSuccessHandler(r=>{if(!r||!r.success||!r.data)return;const box=host('lp-leader-'+i);if(!box)return;const im=box.querySelector('img'),av=box.querySelector('.lp-avatar');im.src=r.data;im.style.display='block';av.style.display='none'}).withFailureHandler(()=>{}).getPublicAboutPhoto(i)});
+    const milestones=(d.timeline||[]).map(t=>'<details class="lp-milestone"><summary><b>'+esc(t.year)+'</b><h4>'+esc(t.title||'Institutional milestone')+'</h4></summary><p>'+esc(t.text||'')+'</p></details>').join('');
+    tl.innerHTML=milestones?'<div class="lp-card-label">Interactive History Timeline · Select a milestone to explore</div><div class="lp-timeline">'+milestones+'</div>':'';
+    if(host('lp-legacy-about')&&window.MRH_PUBLIC_LEGACY)host('lp-legacy-about').innerHTML=window.MRH_PUBLIC_LEGACY;
+  }
+  function scholarshipsDraw(list){
+    const el=host('lp-scholarship-content');if(!el)return;
+    const names={TLC:'TLC Scholarship',ESC:'ESC Program',QVR:'Senior High School Voucher · QVR',QVA:'Senior High School Voucher · QVA'};
+    el.innerHTML=(list||[]).map(p=>{
+      const sections=(p.sections||[]).map((s,i)=>'<details '+(i===0?'':'')+'><summary>'+esc(s.title)+'</summary><div class="lp-sch-copy">'+textFmt(s.items)+'</div></details>').join('');
+      return '<article class="lp-sch-card"><span class="lp-sch-code">'+esc(p.program)+'</span><h3>'+esc(names[p.program]||p.program)+'</h3>'+sections+'</article>';
+    }).join('')||'<div class="lp-loading">Scholarship information will be published here.</div>';
+  }
+  function facilitiesDraw(data){
+    const el=host('lp-facilities-content'),gallery=host('lp-facilities-gallery');if(!el)return;
+    el.innerHTML='<div class="lp-campus-copy">'+(data.facilitiesHtml||'<p>Campus facilities and learning spaces will be introduced here.</p>')+'</div>';
+    const items=data.facilitiesGallery||[];
+    gallery.innerHTML=items.map((x,i)=>'<figure id="lp-facility-'+i+'"><img alt="'+esc(x.caption||'Moreh Academy facility')+'" src="" loading="lazy"><figcaption>'+esc(x.caption||'Moreh Academy facility')+'</figcaption></figure>').join('');
+    items.forEach((x,i)=>imageCall('getPublicFacilitiesPhoto',i,'lp-facility-'+i));
+  }
+  function enrollmentDraw(html){const el=host('lp-enrollment-detail');if(el)el.innerHTML=html||'<p>For current requirements and grade-level guidance, please contact the Admissions Office.</p>'}
+  function load(){
+    if(!host('login')||!host('lp-about-content'))return;
+    google.script.run.withSuccessHandler(r=>{
+      if(!r||!r.success){['lp-about-content','lp-scholarship-content','lp-facilities-content'].forEach(id=>{const e=host(id);if(e)e.innerHTML='<div class="lp-loading">Information is temporarily unavailable. Please contact the Admissions Office.</div>'});return}
+      const d=r.data||{};
+      aboutDraw(d.about||{});
+      if(d.legacyAbout){const legacy=document.createElement('div');legacy.className='lp-public-card';legacy.innerHTML=d.legacyAbout;host('lp-about-content').appendChild(legacy)}
+      scholarshipsDraw(d.scholarships||[]);
+      facilitiesDraw(d);
+      enrollmentDraw(d.enrollmentGuide||'');
+    }).withFailureHandler(()=>{
+      ['lp-about-content','lp-scholarship-content','lp-facilities-content'].forEach(id=>{const e=host(id);if(e)e.innerHTML='<div class="lp-loading">Information is temporarily unavailable. Please contact the Admissions Office.</div>'});
+    }).getPublicAdmissionContent();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load);else load();
+})();
 </script><style id="moreh-admissions-visual-refinement">
 /* Moreh Academy admissions homepage — responsive visual refinement */
 #login{scroll-behavior:smooth}
@@ -4780,5 +4836,5 @@ html[data-theme=dark] #login .lp-logo{background:#fff}
 html[data-theme=dark] #login .lp-step:hover{background:#151f48}
 html[data-theme=dark] #login .lp-public-card:hover,html[data-theme=dark] #login .lp-sch-card:hover,html[data-theme=dark] #login .lp-enroll-card:hover{border-color:#40558a}
 </style>
-<?!= include('Script'); ?>
+
 </body></html>
