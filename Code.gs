@@ -151,10 +151,8 @@ const fail = e => ({ success:false, error:e.message });
 const deptOf_ = g => { const i = GRADES.indexOf(g); return i<0?'':i<3?'Preschool':i<9?'Elementary':i<13?'Junior High School':'Senior High School'; };
 
 function doGet(e) {
-  const portal = e && e.parameter && e.parameter.portal;
-  const page = portal ? 'Index' : 'PublicHome';
-  return HtmlService.createTemplateFromFile(page).evaluate()
-    .setTitle(portal ? 'Moreh Academy Portal' : 'Moreh Academy')
+  return HtmlService.createTemplateFromFile('Index').evaluate()
+    .setTitle('Moreh Academy Portal')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 function include(f) { return HtmlService.createHtmlOutputFromFile(f).getContent(); }

@@ -826,14 +826,160 @@ aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
 @media(prefers-reduced-motion:reduce){.mod,.mod>div,#toast{animation:none!important}.btn,.shc,.wst,.galc,.sprow{transition:none!important}}
 }
 </style>
+<style id="landing-ui">
+#login{display:block;grid-template-columns:none!important;min-height:100vh;background:#F5F8FC;color:#172B4D;
+ --lp-blue:#155EEF;--lp-navy:#102A56;--lp-sky:#38BDF8;--lp-mut:#66758B;--lp-line:#E5EAF2;
+ --lp-grad:linear-gradient(120deg,#155EEF 0%,#287CEB 55%,#38BDF8 100%);
+ --lp-disp:'Plus Jakarta Sans',Inter,Arial,sans-serif}
+#login.hidden{display:none}
+#login *{box-sizing:border-box}
+#login a{text-decoration:none;color:inherit}
+.lp-wrap{width:min(1160px,calc(100% - 48px));margin:auto}
+.lp-hdr{height:78px;background:rgba(255,255,255,.94);border-bottom:1px solid var(--lp-line);display:flex;align-items:center;position:sticky;top:0;z-index:5}
+.lp-nav{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.lp-brand{display:flex;align-items:center;gap:11px;color:var(--lp-navy);font:800 14px var(--lp-disp);letter-spacing:.02em}
+.lp-mark{width:39px;height:39px;border-radius:12px;background:var(--lp-grad);display:grid;place-items:center;color:#fff;font:800 17px var(--lp-disp);box-shadow:0 7px 18px #155eef38}
+.lp-links{display:flex;gap:30px;font-size:13px;font-weight:600;color:#52637b}
+.lp-links a:hover{color:var(--lp-blue)}
+#login .lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 20px;border-radius:12px;border:0;background:var(--lp-grad);color:#fff;font:700 13px Inter,Arial,sans-serif;box-shadow:0 9px 20px #155eef30;cursor:pointer;transition:.18s}
+#login .lp-btn:hover{transform:translateY(-2px);box-shadow:0 13px 25px #155eef40}
+#login .lp-btn.light{background:#fff;border:1px solid var(--lp-line);color:var(--lp-navy);box-shadow:none}
+#login .lp-btn.lp-full{width:100%;margin-top:6px}
+.lp-hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff,#f5f8fc);padding:64px 0 72px}
+.lp-hero:before{content:"";position:absolute;width:650px;height:650px;right:-140px;top:-280px;border-radius:50%;background:radial-gradient(circle,#38bdf83d 0%,#155eef13 48%,transparent 70%);pointer-events:none}
+.lp-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center;position:relative}
+.lp-eyebrow{display:inline-flex;align-items:center;gap:9px;color:var(--lp-blue);font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+.lp-eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--lp-sky)}
+.lp-h1{font:800 clamp(36px,5vw,58px)/1.08 var(--lp-disp);letter-spacing:-.05em;color:var(--lp-navy);margin:18px 0 20px;max-width:650px}
+.lp-lead{max-width:560px;color:var(--lp-mut);font-size:16px;line-height:1.8;margin:0 0 27px}
+.lp-actions{display:flex;gap:12px;flex-wrap:wrap}
+.lp-trust{display:flex;gap:22px;flex-wrap:wrap;margin-top:31px;color:var(--lp-mut);font-size:11px;font-weight:600}
+.lp-trust span:before{content:"✓";color:#16a36a;font-weight:800;margin-right:7px}
+.lp-side{position:relative;display:grid;place-items:center;min-height:420px}
+.lp-orb{position:absolute;border-radius:50%;pointer-events:none}
+.lp-o1{width:300px;height:300px;background:linear-gradient(145deg,#38bdf8,#155eef 75%);box-shadow:0 30px 75px #155eef3d;opacity:.9}
+.lp-o2{width:132px;height:132px;right:0;top:0;background:linear-gradient(145deg,#c4f0ff,#8b5cf6);opacity:.85}
+.lp-o3{width:90px;height:90px;left:0;bottom:0;background:linear-gradient(145deg,#dceaff,#38bdf8)}
+.lp-card{position:relative;z-index:1;width:min(390px,100%);background:#ffffffee;backdrop-filter:blur(14px);border:1px solid #ffffffd9;border-radius:20px;padding:28px;box-shadow:0 22px 55px #102a5630}
+.lp-card h2{font:800 26px var(--lp-disp);letter-spacing:-.03em;color:var(--lp-navy)}
+.lp-sub{margin:4px 0 16px;color:var(--lp-mut)}
+.lp-card label.sec{display:block;margin:12px 0 5px;color:var(--lp-mut)}
+.lp-card input{width:100%;height:46px;padding:0 14px;border:1px solid #cbd5e1;border-radius:12px;background:#fff;font:inherit;color:#172B4D;transition:border-color .15s,box-shadow .15s}
+.lp-card input:focus{outline:0;border-color:var(--lp-blue);box-shadow:0 0 0 3px #155eef33}
+.lp-links2{text-align:center;margin:12px 0 0}
+.lp-links2 a{color:var(--lp-blue);font-weight:600;font-size:13.5px}
+.lp-links2 a:hover{text-decoration:underline}
+#regbox{margin-top:16px;padding-top:6px;border-top:1px solid var(--lp-line)}
+.lp-journey{padding:0 0 70px}
+.lp-steps{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid var(--lp-line);border-radius:20px;box-shadow:0 12px 35px #102a560d;overflow:hidden}
+.lp-step{padding:27px 29px}.lp-step+.lp-step{border-left:1px solid var(--lp-line)}
+.lp-num{font:800 11px var(--lp-disp);letter-spacing:.1em;color:var(--lp-blue)}
+.lp-step h2{font:700 18px var(--lp-disp);color:var(--lp-navy);margin:10px 0 7px}
+.lp-step p{font-size:13px;color:var(--lp-mut);margin:0;line-height:1.75}
+.lp-info{padding:72px 0;background:#fff;border-top:1px solid var(--lp-line)}
+.lp-shead{text-align:center;max-width:650px;margin:0 auto 34px}
+.lp-shead h2{font:800 clamp(26px,3.2vw,36px)/1.2 var(--lp-disp);letter-spacing:-.04em;color:var(--lp-navy);margin:12px 0}
+.lp-shead p{color:var(--lp-mut);margin:0}
+.lp-igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.lp-icard{padding:24px;border:1px solid var(--lp-line);border-radius:17px;background:#fff}
+.lp-ibox{width:42px;height:42px;border-radius:13px;background:#eaf2ff;color:var(--lp-blue);display:grid;place-items:center;font-size:19px}
+.lp-icard h3{font:700 16px var(--lp-disp);color:var(--lp-navy);margin:16px 0 7px}
+.lp-icard p{font-size:13px;color:var(--lp-mut);margin:0}
+.lp-cta{padding:65px 0;background:linear-gradient(120deg,#102a56,#155eef 70%,#287ceb);color:#fff}
+.lp-ctai{display:flex;align-items:center;justify-content:space-between;gap:25px}
+.lp-cta h2{font:800 clamp(25px,3vw,34px)/1.2 var(--lp-disp);margin:0 0 9px}
+.lp-cta p{margin:0;color:#dce9ff;font-size:14px}
+#login .lp-cta .lp-btn{background:#fff;color:var(--lp-blue);box-shadow:none}
+.lp-foot{padding:27px 0;background:#fff;border-top:1px solid var(--lp-line);color:var(--lp-mut);font-size:12px}
+.lp-footi{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+@media(max-width:900px){
+ .lp-hero{padding:44px 0 52px}.lp-grid{grid-template-columns:1fr;gap:30px}.lp-links{display:none}
+ .lp-steps,.lp-igrid{grid-template-columns:1fr}.lp-step+.lp-step{border-left:0;border-top:1px solid var(--lp-line)}
+ <div class="lp-orb lp-o1"></div><div class="lp-orb lp-o2"></div><div class="lp-orb lp-o3"></div>
+}
+@media(max-width:600px){
+ .lp-wrap{width:calc(100% - 32px)}.lp-hdr{height:68px}.lp-card{padding:22px}.lp-trust{gap:12px}
+ .lp-ctai{flex-direction:column;align-items:flex-start}.lp-info{padding:54px 0}
+}
+@media(prefers-reduced-motion:reduce){#login *{transition:none!important}}
+</style>
 </head>
 <body>
-<div id="login"><div class="hero"><img src="https://i.imgur.com/roCMSYf.jpeg" alt=""><h1>Moreh Academy</h1><p style="opacity:.8">Admission &amp; Student Portal</p></div>
-<div class="lf"><img class="mlogo" src="https://i.imgur.com/roCMSYf.jpeg" alt="Moreh Academy"><h1 style="font-size:28px;color:var(--navy)">Welcome back</h1><p style="color:var(--mut);margin:6px 0 24px">Sign in to continue</p>
-<label class="sec">USERNAME</label><input id="u" autocomplete="username"><label class="sec">PASSWORD</label><input id="p" type="password" autocomplete="current-password">
-<button class="btn" id="go" style="justify-content:center">Sign in</button>
-<p style="text-align:center;margin-top:14px"><a href="javascript:void(0)" data-act="forgot" style="color:var(--blue);font-weight:600">Forgot password?</a></p><p style="text-align:center;margin-top:10px"><a href="javascript:void(0)" data-act="showreg" style="color:var(--blue);font-weight:600">New enrollee? Create an account</a></p>
-<div id="regbox" class="hidden"><label class="sec">SURNAME</label><input id="rs"><label class="sec">FIRST NAME</label><input id="rf"><label class="sec">LRN (12 DIGITS)</label><input id="rl" maxlength="12" inputmode="numeric"><label class="sec">EMAIL (YOUR USERNAME)</label><input id="re" type="email"><label class="sec">BIRTH DATE</label><input id="rb" type="date" onchange="gate()"><div id="gbox" class="hidden"><p class="sec" style="color:#b3261e">BELOW 18: PARENT / LEGAL GUARDIAN DETAILS REQUIRED</p><label class="sec">PARENT / GUARDIAN FULL NAME</label><input id="gn"><label class="sec">RELATIONSHIP</label><input id="gr" placeholder="e.g. Mother"><label class="sec">PARENT / GUARDIAN EMAIL (MUST DIFFER FROM YOURS)</label><input id="ge" type="email"><label class="sec">PARENT / GUARDIAN MOBILE (11 DIGITS)</label><input id="gm" maxlength="11" inputmode="numeric"></div><label class="sec">PASSWORD (MIN. 8 CHARACTERS)</label><input id="rpw" type="password"><button class="btn" data-act="reg" style="justify-content:center;width:100%">Create account</button></div></div></div>
+<div id="login">
+ <div class="lp-hdr"><div class="lp-wrap lp-nav">
+  <a class="lp-brand" href="javascript:void(0)" onclick="window.scrollTo({top:0,behavior:'smooth'})"><span class="lp-mark">A</span><span>ADMISSION PORTAL</span></a>
+  <nav class="lp-links" aria-label="Main navigation">
+   <a href="javascript:void(0)" onclick="document.getElementById('lp-journey').scrollIntoView({behavior:'smooth'})">How it works</a>
+   <a href="javascript:void(0)" onclick="document.getElementById('lp-info').scrollIntoView({behavior:'smooth'})">Admission information</a>
+   <a href="javascript:void(0)" onclick="document.getElementById('lp-contact').scrollIntoView({behavior:'smooth'})">Contact</a>
+  </nav>
+  <a class="lp-btn" href="javascript:void(0)" onclick="var i=document.getElementById('u');i.scrollIntoView({behavior:'smooth',block:'center'});i.focus()">Sign in <span aria-hidden="true">→</span></a>
+ </div></div>
+
+ <section class="lp-hero"><div class="lp-wrap lp-grid">
+  <div>
+   <span class="lp-eyebrow">A simpler admission experience</span>
+   <h1 class="lp-h1">A clearer path to your next chapter.</h1>
+   <p class="lp-lead">A welcoming place for families to explore admission, complete student information, and follow application progress with confidence.</p>
+   <div class="lp-actions">
+    <a class="lp-btn" href="javascript:void(0)" onclick="document.getElementById('lp-journey').scrollIntoView({behavior:'smooth'})">Discover the process <span aria-hidden="true">→</span></a>
+    <a class="lp-btn light" href="javascript:void(0)" onclick="document.getElementById('lp-info').scrollIntoView({behavior:'smooth'})">View admission information</a>
+   </div>
+   <div class="lp-trust"><span>Family-friendly experience</span><span>Clear application steps</span><span>Staff-verified requirements</span></div>
+  </div>
+
+  <div class="lp-side">
+   <div class="lp-orb main"></div><div class="lp-orb top"></div><div class="lp-orb bottom"></div>
+   <div class="lp-card">
+    <h2>Welcome back</h2>
+    <p class="lp-sub">Sign in to continue</p>
+    <label class="sec" for="u">USERNAME</label><input id="u" autocomplete="username">
+    <label class="sec" for="p">PASSWORD</label><input id="p" type="password" autocomplete="current-password">
+    <button class="lp-btn lp-full" id="go">Sign in</button>
+    <p class="lp-links2"><a href="javascript:void(0)" data-act="forgot">Forgot password?</a></p>
+    <p class="lp-links2"><a href="javascript:void(0)" data-act="showreg">New enrollee? Create an account</a></p>
+    <div id="regbox" class="hidden">
+     <label class="sec" for="rs">SURNAME</label><input id="rs">
+     <label class="sec" for="rf">FIRST NAME</label><input id="rf">
+     <label class="sec" for="rl">LRN (12 DIGITS)</label><input id="rl" maxlength="12" inputmode="numeric">
+     <label class="sec" for="re">EMAIL (YOUR USERNAME)</label><input id="re" type="email">
+     <label class="sec" for="rb">BIRTH DATE</label><input id="rb" type="date" onchange="gate()">
+     <div id="gbox" class="hidden">
+      <p class="sec" style="color:#b3261e">BELOW 18: PARENT / LEGAL GUARDIAN DETAILS REQUIRED</p>
+      <label class="sec" for="gn">PARENT / GUARDIAN FULL NAME</label><input id="gn">
+      <label class="sec" for="gr">RELATIONSHIP</label><input id="gr" placeholder="e.g. Mother">
+      <label class="sec" for="ge">PARENT / GUARDIAN EMAIL (MUST DIFFER FROM YOURS)</label><input id="ge" type="email">
+      <label class="sec" for="gm">PARENT / GUARDIAN MOBILE (11 DIGITS)</label><input id="gm" maxlength="11" inputmode="numeric">
+     </div>
+     <label class="sec" for="rpw">PASSWORD (MIN. 8 CHARACTERS)</label><input id="rpw" type="password">
+     <button class="lp-btn lp-full" data-act="reg">Create account</button>
+    </div>
+   </div>
+  </div>
+ </div></section>
+
+ <section class="lp-journey" id="lp-journey"><div class="lp-wrap"><div class="lp-steps">
+  <article class="lp-step"><div class="lp-num">01 · EXPLORE</div><h2>Know what to prepare</h2><p>Review admission information and the requirements for your application.</p></article>
+  <article class="lp-step"><div class="lp-num">02 · APPLY</div><h2>Complete student details</h2><p>Provide accurate applicant and student information through a guided process.</p></article>
+  <article class="lp-step"><div class="lp-num">03 · FOLLOW</div><h2>Stay informed</h2><p>Check application updates and requirements verified by admissions personnel.</p></article>
+ </div></div></section>
+
+ <section class="lp-info" id="lp-info"><div class="lp-wrap">
+  <div class="lp-shead"><span class="lp-eyebrow">Your admission journey</span><h2>Everything starts with clear information.</h2><p>Find the guidance you need at each stage of the admission process.</p></div>
+  <div class="lp-igrid">
+   <article class="lp-icard"><div class="lp-ibox">◎</div><h3>Explore programs</h3><p>Learn about available academic offerings and find the right path for your goals.</p></article>
+   <article class="lp-icard"><div class="lp-ibox">▤</div><h3>Prepare requirements</h3><p>Review the admission checklist. Physical requirements are submitted to the school for staff verification.</p></article>
+   <article class="lp-icard"><div class="lp-ibox">↗</div><h3>Track your progress</h3><p>Follow application updates and see the next steps from your applicant account.</p></article>
+  </div>
+ </div></section>
+
+ <section class="lp-cta" id="lp-contact"><div class="lp-wrap lp-ctai">
+  <div><h2>Ready to take the next step?</h2><p>Sign in, or create your account to begin your application.</p></div>
+  <a class="lp-btn" href="javascript:void(0)" onclick="var i=document.getElementById('u');i.scrollIntoView({behavior:'smooth',block:'center'});i.focus()">Sign in now <span aria-hidden="true">→</span></a>
+ </div></section>
+
+ <div class="lp-foot"><div class="lp-wrap lp-footi"><span>Admission Portal · Temporary identity</span><span>Preview interface · School details to be confirmed</span></div></div>
+</div>
 <div id="app" class="hidden"><button class="skip" data-act="skip">Skip to main content</button><aside id="side" role="navigation" aria-label="Main Navigation"><div class="brand"><img src="https://i.imgur.com/roCMSYf.jpeg" alt=""><div><b>Moreh Academy</b><small id="role"></small></div></div><div id="nav"></div><div class="me"><div id="who"></div><button class="nav" data-act="out" style="margin-top:8px"></button></div></aside><div id="sbbd" data-act="menu"></div>
 <main id="main"><div class="top" role="banner"><div class="tl" style="display:flex;gap:14px;align-items:center"><button id="menu" data-act="menu" aria-label="Toggle navigation" aria-controls="side" aria-expanded="true" title="Toggle navigation">&#9776;</button><img class="tlogo" src="https://i.imgur.com/roCMSYf.jpeg" alt=""><div><h1 id="title"></h1><p id="sub"></p></div></div><div id="gsw" class="gsw hidden"><input id="gs" type="text" autocomplete="off" placeholder="Search" aria-label="Global search" role="combobox" aria-autocomplete="list" aria-controls="gsr" aria-expanded="false"><div id="gsr" class="gsr hidden" role="listbox"></div></div><div class="tr" style="display:flex;gap:12px;align-items:center;position:relative"><button class="av" id="gsb" data-act="gsopen" aria-label="Search" title="Search" style="background:#fff;color:var(--navy);border:1px solid var(--line)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"/></svg></button><span id="rbd" class="rbd hidden"></span><span style="position:relative"><button class="av" style="background:#fff;color:var(--navy);border:1px solid var(--line)" data-act="bell" title="Notifications" aria-label="Notifications">&#128276;</button><span id="nb" class="hidden" style="position:absolute;top:-4px;right:-4px;background:#d93025;color:#fff;border-radius:999px;min-width:20px;height:20px;font:700 11px/20px Inter,sans-serif;text-align:center;padding:0 5px"></span></span><div class="dd hidden" id="np" style="width:340px;right:56px;max-height:70vh;overflow:auto"></div><div class="uchip" data-act="dd"><b id="uname"></b><small id="urole"></small></div><button class="av" id="av" data-act="dd" title="Account" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"></button><div class="dd hidden" id="dd" role="menu"></div></div></div><div id="view" tabindex="-1"></div><footer id="ftr" class="ftr"><div class="fl1"><span>&copy; <span id="fyr"></span> Moreh Academy</span><span>v1.0</span><a href="javascript:void(0)" data-act="nav" data-v="pp">Data Privacy Policy</a></div><div class="fl1"><span id="fst" class="fst on"><i></i><span>Online</span></span><a href="mailto:morehians@gmail.com">morehians@gmail.com</a><a href="tel:09618766886">0961 876 6886</a></div></footer></main><nav id="bnav" aria-label="Quick navigation"></nav></div>
 <div id="load" class="hidden"><i></i></div><div id="toast" class="hidden" role="status" aria-live="polite"></div>
