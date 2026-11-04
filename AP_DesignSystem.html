@@ -161,4 +161,55 @@ img { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Authenticated workspace primitives */
+.ap-app-shell { display: grid; grid-template-columns: 252px minmax(0,1fr); min-height: 100vh; }
+.ap-sidebar { display: flex; flex-direction: column; gap: 22px; padding: 24px 16px; border-right: 1px solid var(--ap-border); background: #fff; }
+.ap-sidebar__nav { display: grid; gap: 5px; }
+.ap-nav-link { display: flex; min-height: 42px; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 10px; color: #53647B; font-size: 13px; font-weight: 600; text-decoration: none; transition: background .15s,color .15s; }
+.ap-nav-link:hover { background: var(--ap-primary-soft); color: var(--ap-primary); }
+.ap-nav-link[aria-current="page"] { background: var(--ap-primary-soft); color: var(--ap-primary); font-weight: 800; }
+.ap-workspace { min-width: 0; padding: 30px clamp(18px,3vw,42px) 56px; }
+.ap-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
+.ap-page-title { margin: 0; color: var(--ap-navy); font: 800 25px/1.2 var(--ap-font-display); letter-spacing: -.04em; }
+.ap-stat-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
+.ap-stat-card { padding: 18px; border: 1px solid var(--ap-border); border-radius: var(--ap-radius-md); background: #fff; box-shadow: var(--ap-shadow-sm); }
+.ap-stat-value { display: block; margin-top: 8px; color: var(--ap-navy); font: 800 27px/1.1 var(--ap-font-display); letter-spacing: -.04em; }
+.ap-stat-label { color: var(--ap-muted); font-size: 12px; }
+.ap-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--ap-border); border-radius: var(--ap-radius-md); background: #fff; }
+.ap-table { width: 100%; border-collapse: collapse; text-align: left; }
+.ap-table th { padding: 12px 14px; background: #F5F8FC; color: #596A81; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.ap-table td { padding: 13px 14px; border-top: 1px solid #EDF1F6; color: var(--ap-text); font-size: 13px; vertical-align: middle; }
+.ap-table tbody tr:hover { background: #F9FBFE; }
+.ap-tabs { display: flex; gap: 5px; overflow-x: auto; border-bottom: 1px solid var(--ap-border); }
+.ap-tab { flex: 0 0 auto; padding: 11px 14px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--ap-muted); font-size: 13px; font-weight: 700; }
+.ap-tab[aria-selected="true"] { border-bottom-color: var(--ap-primary); color: var(--ap-primary); }
+.ap-alert { display: flex; align-items: flex-start; gap: 11px; padding: 13px 15px; border: 1px solid var(--ap-border); border-radius: 12px; background: #fff; font-size: 13px; }
+.ap-alert--info { border-color: #CFE0FF; background: var(--ap-info-bg); }
+.ap-alert--success { border-color: #C7EAD5; background: var(--ap-success-bg); }
+.ap-alert--warning { border-color: #F4D9A8; background: var(--ap-warning-bg); }
+.ap-alert--danger { border-color: #F5CACA; background: var(--ap-danger-bg); }
+.ap-form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
+.ap-steps { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1px; overflow: hidden; }
+.ap-step { padding: 22px; }
+.ap-step + .ap-step { border-left: 1px solid var(--ap-border); }
+
+@media (max-width: 1100px) {
+  .ap-stat-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 900px) {
+  .ap-app-shell { grid-template-columns: 1fr; }
+  .ap-sidebar { gap: 12px; padding: 14px 18px; border-right: 0; border-bottom: 1px solid var(--ap-border); }
+  .ap-sidebar__nav { display: flex; overflow-x: auto; }
+  .ap-nav-link { flex: 0 0 auto; }
+  .ap-workspace { padding: 22px 20px 44px; }
+}
+@media (max-width: 600px) {
+  .ap-page-header { flex-direction: column; }
+  .ap-stat-grid, .ap-form-grid, .ap-steps { grid-template-columns: 1fr; }
+  .ap-stat-card { padding: 15px; }
+  .ap-step + .ap-step { border-top: 1px solid var(--ap-border); border-left: 0; }
+  .ap-workspace { padding: 18px 16px 36px; }
+}
+
 </style>
