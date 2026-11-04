@@ -1,5 +1,28 @@
 <!DOCTYPE html>
-<html lang="en"><head><base target="_top"><script>window.addEventListener('error',function(e){var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#b3261e;color:#fff;padding:8px 14px;z-index:99999;font:13px Arial,sans-serif';b.textContent='Page error: '+(e.message||'unknown')+(e.lineno?' (line '+e.lineno+')':'');(document.body||document.documentElement).appendChild(b)});</script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head><base target="_top"><script>window.addEventListener('error',function(e){var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#b3261e;color:#fff;padding:8px 14px;z-index:99999;font:13px Arial,sans-serif';b.textContent='Page error: '+(e.message||'unknown')+(e.lineno?' (line '+e.lineno+')':'');(document.body||document.documentElement).appendChild(b)});</script><meta charset="utf-8">
+<script>
+(function(){
+  var KEY='mrh_theme',root=document.documentElement,mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+  function saved(){try{var v=localStorage.getItem(KEY);return v==='dark'||v==='light'?v:null}catch(e){return null}}
+  function cur(){return root.getAttribute('data-theme')==='dark'?'dark':'light'}
+  function apply(t){
+    root.setAttribute('data-theme',t);
+    var m=document.querySelector('meta[name="color-scheme"]');
+    if(!m){m=document.createElement('meta');m.name='color-scheme';document.head.appendChild(m)}
+    m.setAttribute('content',t);
+    var sw=document.querySelectorAll('.theme-switch'),d=t==='dark',l=d?'Switch to day mode':'Switch to night mode';
+    for(var i=0;i<sw.length;i++){sw[i].setAttribute('aria-pressed',d?'true':'false');sw[i].setAttribute('aria-label',l);sw[i].title=l}
+  }
+  window.MRH_THEME={
+    get:cur,
+    set:function(t,persist){t=t==='dark'?'dark':'light';apply(t);if(persist!==false){try{localStorage.setItem(KEY,t)}catch(e){}}},
+    toggle:function(){this.set(cur()==='dark'?'light':'dark')},
+    sync:function(){apply(cur())}
+  };
+  apply(saved()||(mq&&mq.matches?'dark':'light'));
+  if(mq&&mq.addEventListener)mq.addEventListener('change',function(e){if(!saved())apply(e.matches?'dark':'light')});
+})();
+</script><meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--navy:#0b2a5b;--blue:#2f5fd0;--soft:#e9effc;--cream:#f8f9fa;--line:#e3e7ee;--txt:#1b2a4a;--mut:#6b7794}
@@ -903,6 +926,133 @@ aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
 }
 @media(prefers-reduced-motion:reduce){#login *{transition:none!important}}
 </style>
+<style id="day-night">
+/* ---------- the switch (same look as Index2) ---------- */
+.theme-switch{position:relative;display:inline-flex;align-items:center;justify-content:space-between;width:64px;height:34px;padding:0 9px;border-radius:999px;border:1px solid var(--line);background:var(--solid,#fff);color:#78839f;box-shadow:0 4px 14px #0a1a4214;flex:none;cursor:pointer}
+.theme-switch svg{width:16px;height:16px;position:relative;z-index:1;transition:color .25s}
+.theme-switch .knob{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;z-index:0;background:linear-gradient(135deg,#ffcf6b,#ff9a4d);box-shadow:0 4px 12px #ff963c80;transition:transform .3s cubic-bezier(.4,.2,.2,1),background .3s,box-shadow .3s}
+.theme-switch .i-sun{color:#fff}
+html[data-theme=dark] .theme-switch{background:#161f46;color:#8f9bc6}
+html[data-theme=dark] .theme-switch .knob{transform:translateX(30px);background:linear-gradient(135deg,#8b7bff,#4f6bff);box-shadow:0 4px 14px #6e6eff99}
+html[data-theme=dark] .theme-switch .i-sun{color:#8f9bc6}
+html[data-theme=dark] .theme-switch .i-moon{color:#fff}
+.theme-switch.floating{position:absolute;top:16px;right:22px;z-index:6}
+@media(max-width:767px){.top .theme-switch{display:none}}   /* phones: the switch lives in My Profile menu instead (see part 3) */
+
+/* ---------- Enrollment Health card (works in both themes) ---------- */
+.ma-rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:12px;text-align:center}
+.ma-ring{display:grid;justify-items:center;gap:10px;font-size:12px;font-weight:700;color:var(--mut)}
+.ma-ring small{display:block;font-weight:500;font-size:11px;opacity:.85}
+.ma-ring-box{position:relative;width:84px;height:84px}
+.ma-ring-box svg{width:84px;height:84px}
+.ma-ring-box .rt{fill:none;stroke:var(--ring-track,#e2e8f0);stroke-width:7}
+.ma-ring-box .rv{fill:none;stroke-width:7;stroke-linecap:round;animation:ma-ring 1s ease both}
+.ma-ring-box b{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;color:var(--navy)}
+@keyframes ma-ring{from{stroke-dasharray:0 100}}
+@media(prefers-reduced-motion:reduce){.ma-ring-box .rv{animation:none}*{transition-duration:.01ms!important}}
+
+@media screen{
+html[data-theme=dark]{
+  color-scheme:dark;
+  --navy:#e9edff;--txt:#e9edff;--mut:#9aa8d0;--line:rgba(150,170,255,.17);--soft:rgba(140,160,255,.15);
+  --cream:#0a1030;--heroline:rgba(150,170,255,.22);--hero1:#18214f;--hero2:#121a40;
+  --solid:#10173a;--ring-track:rgba(140,160,255,.18);--blue:#6f93ff;
+  --sh:0 12px 36px rgba(0,0,0,.38);--sh2:0 24px 60px rgba(0,0,0,.55);--ring:0 0 0 3px rgba(111,147,255,.35);
+  --ok:#4ade80;--okbg:rgba(74,222,128,.14);--warn:#fbbf24;--warnbg:rgba(251,191,36,.14);--bad:#ff8a9d;--badbg:rgba(255,107,133,.15);
+}
+html[data-theme=dark],html[data-theme=dark] body{background:#070b1f}
+html[data-theme=dark] body:not(.stu){background:radial-gradient(circle at 12% 8%,rgba(122,84,255,.30),transparent 42%),radial-gradient(circle at 92% 88%,rgba(41,98,255,.32),transparent 46%),linear-gradient(160deg,#070b1f 0%,#0b1033 55%,#160c3a 100%) fixed;color:var(--txt)}
+html[data-theme=dark] body.stu{background:#0b1230;--sb:#0f1a4a}
+html[data-theme=dark] body.stu aside{background:#0f1a4a}
+html[data-theme=dark] body.stu main{background:#0e1638}
+
+/* cards, tiles, panels */
+html[data-theme=dark] .card,html[data-theme=dark] .stat,html[data-theme=dark] .tile,html[data-theme=dark] .kpi,html[data-theme=dark] .shc,
+html[data-theme=dark] .sprow,html[data-theme=dark] .evc,html[data-theme=dark] .galc,html[data-theme=dark] .abc,html[data-theme=dark] .alc,
+html[data-theme=dark] .hbc,html[data-theme=dark] .gct,html[data-theme=dark] .lv,html[data-theme=dark] .qb,html[data-theme=dark] .dxb,
+html[data-theme=dark] .rc,html[data-theme=dark] .wst,html[data-theme=dark] .sv-pc,html[data-theme=dark] .sv-k,html[data-theme=dark] .gpg,
+html[data-theme=dark] .admbar,html[data-theme=dark] .rhead,html[data-theme=dark] .rrail .card,html[data-theme=dark] .segbar{background:#10173a;border-color:var(--line);color:var(--txt)}
+html[data-theme=dark] .top{background:rgba(12,18,46,.72)!important;border-color:var(--line)}
+html[data-theme=dark] body:not(.stu) .top{background:linear-gradient(90deg,#0a1a42,#10306b)!important}
+html[data-theme=dark] .shero{background:linear-gradient(120deg,var(--hero1),var(--hero2));border-color:var(--heroline);color:var(--txt)}
+html[data-theme=dark] .hm .card .ch h3,html[data-theme=dark] .hm .card>h3,html[data-theme=dark] .lv h4,html[data-theme=dark] .gct h4{color:var(--txt)}
+html[data-theme=dark] .gct h4{background:color-mix(in srgb,var(--c) 20%,#10173a)}
+html[data-theme=dark] .gct tr.hl{background:color-mix(in srgb,var(--c) 28%,#10173a)}
+html[data-theme=dark] .gct tr.hl td,html[data-theme=dark] .gct td:last-child{color:var(--txt)}
+html[data-theme=dark] .pl,html[data-theme=dark] .bkb,html[data-theme=dark] .clr,html[data-theme=dark] .gsr2{background:#0e1538;border-color:var(--line)}
+html[data-theme=dark] .helpbar{background:linear-gradient(120deg,#17214f,#121a40);border-color:var(--heroline)}
+html[data-theme=dark] .dxa{background:linear-gradient(180deg,#2a1530,#10173a 70%);border-color:rgba(255,107,133,.3)}
+html[data-theme=dark] .dxa .ch h3{color:#ff9fb0}
+html[data-theme=dark] .dxa .at th{background:rgba(255,107,133,.12)}
+html[data-theme=dark] .fpch,html[data-theme=dark] .sch{background:linear-gradient(90deg,#161f4a,#10173a)}
+html[data-theme=dark] .scn{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.35);color:#fcd98b}
+html[data-theme=dark] .scn b{color:#ffe2a3}
+
+/* tables */
+html[data-theme=dark] .at th,html[data-theme=dark] .cmp th{background:#161f4a;color:#9aa8d0}
+html[data-theme=dark] .at tbody tr:hover,html[data-theme=dark] tbody tr:hover,html[data-theme=dark] .rt tbody tr:hover{background:rgba(140,160,255,.09)}
+html[data-theme=dark] .rt tbody tr:nth-child(even){background:rgba(140,160,255,.05)}
+html[data-theme=dark] .rt tr.tt td{background:#161f4a;border-top-color:var(--blue)}
+html[data-theme=dark] .rt.wide td:first-child{background:#10173a}
+html[data-theme=dark] .cmp tr.cmp-best td{background:rgba(74,222,128,.1)}
+html[data-theme=dark] td{border-top-color:var(--line)}
+
+/* forms */
+html[data-theme=dark] .f input,html[data-theme=dark] .f select,html[data-theme=dark] .f textarea,html[data-theme=dark] .sb input,
+html[data-theme=dark] .admsel,html[data-theme=dark] .rsrch input,html[data-theme=dark] .stsel{background-color:#0a1030;color:var(--txt);border-color:rgba(150,170,255,.3)}
+html[data-theme=dark] .f input:disabled,html[data-theme=dark] .f select:disabled,html[data-theme=dark] .f textarea:disabled{background:#0e1538;color:#cdd6f6;-webkit-text-fill-color:#cdd6f6;border-color:var(--line)}
+html[data-theme=dark] .f input::placeholder,html[data-theme=dark] .f textarea::placeholder{color:#6f7ca5}
+html[data-theme=dark] #gs{background-color:#0a1030!important;color:var(--txt)}
+html[data-theme=dark] body:not(.stu) #gs{background-color:#fff!important;color:#0f172a}
+html[data-theme=dark] select option{background:#10173a;color:var(--txt)}
+html[data-theme=dark] .rad label{background:#0e1538;border-color:var(--line);color:var(--txt)!important}
+html[data-theme=dark] .rad label:has(input:checked){background:var(--soft);border-color:var(--blue)}
+
+/* buttons, pills, chips, menus */
+html[data-theme=dark] .btn.alt,html[data-theme=dark] .vb.alt{background:#161f4a;color:var(--txt);border-color:rgba(150,170,255,.3)}
+html[data-theme=dark] .btn.alt:hover{background:#1e2a60}
+html[data-theme=dark] .btn.red{background:rgba(255,107,133,.1);color:#ff9fb0;border-color:rgba(255,107,133,.4)}
+html[data-theme=dark] .pill{background:#161f4a;color:var(--txt);border-color:rgba(150,170,255,.3)}
+html[data-theme=dark] .pill.on{background:var(--blue);border-color:var(--blue);color:#fff}
+html[data-theme=dark] .chip{background:var(--soft);color:#c9d6ff;border-color:var(--line)}
+html[data-theme=dark] .tabs,html[data-theme=dark] .gtabs{background:#10173a;border-color:var(--line)}
+html[data-theme=dark] .seg{background:#0a1030;border-color:var(--line)}
+html[data-theme=dark] .seg button.on{background:#1e2a60;color:#fff;box-shadow:none}
+html[data-theme=dark] .dd,html[data-theme=dark] .gsr,html[data-theme=dark] .mod>div,html[data-theme=dark] #nm>div{background:#10173a;border-color:var(--line);color:var(--txt)}
+html[data-theme=dark] .mod .ft,html[data-theme=dark] .nmh{background:#0e1538;border-color:var(--line)}
+html[data-theme=dark] #nm>div .nmb{background:#0a1030}
+html[data-theme=dark] .dd button:hover,html[data-theme=dark] .gsi:hover,html[data-theme=dark] .ai:hover{background:var(--soft)}
+html[data-theme=dark] #bnav{background:#10173a;border-color:var(--line)}
+html[data-theme=dark] .ftr{border-color:var(--line)}
+html[data-theme=dark] .ring:before{background:#10173a;box-shadow:inset 0 0 0 1px var(--line)}
+html[data-theme=dark] .av2{background:linear-gradient(135deg,#27358a,#3a2a7a);color:#dfe6ff}
+html[data-theme=dark] .stpi:hover{background:rgba(140,160,255,.1)}
+html[data-theme=dark] .hsi{background:#10173a;border-color:var(--line)}
+html[data-theme=dark] #guidebox ol>li,html[data-theme=dark] #gbody ol>li{background:#0e1538;border-color:var(--line)}
+html[data-theme=dark] .pvs,html[data-theme=dark] .abq,html[data-theme=dark] .abp,html[data-theme=dark] .cld{color:#cdd6f6}
+html[data-theme=dark] .skip{background:#10173a;color:var(--txt)}
+
+/* ---------- landing page (sign-in) ---------- */
+html[data-theme=dark] #login{background:#070b1f;color:#e9edff;--lp-navy:#e9edff;--lp-mut:#9aa8d0;--lp-line:rgba(150,170,255,.18)}
+html[data-theme=dark] .lp-hdr{background:rgba(10,16,48,.92)}
+html[data-theme=dark] .lp-hero{background:linear-gradient(180deg,#0b1033,#070b1f)}
+html[data-theme=dark] .lp-card{background:rgba(22,31,70,.82);border-color:rgba(150,170,255,.2)}
+html[data-theme=dark] .lp-card input{background:#0a1030;color:#e9edff;border-color:rgba(150,170,255,.3)}
+html[data-theme=dark] #login .lp-btn.light{background:#161f4a;color:#e9edff;border-color:rgba(150,170,255,.3)}
+html[data-theme=dark] .lp-steps,html[data-theme=dark] .lp-icard{background:#10173a;border-color:var(--line)}
+html[data-theme=dark] .lp-info,html[data-theme=dark] .lp-foot{background:#0b1033;border-color:var(--line)}
+html[data-theme=dark] .lp-ibox{background:rgba(111,147,255,.16)}
+html[data-theme=dark] .lp-links{color:#9aa8d0}
+
+/* Targeted contrast fix for the two enrollee status badges in night mode */
+html[data-theme=dark] .shchip.sh-unsaved,
+html[data-theme=dark] .shchip.sh-pending{
+  background:#26365F !important;
+  color:#DCE7FF !important;
+  border:1px solid #40558A !important;
+}
+}
+</style>
 </head>
 <body>
 <div id="login">
@@ -1367,13 +1517,13 @@ const COR_CSS=`<style>
 </style>`;
 const corLearner=(r,photo,sid)=>{const L={lw:48};return efBar('Learner Academic Information',49)
  +efAt(13.7,56.9,33.5,photo?`<img src="${esc(photo)}" alt="">`:'','ph',38)
- +efAt(48.5,56.9,150.1,efCol(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:20}),efFd('Student ID',sid))))
+ +efAt(48.5,56.9,150.1,efColIndex3(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:20}),efFd('Student ID',sid))))
  +efAt(48.5,62.9,150.1,'','dv')
- +efAt(48.5,65.6,150.1,efCol(4.3,1.05,efRw(efFd('Learner\u2019s Full Name',r.FullName,L)),efRw(efFd('Learner Reference Number',r.LRN,L)),efRw(efFd('Grade Level',r.GradeLevel,L)),
+ +efAt(48.5,65.6,150.1,efColIndex3(4.3,1.05,efRw(efFd('Learner\u2019s Full Name',r.FullName,L)),efRw(efFd('Learner Reference Number',r.LRN,L)),efRw(efFd('Grade Level',r.GradeLevel,L)),
    efRw(efFd('Cluster',r.Cluster,L)),efRw(efFd('Section',r.Section,L)),efRw(efFd('Enrollment Status',r.EnrollStatus,{lw:48,bw:34}),efFd('School Year',r.SchoolYear))))};
 
 function corHTML(c,art){const r=c.rec,st=c.s,A_=art||{},
- par=p=>efCol(4.1,.7,efRw(efFd('Name',r[p+'Name'],{lw:26})),efRw(efFd('Parental Status',r[p+'Status'],{lw:26})),efRw(efFd('Occupation',r[p+'Occupation'],{lw:26})),efRw(efFd('Contact No.',r[p+'Mobile'],{lw:26}))),
+ par=p=>efColIndex3(4.1,.7,efRw(efFd('Name',r[p+'Name'],{lw:26})),efRw(efFd('Parental Status',r[p+'Status'],{lw:26})),efRw(efFd('Occupation',r[p+'Occupation'],{lw:26})),efRw(efFd('Contact No.',r[p+'Mobile'],{lw:26}))),
  sb=(t,l,w)=>`<div class="ab bar s" style="top:187.6mm;left:${l}mm;width:${w}mm">${t}</div>`,
  fd=(l,v,lw)=>`<div class="fd"><label style="width:${lw}mm">${l}</label><div class="v n">${esc(v)}</div></div>`;
  return `<div class="ef cor">${EF_CSS}${COR_CSS}
@@ -1383,12 +1533,12 @@ function corHTML(c,art){const r=c.rec,st=c.s,A_=art||{},
  ${efAt(12.2,134.3,0,'FATHER\u2019S DATA','pill')}${efAt(106.9,134.3,0,'MOTHER\u2019S DATA','pill')}
  ${efAt(15.6,141.5,86.8,par('Father'))}${efAt(110.3,141.5,87.2,par('Mother'))}
  ${efBar('Primary Contact Information',160.7,12.5,189.2)}
- ${efAt(15.7,169.6,87.8,efCol(4.2,.8,efRw(efFd('Name',r.EmName,{lw:14})),efRw(efFd('Address',r.EmSameAddr==='Yes'?addrOf(r):r.EmAddress,{lw:14,s:1}))))}
- ${efAt(106.3,169.6,92.6,efCol(4.2,.8,efRw(efFd('Relationship to Applicant',r.EmRelation,{lw:42.7})),efRw(efFd('Contact Number',r.EmMobile,{lw:42.7,ra:1}))))}
+ ${efAt(15.7,169.6,87.8,efColIndex3(4.2,.8,efRw(efFd('Name',r.EmName,{lw:14})),efRw(efFd('Address',r.EmSameAddr==='Yes'?addrOf(r):r.EmAddress,{lw:14,s:1}))))}
+ ${efAt(106.3,169.6,92.6,efColIndex3(4.2,.8,efRw(efFd('Relationship to Applicant',r.EmRelation,{lw:42.7})),efRw(efFd('Contact Number',r.EmMobile,{lw:42.7,ra:1}))))}
  ${sb('ASSESSMENT OF FEES',12.1,61.9)}${sb('SCHOLARSHIP DETAILS',75.7,61.8)}${sb('SUMMARY OF ASSESSMENT',139.7,61.9)}
- ${efAt(12.1,195.3,61.9,efCol(4.2,.8,efRw(fd('Tuition Fees',st.Tuition,39.2)),efRw(fd('Miscellaneous Fees',st.Misc,39.2))))}
+ ${efAt(12.1,195.3,61.9,efColIndex3(4.2,.8,efRw(fd('Tuition Fees',st.Tuition,39.2)),efRw(fd('Miscellaneous Fees',st.Misc,39.2))))}
  ${efAt(12.1,207.4,61.9,efRw(fd('Gross School Fee',st.Gross,39.2)))}
- ${efAt(75.7,195.3,61.8,efCol(4.2,.8,efRw(fd('Special Discount',st.Special,39)),efRw(fd('Misc. Fee Discount',st.MiscDisc,39))))}
+ ${efAt(75.7,195.3,61.8,efColIndex3(4.2,.8,efRw(fd('Special Discount',st.Special,39)),efRw(fd('Misc. Fee Discount',st.MiscDisc,39))))}
  ${efAt(139.7,195.3,61.9,efRw(fd('Upon Enrollment',st.Upon,39)))}
  ${efAt(139.7,207.4,61.9,efRw(fd('Total Account Balance',st.Balance,39)))}
  ${efBar('Signature Specimen',218.6,12.1,74)}${efBar('Student Identification Card',218.6,89.9,111.5)}
@@ -1436,7 +1586,7 @@ act.search=()=>call('searchStudents',[T(),$('q').value,S.flt||'All'],r=>{const L
   return `<tr><td><input type="checkbox" class="sel" value="${esc(s.StudentID)}"></td><td><div class="lrn"><span class="av2">${esc(ini)}</span><div><b>${esc(tc(s.FullName))}</b><small>${esc(s.StudentID)}${s.SchoolYear?' \u00b7 SY '+esc(s.SchoolYear):''}</small></div></div></td><td>${esc(s.LRN)}</td><td>${esc(tc(s.GradeLevel))} ${esc(tc(s.Section))}</td><td><select class="stsel ${stc(st)}" data-act="rowst" data-id="${esc(s.StudentID)}" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select></td><td><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')}</tbody></table>`:'<div class="aemp">No matching learners.</div>'});
 function recHero(t){const r=t.rec,p=String(r.FullName||'').split(','),nm=r.FullName?tc(r.FullName):(r.Surname||r.FirstName?tc([r.Surname,r.FirstName].filter(Boolean).join(', ')):'New enrollee'),
  ini=((r.FullName?(p[0]||'').trim()[0]:(r.Surname||nm)[0])||'N')+(r.FullName?((p[1]||'').trim()[0]||''):(r.FirstName||'')[0]||''),gs=((r.GradeLevel||'')+' '+(r.Section||'')).trim();
- return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(tc(gs))}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`}
+ return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip ${r.StudentID?'':'sh-unsaved'}">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip ${(!r.EnrollStatus||r.EnrollStatus==='Not Enrolled')?'sh-pending':''}">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(tc(gs))}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`}
 
 function stuProfile(keep){head('Student Profile','Review and update your information');S.cur='stu';
  if(keep===true)return $('view').innerHTML=formHTML(S.st);call('getStudent',[T()],r=>{S.st={rec:r.data,edit:false};$('view').innerHTML=formHTML(S.st)})}
@@ -1570,7 +1720,7 @@ function enrollFormHTML(r,photo){
 const efFd=(l,x,o)=>{o=o||{};const lw=o.lw?` style="width:${o.lw}mm"`:'',bw=o.bw?` style="flex:none;width:${o.bw}mm"`:'';
  return `<div class="fd" style="flex:${o.bw?'none':'1 1 0'}"><label${o.ra?' class="ra"':''}${lw}>${l}</label><div class="v${o.s?' s':''}"${bw}>${esc(x)}</div></div>`};
 const efRw=(...a)=>`<div class="rw">${a.join('')}</div>`;
-const efCol=(h,g,...a)=>`<div class="col" style="--h:${h}mm;--g:${g}mm">${a.join('')}</div>`;
+const efColIndex3=(h,g,...a)=>`<div class="col" style="--h:${h}mm;--g:${g}mm">${a.join('')}</div>`;
 const efAt=(l,t,w,html,c,h)=>`<div class="ab ${c||''}" style="left:${l}mm;top:${t}mm;${w?'width:'+w+'mm;':''}${h?'height:'+h+'mm;':''}">${html}</div>`;
 const efBar=(t,top,l,w)=>`<div class="ab bar" style="top:${top}mm${l!=null?`;left:${l}mm;width:${w}mm`:''}">${t}</div>`;
 const efFv=(r,k,test)=>{if(r[k]!=null&&r[k]!=='')return r[k];const F=(typeof S!=='undefined'&&S.fields)||[],x=F.find(test);return x&&r[x[1]]!=null?r[x[1]]:''};
@@ -1578,20 +1728,20 @@ const efHead=title=>`<div class="ab hdr"><img src="${LOGO}" alt=""><div class="w
 
 const efLearner=(r,photo)=>{const L={lw:48};return efBar('Learner Academic Information',49)
  +efAt(13.7,56.9,33.5,photo?`<img src="${esc(photo)}" alt="">`:'','ph',38)
- +efAt(48.5,56.9,150.1,efCol(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:20}),efFd('Enrollment ID',r.StudentID))))
+ +efAt(48.5,56.9,150.1,efColIndex3(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:20}),efFd('Enrollment ID',r.StudentID))))
  +efAt(48.5,62.9,150.1,'','dv')
- +efAt(48.5,65.6,150.1,efCol(4.3,1.05,
+ +efAt(48.5,65.6,150.1,efColIndex3(4.3,1.05,
    efRw(efFd('Learner\u2019s Full Name',r.FullName,L)),efRw(efFd('Learner Reference Number',r.LRN,L)),efRw(efFd('Grade Level',r.GradeLevel,L)),
    efRw(efFd('Cluster',r.Cluster,L)),efRw(efFd('Section',r.Section,L)),
    efRw(efFd('Enrollment Status',r.EnrollStatus,{lw:48,bw:34}),efFd('School Year',r.SchoolYear))))};
 
 const efPersonal=r=>{const rel=r.Religion==='Others, specify'?r.ReligionOther:r.Religion,bp=efFv(r,'BirthPlace',x=>/birth\s*place|place of birth/i.test(x[2]||''));
  return efBar('Personal Information',99.2)
- +efAt(13.5,106.3,117.7,efCol(4.1,.9,
+ +efAt(13.5,106.3,117.7,efColIndex3(4.1,.9,
    efRw(efFd('Address',addrOf(r),{s:1})),efRw(efFd('Email Address',r.Email,{s:1})),
    efRw(efFd('Legal Sex',r.SexualOrient,{bw:23}),efFd('Gender Identity (Optional):',r.GenderOrient)),
    efRw(efFd('Religion',rel,{bw:44}),efFd('Contact Number',r.Mobile))))
- +efAt(133,106.3,63.5,efCol(4.1,.9,
+ +efAt(133,106.3,63.5,efColIndex3(4.1,.9,
    efRw(efFd('Birth Date',fmtD(r.Birthdate),{lw:20})),efRw(efFd('Birth Place',bp,{lw:20,s:1})),
    efRw(efFd('Age',r.Birthdate?ageOf(r.Birthdate):'',{lw:20})),efRw(efFd('FB Link',r.Facebook,{lw:20,s:1}))))};
 
@@ -1606,9 +1756,9 @@ const SLIP_CSS=`<style>
 
 function confirmSlipHTML(r,photo,reqs,sch){
  reqs=Array.isArray(reqs)?reqs:[];sch=sch||{};const det=Array.isArray(sch.details)?sch.details:[],ix=[0,1,2,3,4,5,6,7,8];
- const reqCol=efCol(4.2,.61,ix.map(i=>{const q=reqs[i]||{};
+ const reqCol=efColIndex3(4.2,.61,ix.map(i=>{const q=reqs[i]||{};
    return `<div class="rw" style="gap:.8mm"><label class="dname" style="width:29mm">${esc(q.name)}</label><div class="v s">${esc(q.remarks)}</div><div class="v" style="flex:none;width:20.9mm">${esc(q.date)}</div></div>`}).join(''));
- const detCol=efCol(4.2,.61,ix.map(i=>efRw(`<div class="v s">${esc(det[i])}</div>`)).join(''));
+ const detCol=efColIndex3(4.2,.61,ix.map(i=>efRw(`<div class="v s">${esc(det[i])}</div>`)).join(''));
  return `<div class="ef">${EF_CSS}${SLIP_CSS}
  ${efHead('ENROLLMENT CONFIRMATION SLIP')}
  ${efLearner(r,photo)}
@@ -1617,7 +1767,7 @@ function confirmSlipHTML(r,photo,reqs,sch){
  ${efBar('Submitted Requirements',128.3,10.5,90.9)}
  ${efBar('Scholarship Details',127.5,108.7,90.9)}
  ${efAt(13.7,135.9,87,reqCol)}
- ${efAt(111.3,135.9,29.4,efCol(4.2,.61,efRw(`<div class="v s">${esc(sch.category)}</div>`)))}
+ ${efAt(111.3,135.9,29.4,efColIndex3(4.2,.61,efRw(`<div class="v s">${esc(sch.category)}</div>`)))}
  ${efAt(141.8,135.9,54.9,detCol)}
 
  ${efBar('Attestation of Enrollment',180.4)}
@@ -1711,14 +1861,14 @@ const Q=r.EnrollStatus==='Transferred Out'
  ${efLearner(r,r.Photo||'')}
 
  ${efBar('Cancellation Details',99.2)}
- ${efAt(13.5,106.3,183,efCol(4.1,.9,
+ ${efAt(13.5,106.3,183,efColIndex3(4.1,.9,
    efRw(efFd('Reason',o.reason,{lw:16.3})),
    efRw(efFd('Receiving School',dest,{lw:27.8,s:1}),efFd('Cancellation Date',fmtD(o.date),{lw:29.8,bw:44.3}))))}
 
  ${efBar('Requirements to Release',118.7,10.5,90.9)}
  ${efBar('Summary of Fees',117.9,108.7,90.9)}
- ${efAt(13.7,126.7,84.8,efCol(4.2,.6,rqRows))}
- ${efAt(111,126.7,85.5,efCol(4.2,.6,feeRows))}
+ ${efAt(13.7,126.7,84.8,efColIndex3(4.2,.6,rqRows))}
+ ${efAt(111,126.7,85.5,efColIndex3(4.2,.6,feeRows))}
 
  ${efBar('Attestation of Cancellation',175)}
  ${efAt(14,183.2,182,`<p class="att">I, ${ln('',72)} (Parent/Legal Guardian), hereby officially request the cancellation of enrollment for ${ln(r.FullName,72)} (Student Name) for School Year ${ln(r.SchoolYear,30)}. I understand that by submitting this cancellation slip, the reserved slot will be forfeited and any released documents or financial account settlement will follow the institutional policies of the school.</p>`)}
@@ -4002,7 +4152,7 @@ document.addEventListener('focusout',e=>{const k=e.target.dataset&&e.target.data
 /* the record banner (shown on narrow screens and in the New Enrollee pop-up) uses the same Grade & Section label */
 recHero=function(t){const r=t.rec,p=String(r.FullName||'').split(','),nm=r.FullName?tc(r.FullName):(r.Surname||r.FirstName?tc([r.Surname,r.FirstName].filter(Boolean).join(', ')):'New enrollee'),
  ini=((r.FullName?(p[0]||'').trim()[0]:(r.Surname||nm)[0])||'N')+(r.FullName?((p[1]||'').trim()[0]||''):(r.FirstName||'')[0]||''),gs=gsLabel(r);
- return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(gs)}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`};
+ return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip ${r.StudentID?'':'sh-unsaved'}">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip ${(!r.EnrollStatus||r.EnrollStatus==='Not Enrolled')?'sh-pending':''}">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(gs)}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`};
 
  /* ===== Student Home v2 + Reports v2 =====
    PASTE at the very END of the main script in Index.html, AFTER admission-ui-v2.js (it uses gsLabel from that file).
@@ -4400,4 +4550,49 @@ homeStudent = function () {
     bnEvents();
   });
 };
+
+/* ===== Day/night theme + Enrollment Health integration ===== */
+/* ---- theme engine fallback (only used if PART 1 was not pasted) ---- */
+if(!window.MRH_THEME){(function(){var KEY='mrh_theme',root=document.documentElement,mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+ var saved=function(){try{var v=localStorage.getItem(KEY);return v==='dark'||v==='light'?v:null}catch(e){return null}},cur=function(){return root.getAttribute('data-theme')==='dark'?'dark':'light'};
+ var apply=function(t){root.setAttribute('data-theme',t);document.querySelectorAll('.theme-switch').forEach(function(b){var d=t==='dark';b.setAttribute('aria-pressed',d);b.setAttribute('aria-label',d?'Switch to day mode':'Switch to night mode');b.title=b.getAttribute('aria-label')})};
+ window.MRH_THEME={get:cur,set:function(t,p){t=t==='dark'?'dark':'light';apply(t);if(p!==false){try{localStorage.setItem(KEY,t)}catch(e){}}},toggle:function(){this.set(cur()==='dark'?'light':'dark')},sync:function(){apply(cur())}};
+ apply(saved()||(mq&&mq.matches?'dark':'light'));
+ if(mq&&mq.addEventListener)mq.addEventListener('change',function(e){if(!saved())apply(e.matches?'dark':'light')})})()}
+
+/* ---- switch buttons ---- */
+const THSW='<svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span class="knob"></span>';
+function thMake(cls){const b=document.createElement('button');b.type='button';b.className='theme-switch'+(cls?' '+cls:'');b.innerHTML=THSW;b.onclick=()=>MRH_THEME.toggle();return b}
+(function(){const lp=document.querySelector('.lp-hdr .lp-nav');if(lp&&!lp.querySelector('.theme-switch')){const w=document.createElement('span');w.style.cssText='display:flex;align-items:center;gap:14px';const b=thMake();const sign=lp.querySelector('.lp-btn');if(sign){lp.insertBefore(w,sign);w.appendChild(b);w.appendChild(sign)}else lp.appendChild(b)}
+ MRH_THEME.sync()})();
+
+/* top bar (after sign-in) + a menu item for phones */
+const _topInitTh=topInit;
+topInit=function(){_topInitTh();
+ const tr=document.querySelector('.top .tr');if(tr&&!tr.querySelector('.theme-switch'))tr.insertBefore(thMake(),tr.firstChild);
+ const dd=$('dd');if(dd&&!dd.querySelector('[data-act=thtoggle]')){const l=dd.querySelector('.ddl');if(l)l.insertAdjacentHTML('beforebegin','<button role="menuitem" data-act="thtoggle">'+I.star+'<span id="thl"></span></button>')}
+ MRH_THEME.sync();thLabel()};
+const thLabel=()=>{const e=$('thl');if(e)e.textContent=MRH_THEME.get()==='dark'?'Switch to day mode':'Switch to night mode'};
+act.thtoggle=()=>{MRH_THEME.toggle();thLabel()};
+new MutationObserver(thLabel).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* ---- Enrollment Health rings (admin Home) ----
+   Ported from the "Efficiency" card in Index2. Data comes from calls the dashboard already makes:
+   Enrolled share, Requirements complete, Consent received (consent is hidden from Encoders, same as elsewhere). */
+function maRing(p,color,label,sub){p=Math.max(0,Math.min(100,Math.round(p)||0));
+ return `<div class="ma-ring" role="img" aria-label="${esc(label)} ${p}%"><div class="ma-ring-box"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="rt" cx="32" cy="32" r="26"/>${p>0?`<circle class="rv" cx="32" cy="32" r="26" pathLength="100" stroke="${color}" stroke-dasharray="${p} 100" transform="rotate(-90 32 32)"/>`:''}</svg><b>${p}%</b></div><span>${esc(label)}<small>${esc(sub)}</small></span></div>`}
+
+function maDraw(st){const X=S.dx&&S.dx.X,host=$('maov');if(!host||!X||!st)return;
+ const live=Math.max(0,(st.total||0)-(st.transferred||0)-(st.cancelled||0)),c=X.attention.counts||{},pc=(a,b)=>b>0?a/b*100:0,full=FULL();
+ const R=[maRing(pc(st.enrolled,live),'#16a34a','Enrolled',st.enrolled+' of '+live+' active'),
+  maRing(pc(live-(c.req||0),live),'#6f8cff','Requirements',(live-(c.req||0))+' of '+live+' complete')];
+ if(full)R.push(maRing(pc(live-(c.consent||0),live),'#b78cff','Consent form',(live-(c.consent||0))+' of '+live+' received'));
+ host.innerHTML=`<div class="card"><div class="ch"><h3>Enrollment Health</h3><span style="color:var(--mut);font-size:13px">Active learners, SY ${esc(String(S.cfg.sy).replace('-','\u2013'))}</span></div><div class="ma-rings">${R.join('')}</div></div>`}
+
+const _dxDrawTh=dxDraw;
+dxDraw=function(X,H){_dxDrawTh(X,H);
+ const rec=$('dxrec');if(!rec||$('maov'))return;
+ rec.insertAdjacentHTML('beforebegin','<div id="maov"></div>');
+ if(S.dsh&&S.dsh.stats)maDraw(S.dsh.stats);
+ else google.script.run.withSuccessHandler(r=>{if(r&&r.success){S.dsh=r.data;maDraw(r.data.stats)}}).withFailureHandler(()=>{}).dashboard(S.token)};
 </script></body></html>
