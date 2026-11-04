@@ -709,7 +709,111 @@ html[data-theme=dark] #login .lp-public-note{background:#18234a;border-color:#29
 #login .lp-milestone h4{margin:5px 0 0}
 #login .lp-milestone>p{padding:0 18px 16px}
 html[data-theme=dark] #login .lp-milestone{background:#10173a}
-</style></head>.
+</style><style id="moreh-admissions-visual-refinement">
+/* Moreh Academy admissions homepage — responsive visual refinement */
+#login{scroll-behavior:smooth}
+#login .lp-hdr{height:auto;min-height:78px;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 5px 24px rgba(16,42,86,.045)}
+#login .lp-nav{min-height:78px}
+#login .lp-brand{gap:12px;white-space:nowrap}
+#login .lp-logo{width:43px;height:43px;object-fit:contain;border-radius:12px;background:#fff;box-shadow:0 5px 16px rgba(16,42,86,.12)}
+#login .lp-links{align-items:center;gap:clamp(12px,1.8vw,24px);overflow:visible}
+#login .lp-links a{position:relative;padding:9px 0;transition:color .18s ease}
+#login .lp-links a:after{content:"";position:absolute;left:0;right:100%;bottom:2px;height:2px;border-radius:2px;background:var(--lp-blue);transition:right .2s ease}
+#login .lp-links a:hover:after,#login .lp-links a:focus-visible:after{right:0}
+#login .lp-nav>.lp-btn{white-space:nowrap;flex:none}
+#login .lp-hero{isolation:isolate;padding:clamp(54px,6vw,82px) 0 clamp(58px,6vw,86px)}
+#login .lp-hero:after{content:"";position:absolute;z-index:-1;width:420px;height:420px;left:-260px;bottom:-300px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.18),transparent 70%);pointer-events:none}
+#login .lp-grid{gap:clamp(30px,5vw,70px)}
+#login .lp-h1{max-width:680px}
+#login .lp-side{min-height:460px;perspective:1000px}
+#login .lp-card{width:min(410px,100%);border-radius:24px;padding:clamp(24px,3vw,34px);box-shadow:0 28px 70px rgba(16,42,86,.18),0 2px 8px rgba(16,42,86,.06);transform:translateZ(0);transition:transform .25s ease,box-shadow .25s ease}
+#login .lp-card:hover{transform:translateY(-3px);box-shadow:0 34px 82px rgba(16,42,86,.2),0 2px 8px rgba(16,42,86,.06)}
+#login .lp-card h2{font-size:28px}
+#login .lp-card input{min-height:48px}
+#login .lp-journey{position:relative;z-index:1}
+#login .lp-steps{box-shadow:0 18px 48px rgba(16,42,86,.075);border-radius:22px}
+#login .lp-step{transition:background .2s ease}
+#login .lp-step:hover{background:#f8fbff}
+#login .lp-info,#login .lp-public-section,#login .lp-campus{scroll-margin-top:120px}
+#login .lp-public-card,#login .lp-sch-card,#login .lp-enroll-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+#login .lp-public-card:hover,#login .lp-sch-card:hover,#login .lp-enroll-card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(16,42,86,.10);border-color:#cbdaf4}
+#login .lp-leader{min-width:0}
+#login .lp-leader img{width:48px;height:48px}
+#login .lp-gallery figure{transition:transform .22s ease,box-shadow .22s ease}
+#login .lp-gallery figure:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(0,0,0,.2)}
+#login .lp-gallery img{transition:transform .35s ease}
+#login .lp-gallery figure:hover img{transform:scale(1.035)}
+#login .lp-cta{position:relative;overflow:hidden}
+#login .lp-cta:after{content:"";position:absolute;width:360px;height:360px;right:-120px;top:-220px;border:1px solid rgba(255,255,255,.18);border-radius:50%;box-shadow:0 0 0 32px rgba(255,255,255,.035),0 0 0 64px rgba(255,255,255,.025);pointer-events:none}
+#login .lp-ctai{position:relative;z-index:1}
+#login a,#login button,#login summary{touch-action:manipulation}
+@media(max-width:1024px){
+ #login .lp-nav{gap:12px}
+ #login .lp-links{gap:15px}
+ #login .lp-links a{font-size:12px}
+ #login .lp-brand{font-size:12px}
+}
+@media(max-width:900px){
+ #login .lp-hdr{min-height:0}
+ #login .lp-nav{min-height:0;display:flex;flex-wrap:wrap;gap:8px 12px;padding:10px 0}
+ #login .lp-brand{order:1}
+ #login .lp-nav>.lp-btn{order:2;margin-left:auto;min-height:40px;padding:0 14px;font-size:11px}
+ #login .lp-links{display:flex!important;order:3;flex:0 0 100%;width:100%;gap:22px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:7px 2px 9px;scrollbar-width:thin;overscroll-behavior-x:contain}
+ #login .lp-links a{flex:none;font-size:12px}
+ #login .lp-grid{grid-template-columns:minmax(0,1fr);gap:26px}
+ #login .lp-hero{padding-top:48px}
+ #login .lp-side{min-height:420px}
+ #login .lp-steps{grid-template-columns:1fr}
+ #login .lp-step+.lp-step{border-left:0;border-top:1px solid var(--lp-line)}
+ #login .lp-public-grid,#login .lp-scholarship-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #login .lp-leader-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #login .lp-enroll-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+ #login .lp-wrap{width:calc(100% - 32px)}
+ #login .lp-logo{width:37px;height:37px}
+ #login .lp-brand{font-size:11px;gap:8px}
+ #login .lp-hdr{position:sticky;top:0}
+ #login .lp-nav{gap:7px 8px}
+ #login .lp-links{gap:19px;padding:6px 2px 8px}
+ #login .lp-nav>.lp-btn{min-height:38px;padding:0 11px;font-size:10px}
+ #login .lp-hero{padding:40px 0 46px}
+ #login .lp-h1{font-size:clamp(34px,10vw,46px);margin:14px 0}
+ #login .lp-lead{font-size:14px;line-height:1.75}
+ #login .lp-actions{display:grid;grid-template-columns:1fr}
+ #login .lp-actions .lp-btn{width:100%}
+ #login .lp-side{min-height:390px}
+ #login .lp-o1{width:250px;height:250px}
+ #login .lp-o2{width:92px;height:92px}
+ #login .lp-o3{width:68px;height:68px}
+ #login .lp-card{padding:22px;border-radius:20px}
+ #login .lp-card h2{font-size:24px}
+ #login .lp-trust{gap:9px 14px;margin-top:22px}
+ #login .lp-public-grid,#login .lp-scholarship-grid,#login .lp-leader-grid{grid-template-columns:1fr}
+ #login .lp-enroll-grid{grid-template-columns:1fr 1fr}
+ #login .lp-public-section,#login .lp-campus,#login .lp-info{padding:52px 0}
+ #login .lp-shead{margin-bottom:25px}
+ #login .lp-shead h2{font-size:27px}
+ #login .lp-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #login .lp-gallery img{height:125px}
+ #login .lp-cta{padding:48px 0}
+ #login .lp-foot{padding:22px 0}
+ #login .lp-info,#login .lp-public-section,#login .lp-campus{scroll-margin-top:112px}
+}
+@media(max-width:380px){
+ #login .lp-brand{font-size:10px}
+ #login .lp-nav>.lp-btn{font-size:9px;padding:0 9px}
+ #login .lp-enroll-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+ #login *,#login *:before,#login *:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}
+html[data-theme=dark] #login .lp-hdr{background:rgba(10,16,48,.94);border-color:rgba(150,170,255,.18)}
+html[data-theme=dark] #login .lp-logo{background:#fff}
+html[data-theme=dark] #login .lp-step:hover{background:#151f48}
+html[data-theme=dark] #login .lp-public-card:hover,html[data-theme=dark] #login .lp-sch-card:hover,html[data-theme=dark] #login .lp-enroll-card:hover{border-color:#40558a}
+</style>
+</head>.
   It only restyles. No JS, no DOM ids, no data-act / data-k hooks, no backend call is touched.
   Everything is inside @media screen, so printed forms, slips, ID cards and reports are unchanged.
 ============================================================ -->
@@ -984,7 +1088,6 @@ aside :focus-visible{outline:3px solid #fff;outline-offset:-3px}
 @media(max-width:900px){
  .lp-hero{padding:44px 0 52px}.lp-grid{grid-template-columns:1fr;gap:30px}.lp-links{display:none}
  .lp-steps,.lp-igrid{grid-template-columns:1fr}.lp-step+.lp-step{border-left:0;border-top:1px solid var(--lp-line)}
- <div class="lp-orb lp-o1"></div><div class="lp-orb lp-o2"></div><div class="lp-orb lp-o3"></div>
 }
 @media(max-width:600px){
  .lp-wrap{width:calc(100% - 32px)}.lp-hdr{height:68px}.lp-card{padding:22px}.lp-trust{gap:12px}
@@ -1123,7 +1226,7 @@ html[data-theme=dark] .shchip.sh-pending{
 <body>
 <div id="login">
  <div class="lp-hdr"><div class="lp-wrap lp-nav">
-  <a class="lp-brand" href="#lp-home" aria-label="Moreh Academy home"><span class="lp-mark">M</span><span>MOREH ACADEMY</span></a>
+  <a class="lp-brand" href="#lp-home" aria-label="Moreh Academy home"><img class="lp-logo" src="https://i.imgur.com/roCMSYf.jpeg" alt="Moreh Academy crest"><span>MOREH ACADEMY</span></a>
   <nav class="lp-links" aria-label="Main navigation">
    <a href="#lp-about">About</a><a href="#lp-timeline">History</a><a href="#lp-scholarships">Scholarships</a><a href="#lp-campus">Campus</a><a href="#lp-enrollment">Enrollment Guide</a>
   </nav>
