@@ -1,2 +1,88 @@
-<!doctype html><html lang="en"><head><base target="_top"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Moreh Academy | Admission Portal</title><style>
-:root{--navy:#142b4a;--blue:#234f7d;--gold:#c9a45c;--ink:#182638;--muted:#6d7b8b;--paper:#f5f7fa}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 Inter,Arial,sans-serif}.bar{height:7px;background:linear-gradient(90deg,var(--navy),var(--blue),var(--gold))}main{min-height:100vh;display:grid;place-items:center;padding:28px}.panel{width:min(620px,100%);background:white;border:1px solid #e5eaf0;border-radius:22px;padding:clamp(28px,6vw,52px);box-shadow:0 24px 70px #142b4a12}.eyebrow{color:var(--gold);font-weight:700;letter-spacing:.16em;text-transform:uppercase;font-size:11px}h1{font-size:clamp(30px,5vw,44px);line-height:1.1;color:var(--navy);margin:12px 0}p{color:var(--muted);margin:0 0 22px}.status{display:flex;gap:10px;align-items:center;background:#f4f7fa;border-radius:12px;padding:14px;color:var(--blue);font-size:13px}.dot{width:9px;height:9px;border-radius:50%;background:var(--gold)}footer{margin-top:28px;font-size:12px;color:#8a96a4}</style></head><body><div class="bar"></div><main><section class="panel"><div class="eyebrow">Moreh Academy · Taguig City</div><h1>Admission, made clearer.</h1><p>Welcome to the new Moreh Academy Admission Portal. We are preparing a simpler way for families to apply and follow their admission progress.</p><div class="status"><span class="dot"></span><span>Foundation installed — applicant registration is not yet open.</span></div><footer>For admission inquiries, please contact the Moreh Academy Admissions Office.</footer></section></main></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#155EEF">
+  <meta name="description" content="A clearer, simpler way to begin your school admission journey.">
+  <title>Admission Portal</title>
+  <?!= include('AP_DesignSystem'); ?>
+</head>
+<body>
+  <header class="ap-public-header">
+    <div class="ap-shell" style="min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px">
+      <a class="ap-brand" href="#" aria-label="Admission Portal home">
+        <span class="ap-brand-mark" aria-hidden="true">A</span>
+        <span>ADMISSION PORTAL</span>
+      </a>
+      <span class="ap-badge ap-badge--info">Foundation preview</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="ap-hero">
+      <div class="ap-shell ap-hero-grid">
+        <div>
+          <span class="ap-eyebrow">A simpler admission experience</span>
+          <h1 class="ap-title" style="margin:18px 0 20px;max-width:650px">A clearer path to your next chapter.</h1>
+          <p class="ap-copy" style="max-width:560px;font-size:17px;line-height:1.8;margin:0 0 26px">
+            A welcoming place for families to explore admission, complete student information,
+            and follow application progress with confidence.
+          </p>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <span class="ap-button ap-button--gradient" aria-disabled="true">Applicant services coming soon</span>
+            <span class="ap-badge ap-badge--neutral">Preview environment</span>
+          </div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:34px;color:var(--ap-muted);font-size:12px">
+            <span>✓ Family-friendly</span>
+            <span>✓ Clear application steps</span>
+            <span>✓ Staff-verified requirements</span>
+          </div>
+        </div>
+
+        <div class="ap-hero-art" aria-label="Abstract blue gradient illustration representing an admission journey">
+          <div class="ap-orb ap-orb--one"></div>
+          <div class="ap-orb ap-orb--two"></div>
+          <div class="ap-orb ap-orb--three"></div>
+          <div class="ap-art-card ap-art-card--top">
+            <div class="ap-art-kicker">Your application</div>
+            <div class="ap-art-value">One step at a time</div>
+          </div>
+          <div class="ap-art-card ap-art-card--bottom">
+            <div class="ap-art-kicker">Admission journey</div>
+            <div class="ap-art-value">Clear · Guided · Connected</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ap-shell" style="padding-top:0;padding-bottom:64px">
+      <div class="ap-card" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;overflow:hidden">
+        <div style="padding:22px">
+          <div class="ap-eyebrow">01 · Explore</div>
+          <h2 style="font:700 17px var(--ap-font-display);color:var(--ap-navy);margin:10px 0 5px">Know what to prepare</h2>
+          <p class="ap-copy" style="font-size:13px;margin:0">Review admission information and the requirements for your application.</p>
+        </div>
+        <div style="padding:22px;border-left:1px solid var(--ap-border)">
+          <div class="ap-eyebrow">02 · Apply</div>
+          <h2 style="font:700 17px var(--ap-font-display);color:var(--ap-navy);margin:10px 0 5px">Complete student details</h2>
+          <p class="ap-copy" style="font-size:13px;margin:0">Provide accurate applicant and student information through a guided process.</p>
+        </div>
+        <div style="padding:22px;border-left:1px solid var(--ap-border)">
+          <div class="ap-eyebrow">03 · Follow</div>
+          <h2 style="font:700 17px var(--ap-font-display);color:var(--ap-navy);margin:10px 0 5px">Stay informed</h2>
+          <p class="ap-copy" style="font-size:13px;margin:0">Check application updates and requirements verified by admissions personnel.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ap-footer">
+    <div class="ap-shell" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <span>Admission Portal · Temporary identity</span>
+      <span>Applicant services are not yet enabled.</span>
+    </div>
+  </footer>
+</body>
+</html>
