@@ -58,10 +58,11 @@ Use the `ap-` class namespace for shared components.
 
 - Buttons: primary, secondary, gradient, and quiet variants.
 - Cards: standard and interactive variants.
+- Workspace: sidebar, navigation links, page headers, statistic cards, tables, tabs, alerts, and responsive form grids.
 - Badges: info, success, warning, danger, and neutral.
 - Form controls: visible labels, inline help, focus state, validation state.
 - Progress: semantic label plus visible progress bar.
-- Feedback: toast, loading skeleton, empty state, confirmation dialog.
+- Feedback: toast, loading skeleton, empty state, modal/confirmation dialog, and inline validation.
 - Navigation: clear active state, keyboard focus, and mobile collapse.
 - Tables: sticky/clear headers where appropriate, row hover, filters, pagination, and mobile overflow wrapper.
 
