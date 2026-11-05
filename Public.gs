@@ -59,3 +59,6 @@ function getPublicAbout() {
     return out;
   } catch (e) { return fail(e); }
 }
+
+/** PUBLIC. URL of the public homepage (used by the sign-in page's "Back to homepage" link). */
+function getHomeUrl() { return ScriptApp.getService().getUrl(); }

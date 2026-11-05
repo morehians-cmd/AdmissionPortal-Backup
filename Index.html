@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><base target="_top"><script>window.addEventListener('error',function(e){var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#b3261e;color:#fff;padding:8px 14px;z-index:99999;font:13px Arial,sans-serif';b.textContent='Page error: '+(e.message||'unknown')+(e.lineno?' (line '+e.lineno+')':'');(document.body||document.documentElement).appendChild(b)});</script><meta charset="utf-8">
+<script>const WANT_REG = <?= reg ? 'true' : 'false' ?>;</script>
 <script>
 (function(){
   var KEY='mrh_theme',root=document.documentElement,mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
@@ -23,7 +24,7 @@
   if(mq&&mq.addEventListener)mq.addEventListener('change',function(e){if(!saved())apply(e.matches?'dark':'light')});
 })();
 </script><meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <style>
 :root{--navy:#0b2a5b;--blue:#2f5fd0;--soft:#e9effc;--cream:#f8f9fa;--line:#e3e7ee;--txt:#1b2a4a;--mut:#6b7794}
 *{box-sizing:border-box}body{margin:0;font:15px/1.5 Inter,system-ui,Arial,sans-serif;background:var(--cream);color:var(--txt)}
@@ -1164,15 +1165,7 @@ html[data-theme=dark] .skip{background:#10173a;color:var(--txt)}
 
 /* ---------- landing page (sign-in) ---------- */
 html[data-theme=dark] #login{background:#070b1f;color:#e9edff;--lp-navy:#e9edff;--lp-mut:#9aa8d0;--lp-line:rgba(150,170,255,.18)}
-html[data-theme=dark] .lp-hdr{background:rgba(10,16,48,.92)}
-html[data-theme=dark] .lp-hero{background:linear-gradient(180deg,#0b1033,#070b1f)}
-html[data-theme=dark] .lp-card{background:rgba(22,31,70,.82);border-color:rgba(150,170,255,.2)}
-html[data-theme=dark] .lp-card input{background:#0a1030;color:#e9edff;border-color:rgba(150,170,255,.3)}
-html[data-theme=dark] #login .lp-btn.light{background:#161f4a;color:#e9edff;border-color:rgba(150,170,255,.3)}
-html[data-theme=dark] .lp-steps,html[data-theme=dark] .lp-icard{background:#10173a;border-color:var(--line)}
-html[data-theme=dark] .lp-info,html[data-theme=dark] .lp-foot{background:#0b1033;border-color:var(--line)}
-html[data-theme=dark] .lp-ibox{background:rgba(111,147,255,.16)}
-html[data-theme=dark] .lp-links{color:#9aa8d0}
+
 
 /* Targeted contrast fix for the two enrollee status badges in night mode */
 html[data-theme=dark] .shchip.sh-unsaved,
@@ -1186,79 +1179,44 @@ html[data-theme=dark] .shchip.sh-pending{
 </head>
 <body>
 <div id="login">
- <div class="lp-hdr"><div class="lp-wrap lp-nav">
-  <a class="lp-brand" href="javascript:void(0)" onclick="window.scrollTo({top:0,behavior:'smooth'})"><span class="lp-mark">A</span><span>ADMISSION PORTAL</span></a>
-  <nav class="lp-links" aria-label="Main navigation">
-   <a href="javascript:void(0)" onclick="document.getElementById('lp-journey').scrollIntoView({behavior:'smooth'})">How it works</a>
-   <a href="javascript:void(0)" onclick="document.getElementById('lp-info').scrollIntoView({behavior:'smooth'})">Admission information</a>
-   <a href="javascript:void(0)" onclick="document.getElementById('lp-contact').scrollIntoView({behavior:'smooth'})">Contact</a>
-  </nav>
-  <a class="lp-btn" href="javascript:void(0)" onclick="var i=document.getElementById('u');i.scrollIntoView({behavior:'smooth',block:'center'});i.focus()">Sign in <span aria-hidden="true">→</span></a>
- </div></div>
+ <div class="hp-top"></div>
+ <header class="hp-hdr"><div class="hp-nav">
+  <a class="hp-brand" id="hphome0" href="javascript:void(0)"><img class="hp-logo" src="https://i.imgur.com/roCMSYf.jpeg" alt=""><span><strong>MOREH ACADEMY</strong><small>Admission portal</small></span></a>
+  <div class="hp-actions"><a class="hp-btn hp-line" id="hphome" href="javascript:void(0)">&larr; Back to homepage</a></div>
+ </div></header>
 
- <section class="lp-hero"><div class="lp-wrap lp-grid">
-  <div>
-   <span class="lp-eyebrow">A simpler admission experience</span>
-   <h1 class="lp-h1">A clearer path to your next chapter.</h1>
-   <p class="lp-lead">A welcoming place for families to explore admission, complete student information, and follow application progress with confidence.</p>
-   <div class="lp-actions">
-    <a class="lp-btn" href="javascript:void(0)" onclick="document.getElementById('lp-journey').scrollIntoView({behavior:'smooth'})">Discover the process <span aria-hidden="true">→</span></a>
-    <a class="lp-btn light" href="javascript:void(0)" onclick="document.getElementById('lp-info').scrollIntoView({behavior:'smooth'})">View admission information</a>
-   </div>
-   <div class="lp-trust"><span>Family-friendly experience</span><span>Clear application steps</span><span>Staff-verified requirements</span></div>
+ <main class="hp-hero" style="min-height:calc(100vh - 74px);display:grid;place-items:center;padding:40px 20px">
+<div class="hp-panel" style="position:relative;z-index:2">
+ <div class="hp-eyebrow">Student &amp; staff portal</div>
+ <h2 id="hpt">Welcome back</h2>
+ <p class="hp-sub" id="hps">Sign in to continue</p>
+
+ <div id="sibox">
+  <div class="hp-field"><label class="hp-lb" for="u">Username</label><input id="u" autocomplete="username"></div>
+  <div class="hp-field"><label class="hp-lb" for="p">Password</label><input id="p" type="password" autocomplete="current-password"></div>
+  <button class="hp-btn hp-gold hp-full" id="go">Sign in</button>
+  <p class="hp-lk"><a href="javascript:void(0)" data-act="forgot">Forgot password?</a></p>
+ </div>
+ <p class="hp-lk"><a href="javascript:void(0)" data-act="showreg" id="hpsw">New enrollee? Create an account</a></p>
+
+ <div id="regbox" class="hidden">
+  <div class="hp-field"><label class="hp-lb" for="rs">Surname</label><input id="rs"></div>
+  <div class="hp-field"><label class="hp-lb" for="rf">First name</label><input id="rf"></div>
+  <div class="hp-field"><label class="hp-lb" for="rl">LRN (12 digits)</label><input id="rl" maxlength="12" inputmode="numeric"></div>
+  <div class="hp-field"><label class="hp-lb" for="re">Email (your username)</label><input id="re" type="email"></div>
+  <div class="hp-field"><label class="hp-lb" for="rb">Birth date</label><input id="rb" type="date" onchange="gate()"></div>
+  <div id="gbox" class="hidden">
+   <p class="hp-warn">Below 18: parent / legal guardian details required</p>
+   <div class="hp-field"><label class="hp-lb" for="gn">Parent / guardian full name</label><input id="gn"></div>
+   <div class="hp-field"><label class="hp-lb" for="gr">Relationship</label><input id="gr" placeholder="e.g. Mother"></div>
+   <div class="hp-field"><label class="hp-lb" for="ge">Parent / guardian email (must differ from yours)</label><input id="ge" type="email"></div>
+   <div class="hp-field"><label class="hp-lb" for="gm">Parent / guardian mobile (11 digits)</label><input id="gm" maxlength="11" inputmode="numeric"></div>
   </div>
-
-  <div class="lp-side">
-   <div class="lp-orb main"></div><div class="lp-orb top"></div><div class="lp-orb bottom"></div>
-   <div class="lp-card">
-    <h2>Welcome back</h2>
-    <p class="lp-sub">Sign in to continue</p>
-    <label class="sec" for="u">USERNAME</label><input id="u" autocomplete="username">
-    <label class="sec" for="p">PASSWORD</label><input id="p" type="password" autocomplete="current-password">
-    <button class="lp-btn lp-full" id="go">Sign in</button>
-    <p class="lp-links2"><a href="javascript:void(0)" data-act="forgot">Forgot password?</a></p>
-    <p class="lp-links2"><a href="javascript:void(0)" data-act="showreg">New enrollee? Create an account</a></p>
-    <div id="regbox" class="hidden">
-     <label class="sec" for="rs">SURNAME</label><input id="rs">
-     <label class="sec" for="rf">FIRST NAME</label><input id="rf">
-     <label class="sec" for="rl">LRN (12 DIGITS)</label><input id="rl" maxlength="12" inputmode="numeric">
-     <label class="sec" for="re">EMAIL (YOUR USERNAME)</label><input id="re" type="email">
-     <label class="sec" for="rb">BIRTH DATE</label><input id="rb" type="date" onchange="gate()">
-     <div id="gbox" class="hidden">
-      <p class="sec" style="color:#b3261e">BELOW 18: PARENT / LEGAL GUARDIAN DETAILS REQUIRED</p>
-      <label class="sec" for="gn">PARENT / GUARDIAN FULL NAME</label><input id="gn">
-      <label class="sec" for="gr">RELATIONSHIP</label><input id="gr" placeholder="e.g. Mother">
-      <label class="sec" for="ge">PARENT / GUARDIAN EMAIL (MUST DIFFER FROM YOURS)</label><input id="ge" type="email">
-      <label class="sec" for="gm">PARENT / GUARDIAN MOBILE (11 DIGITS)</label><input id="gm" maxlength="11" inputmode="numeric">
-     </div>
-     <label class="sec" for="rpw">PASSWORD (MIN. 8 CHARACTERS)</label><input id="rpw" type="password">
-     <button class="lp-btn lp-full" data-act="reg">Create account</button>
-    </div>
-   </div>
-  </div>
- </div></section>
-
- <section class="lp-journey" id="lp-journey"><div class="lp-wrap"><div class="lp-steps">
-  <article class="lp-step"><div class="lp-num">01 · EXPLORE</div><h2>Know what to prepare</h2><p>Review admission information and the requirements for your application.</p></article>
-  <article class="lp-step"><div class="lp-num">02 · APPLY</div><h2>Complete student details</h2><p>Provide accurate applicant and student information through a guided process.</p></article>
-  <article class="lp-step"><div class="lp-num">03 · FOLLOW</div><h2>Stay informed</h2><p>Check application updates and requirements verified by admissions personnel.</p></article>
- </div></div></section>
-
- <section class="lp-info" id="lp-info"><div class="lp-wrap">
-  <div class="lp-shead"><span class="lp-eyebrow">Your admission journey</span><h2>Everything starts with clear information.</h2><p>Find the guidance you need at each stage of the admission process.</p></div>
-  <div class="lp-igrid">
-   <article class="lp-icard"><div class="lp-ibox">◎</div><h3>Explore programs</h3><p>Learn about available academic offerings and find the right path for your goals.</p></article>
-   <article class="lp-icard"><div class="lp-ibox">▤</div><h3>Prepare requirements</h3><p>Review the admission checklist. Physical requirements are submitted to the school for staff verification.</p></article>
-   <article class="lp-icard"><div class="lp-ibox">↗</div><h3>Track your progress</h3><p>Follow application updates and see the next steps from your applicant account.</p></article>
-  </div>
- </div></section>
-
- <section class="lp-cta" id="lp-contact"><div class="lp-wrap lp-ctai">
-  <div><h2>Ready to take the next step?</h2><p>Sign in, or create your account to begin your application.</p></div>
-  <a class="lp-btn" href="javascript:void(0)" onclick="var i=document.getElementById('u');i.scrollIntoView({behavior:'smooth',block:'center'});i.focus()">Sign in now <span aria-hidden="true">→</span></a>
- </div></section>
-
- <div class="lp-foot"><div class="lp-wrap lp-footi"><span>Admission Portal · Temporary identity</span><span>Preview interface · School details to be confirmed</span></div></div>
+  <div class="hp-field"><label class="hp-lb" for="rpw">Password (min. 8 characters)</label><input id="rpw" type="password"></div>
+  <button class="hp-btn hp-gold hp-full" data-act="reg">Create account</button>
+ </div>
+</div>
+ </main>
 </div>
 <div id="app" class="hidden"><button class="skip" data-act="skip">Skip to main content</button><aside id="side" role="navigation" aria-label="Main Navigation"><div class="brand"><img src="https://i.imgur.com/roCMSYf.jpeg" alt=""><div><b>Moreh Academy</b><small id="role"></small></div></div><div id="nav"></div><div class="me"><div id="who"></div><button class="nav" data-act="out" style="margin-top:8px"></button></div></aside><div id="sbbd" data-act="menu"></div>
 <main id="main"><div class="top" role="banner"><div class="tl" style="display:flex;gap:14px;align-items:center"><button id="menu" data-act="menu" aria-label="Toggle navigation" aria-controls="side" aria-expanded="true" title="Toggle navigation">&#9776;</button><img class="tlogo" src="https://i.imgur.com/roCMSYf.jpeg" alt=""><div><h1 id="title"></h1><p id="sub"></p></div></div><div id="gsw" class="gsw hidden"><input id="gs" type="text" autocomplete="off" placeholder="Search" aria-label="Global search" role="combobox" aria-autocomplete="list" aria-controls="gsr" aria-expanded="false"><div id="gsr" class="gsr hidden" role="listbox"></div></div><div class="tr" style="display:flex;gap:12px;align-items:center;position:relative"><button class="av" id="gsb" data-act="gsopen" aria-label="Search" title="Search" style="background:#fff;color:var(--navy);border:1px solid var(--line)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"/></svg></button><span id="rbd" class="rbd hidden"></span><span style="position:relative"><button class="av" style="background:#fff;color:var(--navy);border:1px solid var(--line)" data-act="bell" title="Notifications" aria-label="Notifications">&#128276;</button><span id="nb" class="hidden" style="position:absolute;top:-4px;right:-4px;background:#d93025;color:#fff;border-radius:999px;min-width:20px;height:20px;font:700 11px/20px Inter,sans-serif;text-align:center;padding:0 5px"></span></span><div class="dd hidden" id="np" style="width:340px;right:56px;max-height:70vh;overflow:auto"></div><div class="uchip" data-act="dd"><b id="uname"></b><small id="urole"></small></div><button class="av" id="av" data-act="dd" title="Account" aria-label="Account menu" aria-haspopup="true" aria-expanded="false"></button><div class="dd hidden" id="dd" role="menu"></div></div></div><div id="view" tabindex="-1"></div><footer id="ftr" class="ftr"><div class="fl1"><span>&copy; <span id="fyr"></span> Moreh Academy</span><span>v1.0</span><a href="javascript:void(0)" data-act="nav" data-v="pp">Data Privacy Policy</a></div><div class="fl1"><span id="fst" class="fst on"><i></i><span>Online</span></span><a href="mailto:morehians@gmail.com">morehians@gmail.com</a><a href="tel:09618766886">0961 876 6886</a></div></footer></main><nav id="bnav" aria-label="Quick navigation"></nav></div>
@@ -4693,8 +4651,14 @@ if(!window.MRH_THEME){(function(){var KEY='mrh_theme',root=document.documentElem
 /* ---- switch buttons ---- */
 const THSW='<svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="i-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span class="knob"></span>';
 function thMake(cls){const b=document.createElement('button');b.type='button';b.className='theme-switch'+(cls?' '+cls:'');b.innerHTML=THSW;b.onclick=()=>MRH_THEME.toggle();return b}
-(function(){const lp=document.querySelector('.lp-hdr .lp-nav');if(lp&&!lp.querySelector('.theme-switch')){const w=document.createElement('span');w.style.cssText='display:flex;align-items:center;gap:14px';const b=thMake();const sign=lp.querySelector('.lp-btn');if(sign){lp.insertBefore(w,sign);w.appendChild(b);w.appendChild(sign)}else lp.appendChild(b)}
- MRH_THEME.sync()})();
+(function(){
+ const h=document.querySelector('#login .hp-actions');
+ if(h&&!h.querySelector('.theme-switch'))h.insertBefore(thMake(),h.firstChild);
+ MRH_THEME.sync();
+ google.script.run.withSuccessHandler(u=>{
+  ['hphome','hphome0'].forEach(id=>{const a=$(id);if(a&&u){a.href=u;a.target='_top'}})
+ }).withFailureHandler(()=>{}).getHomeUrl();
+})();
 
 /* top bar (after sign-in) + a menu item for phones */
 const _topInitTh=topInit;
@@ -4725,4 +4689,17 @@ dxDraw=function(X,H){_dxDrawTh(X,H);
  rec.insertAdjacentHTML('beforebegin','<div id="maov"></div>');
  if(S.dsh&&S.dsh.stats)maDraw(S.dsh.stats);
  else google.script.run.withSuccessHandler(r=>{if(r&&r.success){S.dsh=r.data;maDraw(r.data.stats)}}).withFailureHandler(()=>{}).dashboard(S.token)};
+
+ /* ===== Sign-in panel: Sign in <-> Create an account (driven by whether #regbox is visible) ===== */
+(function(){
+ const rb=$('regbox');if(!rb)return;
+ function sync(){const on=!rb.classList.contains('hidden');
+  $('sibox').classList.toggle('hidden',on);
+  $('hpt').textContent=on?'Create an account':'Welcome back';
+  $('hps').textContent=on?'Fill in your details to start your application':'Sign in to continue';
+  $('hpsw').textContent=on?'Already have an account? Sign in':'New enrollee? Create an account'}
+ new MutationObserver(sync).observe(rb,{attributes:true,attributeFilter:['class']});
+ if(typeof WANT_REG!=='undefined'&&WANT_REG){rb.classList.remove('hidden');setTimeout(()=>{const f=$('rs');if(f)f.focus()},150)}
+ sync()
+})();
 </script></body></html>
