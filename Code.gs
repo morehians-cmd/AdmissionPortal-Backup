@@ -154,6 +154,7 @@ function doGet(e) {
   const p = (e && e.parameter) || {}, portal = String(p.page || '') === 'portal';
   const t = HtmlService.createTemplateFromFile(portal ? 'Index' : 'PublicHome');
   t.reg = portal && String(p.reg || '') === '1';     // ?page=portal&reg=1 opens the Create an Account form
+  t.portal = ScriptApp.getService().getUrl() + '?page=portal';
   return t.evaluate()
     .setTitle(portal ? 'Moreh Academy Portal' : 'Moreh Academy')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
