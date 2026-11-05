@@ -1238,7 +1238,7 @@ function reqsFor(r){const lv=reqLevel(r.GradeLevel),ru=S.cfg.reqRules[lv];if(!ru
 const abbr=c=>Object.keys(S.clusters).find(k=>S.clusters[k]===c);
 
 const enter=r=>{Object.assign(S,r.data);try{sessionStorage.setItem('mrh_t',S.token)}catch(e){}$('login').classList.add('hidden');$('app').classList.remove('hidden');boot()};
-$('go').onclick=()=>call('login',[$('u').value,$('p').value],r=>{if(r.data&&r.data.otp)return otpModal(r.data);enter(r)});
+/* Sign-in handler is defined once in the hardened authentication block below. */
 $('p').onkeydown=e=>{if(e.key==='Enter')$('go').click()};
 function setAv(){const u=S.user,a=$('av');a.style.backgroundImage=u.Photo?`url(${u.Photo})`:'';a.textContent=u.Photo?'':(u.FullName||u.Username)[0].toUpperCase()}
 function boot(){try{boot0()}catch(e){$('app').classList.remove('hidden');toast('Signed in, but the page failed to load: '+e.message,false);console.error(e)}}
