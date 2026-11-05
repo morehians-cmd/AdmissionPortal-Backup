@@ -107,6 +107,7 @@ function saveAbout(token, d) {
     const json = JSON.stringify(clean); if (json.length > 45000) throw new Error('The page content is too long to save.');
     const b = blockRow_(ABOUT_KEY);
     put_(b.sh, b.row || (b.sh.getLastRow() + 1), 1, [[ABOUT_KEY, json]]);
+    CacheService.getScriptCache().remove('puba_v1');
     const keep = clean.leaders.map(l => l.photo);
     oldIds.filter(id => !keep.includes(id)).forEach(id => { try { DriveApp.getFileById(id).setTrashed(true); } catch (_) {} });
     audit_(ou, 'content.save', ABOUT_KEY, '');
