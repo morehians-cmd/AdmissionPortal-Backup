@@ -49,15 +49,6 @@ function alert_(key, subject, body) {
 
 /** Daily cap on e-mails triggered by PUBLIC actions, so attackers cannot exhaust the quota that staff codes need.
     Default 60/day. On a consumer Gmail the daily limit is ~100; on Workspace raise it via Script Property PUBLIC_MAIL_CAP. */
-function pubMailOk_() {
-  if (quotaLeft_() <= MAIL_RESERVE) { alert_('mailres', 'Mail quota reserve reached', 'Public e-mails are paused to keep the remaining quota for staff sign-in codes.'); return false; }
-  const pr = PropertiesService.getScriptProperties(), k = 'pm_' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd');
-  const n = parseInt(pr.getProperty(k) || '0', 10), cap = parseInt(pr.getProperty('PUBLIC_MAIL_CAP') || '60', 10);
-  if (n >= cap) { alert_('mailcap', 'Public e-mail cap reached', 'Registrations / password resets are being refused today (cap ' + cap + '). Could be a surge of enrollees, or abuse.'); return false; }
-  pr.setProperty(k, String(n + 1));
-  if (n + 1 === Math.floor(cap * 0.8)) alert_('mailcap80', 'Public e-mail use at 80%', 'Today\'s public e-mail cap (' + cap + ') is 80% used.');
-  return true;
-}
 
 
 /* ============================ PART 2: BACKUP + DIGEST ============================ */
@@ -169,14 +160,6 @@ function sessionData_(token, u) {
       reqAll:REQ_ALL, reqRules:REQ_RULES, reqTf:REQ_TF_CATS, reqHints:REQ_HINTS, reqNotes:reqNotes_(), sy:activeSY_() } };
 }
 
-function loginPayload_(u) {
-  const token = Utilities.getUuid(); putSession_(token, u);
-  if (u.Role === 'admin') {   // students no longer write properties on sign-in
-    try { const pr = PropertiesService.getScriptProperties(); pr.setProperty('pl_'+u.Username, pr.getProperty('ll_'+u.Username)||''); pr.setProperty('ll_'+u.Username, Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss')); } catch (_) {}
-    audit_(u, 'login', '', '');
-  }
-  return ok(sessionData_(token, u));
-}
 
 /** PUBLIC. Called when the page loads with a stored token. Re-validates it and returns the same data as sign-in, with the SAME token (no new session, no audit row). */
 function resumeSession(token) {
@@ -187,22 +170,3 @@ function resumeSession(token) {
 }
 
 /** REPLACES the login in the Security file. Staff get a code after the correct password (when enabled). */
-function login(username, password) {
-  try {
-    const key = String(username).trim().toLowerCase().slice(0, 100), fk = 'lf_' + key, cache = CacheService.getScriptCache(), pw = String(password);
-    const fails = parseInt(cache.get(fk) || '0', 10);
-    if (fails >= 5) throw new Error('Too many failed attempts. Please wait 15 minutes, or use "Forgot password?".');
-    const hit = userRow_(key), idx = hit ? hit.r - 2 : -1, u = hit ? hit.u : null;
-    const good = u ? verify_(pw, u.PasswordHash) : (hash_('timing-equaliser'), false);
-    if (!good) {
-      cache.put(fk, String(fails + 1), 900);
-      if (u && u.Role === 'admin' && fails + 1 === 5) alert_('lock:' + key, 'Staff sign-in locked: ' + key, '5 failed sign-in attempts for this staff account. It is locked for 15 minutes.');
-      throw new Error('Invalid username or password.');
-    }
-    if (pw === DEFAULT_PW) throw new Error('This default password is disabled. Ask the owner to reset the account.');
-    cache.remove(fk);
-    if (isLegacy_(u.PasswordHash)) { try { put_(sh_('U'), idx + 2, 2, [[hash_(pw)]]); } catch (_) {} }
-    if (u.Role === 'admin' && otpOn_()) return startOtp_(u);
-    return loginPayload_(u);
-  } catch (e) { return fail(e); }
-}
