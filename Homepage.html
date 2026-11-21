@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moreh Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--wrap:1200px;--pad:clamp(16px,3vw,40px);--navy:#062E70;--blue:#0648AD;--orange:#FF941F;--light:#EEF4FF;--ink:#14213d;
+--head:'Poppins',system-ui,sans-serif;--body:'Open Sans',system-ui,sans-serif;--serif:Georgia,'Times New Roman',serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:120px}
+body{margin:0;font:400 clamp(15px,.35vw + 12.5px,18px)/1.6 var(--body);color:var(--ink);background:#fff;overflow-x:hidden}
+h1,h2,h3{font-family:var(--head);margin:0}a{color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.wrap{width:100%;max-width:var(--wrap);margin:0 auto;padding:0 var(--pad)}
+@media(min-width:1600px){:root{--wrap:1440px}}@media(min-width:2200px){:root{--wrap:1680px}}
+img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflow-wrap:anywhere}.ids{min-width:0}
+/* masthead */
+.mast{background:#fff}.mast .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:12px;padding-bottom:12px;flex-wrap:wrap}
+.ids{display:flex;align-items:center;gap:0;flex-wrap:wrap}
+.id{display:flex;align-items:center;gap:10px;padding:0 18px;border-left:1px solid #c9d6ee;font:600 15px/1.2 var(--head);color:var(--navy);text-decoration:none}
+.id:first-child{padding-left:0;border-left:0}
+.logo{width:44px;height:44px;border-radius:50%;object-fit:contain;background:var(--navy);color:#fff;display:grid;place-items:center;font:700 14px var(--head);flex:none}
+.tag{font:italic 700 22px var(--serif);color:var(--navy)}
+.soc{display:flex;gap:8px;align-items:center}.soc a{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font:700 12px var(--head);text-decoration:none}
+/* nav */
+.nav{background:var(--navy);position:sticky;top:0;z-index:50}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.menu{display:flex;list-style:none;margin:0;padding:0;align-items:center}
+.menu>li{position:relative}
+.menu>li>a,.menu>li>button{display:flex;align-items:center;gap:6px;white-space:nowrap;background:none;border:0;color:#fff;font:600 clamp(12px,.22vw + 9.6px,14.5px) var(--head);padding:15px clamp(6px,.7vw,12px);cursor:pointer;text-decoration:none}
+.menu>li>button::after{content:"▾";font-size:10px;margin-left:-2px}
+.sub{display:none;position:absolute;left:0;top:100%;min-width:250px;background:#fff;list-style:none;margin:0;padding:8px 0;border-radius:0 0 10px 10px;box-shadow:0 12px 28px rgba(6,46,112,.25)}
+.sub a{display:block;padding:9px 18px;font:600 14px var(--head);color:var(--navy);text-decoration:none}
+.sub a:hover{background:var(--light);color:var(--blue)}
+.menu>li:hover>.sub,.menu>li.open>.sub{display:block}
+.btn{display:inline-block;border:2px solid var(--orange);background:var(--orange);color:#fff;font:700 14px var(--head);padding:11px 22px;border-radius:10px;cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;border-color:#fff}.btn.blue{background:var(--blue);border-color:var(--blue)}
+.nav .loginbtn{white-space:nowrap;flex:none;padding:9px 18px!important;margin-left:8px}.menu{flex:1 1 auto;min-width:0}.burger{display:none;background:none;border:0;color:#fff;font-size:26px;padding:10px;cursor:pointer}
+/* hero */
+.hero{position:relative;color:#fff;min-height:clamp(380px,62vh,700px);overflow:hidden;background:var(--navy)}
+.slides{position:absolute;inset:0;display:flex;transition:transform .7s ease;touch-action:pan-y}
+.slide{flex:0 0 100%;background-size:cover;background-position:center}
+.hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(6,46,112,.92) 0%,rgba(6,46,112,.7) 45%,rgba(6,46,112,.1) 100%)}
+.hero .wrap{position:relative;z-index:2;padding-top:54px;padding-bottom:84px}
+.hero h1{font-size:clamp(36px,6vw,68px);font-weight:800;line-height:1.05}.hero h1 span{color:var(--orange);display:block}
+.hero .sub2{font:italic 700 clamp(20px,3vw,32px) var(--serif);margin:14px 0 6px}
+.hero .desc{max-width:480px;margin:0 0 22px}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+.ctl{position:absolute;z-index:3;right:20px;bottom:20px;display:flex;align-items:center;gap:10px}
+.ctl button.arrow{width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.9);color:var(--navy);font-size:18px;cursor:pointer}
+.dots{display:flex;gap:8px}.dots button{width:11px;height:11px;border-radius:50%;border:0;background:#fff;opacity:.6;cursor:pointer;padding:0}.dots button.on{background:var(--orange);opacity:1}
+/* values */
+.values{background:var(--light)}.values ul{list-style:none;margin:0;padding:18px 20px;display:grid;grid-template-columns:repeat(5,1fr);max-width:1200px;margin:auto}
+.values li{display:flex;align-items:center;gap:12px;padding:8px 16px;border-left:2px solid #c9d6ee;font:600 15px/1.25 var(--head);color:var(--navy)}
+.values li:first-child{border-left:0}.values .ic{font-size:28px;line-height:1}
+/* sections */
+.sec{padding:clamp(40px,6vw,88px) 0}.sec:nth-of-type(even){background:var(--light)}
+.sec h2{color:var(--navy);font-size:clamp(26px,4vw,38px);margin-bottom:6px}
+.sec .lead{max-width:640px;margin:0 0 28px}.bar{width:56px;height:4px;background:var(--orange);margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.card{background:#fff;border:1px solid #d8e3f8;border-top:4px solid var(--blue);border-radius:10px;padding:20px}
+.card h3{color:var(--blue);font-size:17px;margin-bottom:6px}.card p{margin:0;font-size:15px}
+.empty{background:var(--navy);color:#fff;border-radius:14px;padding:24px}
+/* academic cards: five across on desktop, balanced rows below */
+.grid.five{display:flex;flex-wrap:wrap;gap:18px}.grid.five .card{flex:0 1 calc(20% - 14.4px)}
+@media(max-width:1099px){.grid.five .card{flex:1 1 calc(33.333% - 12px)}}
+@media(max-width:699px){.grid.five .card{flex:1 1 calc(50% - 9px)}}
+@media(max-width:459px){.grid.five .card{flex:1 1 100%}}
+/* shared building blocks for admission forms, dashboards, admin screens */
+.table-wrap{overflow-x:auto;max-width:100%}.table-wrap table{border-collapse:collapse;min-width:520px;width:100%}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:14px}
+.dash{display:grid;grid-template-columns:minmax(210px,260px) minmax(0,1fr);gap:20px}.dash>aside{position:sticky;top:70px;align-self:start}
+.chart{width:100%;aspect-ratio:16/9;max-height:60vh}
+@media(max-width:900px){.dash{grid-template-columns:minmax(0,1fr)}.dash>aside{position:static}}
+@media(max-height:700px){.nav{position:static}.hero{min-height:340px}.hero .wrap{padding-top:28px;padding-bottom:70px}.sub{max-height:60vh;overflow:auto}}
+/* landing sections */
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;list-style:none;padding:0;margin:0 0 24px;position:relative}
+.steps::before{content:"";position:absolute;left:8%;right:8%;top:38px;border-top:2px dashed #9db5e3;z-index:0}
+.step{position:relative;z-index:1;background:#fff;border:1px solid #d8e3f8;border-radius:16px;padding:16px 12px;text-align:center;transition:transform .2s,box-shadow .2s}
+.step:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(6,46,112,.15)}
+.step .n{width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;font:700 18px/44px var(--head);margin:0 auto 8px}
+.step .si{font-size:22px}.step h3{font-size:15px;color:var(--navy);margin:4px 0}.step p{margin:0;font-size:13px;line-height:1.4}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
+.photo{min-height:260px;border-radius:14px;background:linear-gradient(135deg,#0648AD,#062E70);background-size:cover;background-position:center}
+.card a.more{display:inline-block;margin-top:10px;color:var(--blue);font:600 14px var(--head);text-decoration:none}
+.crumb{font-size:14px;margin-bottom:12px}.crumb a{color:var(--blue)}
+.page{padding:48px 0 64px;min-height:50vh}
+@media(max-width:1000px){.steps{grid-template-columns:repeat(3,1fr)}.steps::before{display:none}}
+@media(max-width:700px){.steps{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:72%;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px}.step{scroll-snap-align:start}.split{grid-template-columns:1fr}}
+.blocks{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px}.blocks>*{grid-column:1/-1;max-width:760px;margin-top:0;margin-bottom:0}.blocks .bh{color:var(--navy);font-size:22px;margin-top:14px}.blocks ul{padding-left:22px}.blocks>.bf{grid-column:auto;max-width:none}.bf img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top;border-radius:12px}.bf figcaption{font-size:13px;color:#51607d;margin-top:8px;line-height:1.4}.bf figcaption strong{display:block;font:600 15px var(--head);color:var(--navy)}
+.blocks>.split2{grid-column:1/-1;max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,360px);gap:32px;align-items:start}.split2 .txt{display:grid;gap:16px;max-width:760px}.split2 .txt>*{margin:0}.split2 .side{display:grid;gap:18px}.split2 .side .bf{width:100%;margin:0}.split2 .side .bf img{aspect-ratio:4/3}@media(max-width:800px){.blocks>.split2{grid-template-columns:minmax(0,1fr)}}
+.blocks>.bf.banner{grid-column:1/-1;max-width:none;width:100%;margin:0}.bf.banner img{aspect-ratio:2048/768;max-height:none;object-position:center}@media(max-width:600px){.bf.banner img{aspect-ratio:16/9}}
+.blocks>.cards{grid-column:1/-1;max-width:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:24px;align-items:start}.seg{background:#f6f9ff;border:1px solid #d8e3f8;border-left:5px solid var(--orange);border-radius:12px;padding:22px 26px}.seg .bh{margin:0 0 12px;font-size:22px}.seg .sb>*{margin:0 0 14px}.seg .sb>*:last-child{margin-bottom:0}.seg ul{padding-left:22px}.cards>.seg:last-child:nth-child(odd){grid-column:1/-1}.cards>.seg:last-child:nth-child(odd) .sb{columns:2 400px;column-gap:44px}.cards>.seg:last-child:nth-child(odd) .sb>*{break-inside:avoid}
+.blocks>.tl{grid-column:1/-1;max-width:none}.tl-rail{overflow-x:auto;padding:6px 0 4px;scrollbar-width:thin}.tl-in{position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(104px,1fr));min-width:calc(var(--n)*104px)}.tl-track{position:absolute;top:19px;left:calc(50%/var(--n));right:calc(50%/var(--n));height:4px;background:#d3def5;border-radius:4px}.tl-fill{height:100%;width:0;background:var(--blue);border-radius:4px;transition:width .45s ease}.tl-n{position:relative;background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 4px 8px;color:#51607d;font:600 15px var(--head)}.tl-n .dot{width:24px;height:24px;margin-top:9px;border-radius:50%;background:#fff;border:4px solid #9db5e3;transition:all .25s}.tl-n:hover .dot{border-color:var(--blue)}.tl-n.past .dot{background:var(--blue);border-color:var(--blue)}.tl-n.on{color:var(--navy)}.tl-n.on .dot{background:var(--orange);border-color:var(--orange);box-shadow:0 0 0 6px rgba(255,148,31,.28);transform:scale(1.15)}.tl-stage{position:relative;margin-top:18px;background:var(--navy);color:#fff;border-radius:16px;padding:clamp(20px,3.5vw,38px);padding-bottom:clamp(68px,8vw,80px)}.tl-p{display:none}.tl-p.on{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:8px 36px;align-items:start;animation:tlin .4s ease}.tl-big{font:800 clamp(34px,5vw,52px)/1.05 var(--head);color:var(--orange);white-space:nowrap}.tl-tx h3{color:#fff;font-size:clamp(20px,2.4vw,26px);margin:0 0 10px}.tl-tx .sb>*{margin:0 0 12px;color:#e6eeff}.tl-tx .sb>*:last-child{margin-bottom:0}.tl-tx .btn{background:var(--orange);border-color:var(--orange)}.tl-ctl{position:absolute;right:clamp(16px,3vw,28px);bottom:16px;display:flex;align-items:center;gap:10px}.tl-cnt{font:600 13px var(--head);opacity:.8;margin-right:6px}.tl-a{width:40px;height:40px;border-radius:50%;border:2px solid rgba(255,255,255,.7);background:transparent;color:#fff;font-size:22px;line-height:1;cursor:pointer}.tl-a:hover{background:var(--orange);border-color:var(--orange)}@keyframes tlin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@media(max-width:800px){.tl-p.on{grid-template-columns:minmax(0,1fr)}}@media(prefers-reduced-motion:reduce){.tl-p.on{animation:none}.tl-fill{transition:none}}
+.navgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:20px;margin-top:8px}.nc{position:relative;display:flex;flex-direction:column;gap:10px;padding:26px 24px 22px;background:#fff;border:1px solid #d8e3f8;border-radius:16px;text-decoration:none;color:var(--ink);overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s}.nc::before{content:"";position:absolute;left:0;top:0;height:4px;width:44px;background:var(--orange);border-radius:0 0 4px 0;transition:width .3s}.nc .ni{width:52px;height:52px;border-radius:14px;background:var(--light);display:grid;place-items:center;font-size:26px;line-height:1}.nc h3{color:var(--navy);font-size:19px;margin:4px 0 0}.nc p{margin:0;font-size:15px;color:#51607d;flex:1}.nc .go{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:14px;border-top:1px solid #e3ebfa;font:600 14px var(--head);color:var(--blue)}.nc .go i{width:30px;height:30px;border-radius:50%;background:var(--light);display:grid;place-items:center;font-style:normal;font-size:18px;line-height:1;transition:background .2s,color .2s,transform .2s}.nc:hover{transform:translateY(-4px);border-color:var(--blue);box-shadow:0 14px 28px rgba(6,46,112,.14)}.nc:hover::before{width:100%}.nc:hover .go i{background:var(--blue);color:#fff;transform:translateX(3px)}@media(prefers-reduced-motion:reduce){.nc,.nc::before,.nc .go i{transition:none}.nc:hover{transform:none}}
+.blocks>details.fq{max-width:900px;margin:0;background:#fff;border:1px solid #d8e3f8;border-radius:12px;overflow:hidden}.blocks>.fq+.fq{margin-top:-12px}.fq summary{list-style:none;cursor:pointer;position:relative;padding:16px 60px 16px 20px;font:600 17px/1.4 var(--head);color:var(--navy)}.fq summary::-webkit-details-marker{display:none}.fq summary:hover{background:#f6f9ff}.fq summary::after{content:"+";position:absolute;right:16px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--light);color:var(--blue);display:grid;place-items:center;font-size:20px;line-height:1}.fq[open]{border-color:var(--blue)}.fq[open] summary::after{content:"–";background:var(--orange);color:var(--navy)}.fq .sb{padding:14px 20px 18px;border-top:1px solid #e3ebfa}.fq .sb>*{margin:0 0 12px}.fq .sb>*:last-child{margin-bottom:0}
+.blocks>.tb{grid-column:1/-1;max-width:none}.tb-cap{margin:0 0 10px;font:600 14px var(--head);color:#51607d}.tb-list{display:flex;flex-wrap:wrap;gap:10px}.tb-t{cursor:pointer;border:2px solid #c9d6ee;background:#fff;color:var(--navy);font:600 15px var(--head);padding:10px 20px;border-radius:999px;transition:background .2s,color .2s,border-color .2s}.tb-t:hover{border-color:var(--blue)}.tb-t.on{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 4px 0 var(--orange)}.tb-p{display:none;margin-top:18px;background:#fff;border:1px solid #d8e3f8;border-top:5px solid var(--navy);border-radius:14px;padding:clamp(18px,3vw,30px)}.tb-p.on{display:block;animation:tlin .35s ease}.tb-p>*{margin:0 0 14px;max-width:760px}.tb-p>*:last-child{margin-bottom:0}.tb-p .bh{font-size:18px;margin-top:20px}.tb-p>.bh:first-child{margin-top:0}.tb-p ul{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:10px;max-width:none}.tb-p li{position:relative;padding:12px 14px 12px 46px;background:#f6f9ff;border:1px solid #e3ebfa;border-radius:10px}.tb-p li::before{content:"✓";position:absolute;left:12px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:var(--orange);color:var(--navy);display:grid;place-items:center;font:700 14px var(--head)}.tb-p .bf{max-width:260px;margin:12px 0}@media(prefers-reduced-motion:reduce){.tb-p.on{animation:none}}
+.rt>*{margin:0 0 12px}.rt>*:last-child{margin-bottom:0}.rt ul,.rt ol{padding-left:22px}.rt li{margin:0 0 4px}.rt a{color:var(--blue);text-decoration:underline;font-weight:600}
+.tb-p>details.fq{background:#fff;border:1px solid #d8e3f8;border-radius:12px;overflow:hidden;max-width:none}
+/* wave + footer */
+.wave{display:block;width:100%;height:70px;margin-bottom:-1px}
+.foot{background:var(--navy);color:#fff;padding:34px 0 20px}
+.foot .wrap{display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px}
+.foot a{text-decoration:none}.foot h3{font-size:16px;margin-bottom:8px;color:var(--orange)}.foot p{margin:4px 0}
+.copy{text-align:center;font-size:13px;opacity:.75;padding-top:20px}
+/* modal + toast */
+.modal{position:fixed;inset:0;background:rgba(6,20,50,.65);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal.show{display:flex}.box{background:#fff;border-radius:14px;max-width:420px;width:100%;padding:clamp(18px,4vw,28px);position:relative;max-height:92vh;max-height:calc(100dvh - 32px);overflow:auto}
+.box h2{color:var(--navy);font-size:24px}.x{position:absolute;right:12px;top:8px;background:none;border:0;font-size:28px;cursor:pointer;color:var(--navy)}
+.f{margin-top:12px}.f label{display:block;font:600 13px var(--head);color:var(--navy)}
+.f input{width:100%;padding:10px 12px;border:1px solid #b9c8e6;border-radius:8px;font:inherit}.f input.bad{border-color:#c0392b}
+.err{color:#c0392b;font-size:13px;min-height:18px}.swap{background:none;border:0;color:var(--blue);font-weight:600;cursor:pointer;margin-top:12px;padding:0}
+.note{font-size:13px;color:#51607d;margin:8px 0 0}.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-top:14px}.chk input{margin-top:3px;flex:none}.chk a{color:var(--blue);font-weight:600}.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}.swap:disabled{opacity:.55;cursor:default}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:12px 20px;border-radius:10px;z-index:200;display:none;max-width:90vw}
+#toast.bad{background:#c0392b}
+@media(max-width:1100px){
+.burger{display:block}.menu{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:stretch;background:var(--navy);max-height:calc(100vh - 130px);overflow:auto}
+.menu.show{display:flex}.menu>li>a,.menu>li>button{width:100%;justify-content:space-between;font-size:15px;padding:14px 18px}
+.menu>li:hover>.sub{display:none}.menu>li.open>.sub{display:block}.sub{position:static;box-shadow:none;border-radius:0;background:#0a3a8a}.sub a{color:#fff}
+.nav .wrap{position:relative}.nav .loginbtn{margin-left:auto}}
+@media(max-width:900px){.values ul{grid-template-columns:1fr 1fr}.values li:nth-child(odd){border-left:0}.foot .wrap{grid-template-columns:1fr}.tag{font-size:18px}.id{padding:6px 12px}}
+@media(max-width:520px){.values ul{grid-template-columns:1fr}.values li{border-left:0}.hero .wrap{padding-bottom:96px}.logo{width:36px;height:36px}.id{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.slides{transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="mast"><div class="wrap">
+  <div class="ids" id="ids"></div>
+  <div style="display:flex;align-items:center;gap:16px"><span class="tag" id="tag"></span><div class="soc" id="soc"></div></div>
+</div></header>
+
+<nav class="nav" aria-label="Main"><div class="wrap">
+  <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">☰</button>
+  <ul class="menu" id="menu"></ul>
+  <a class="btn loginbtn" id="loginBtn" href="#" style="padding:8px 18px">Portal Login</a>
+  <a class="btn ghost" id="outBtn" href="#" style="display:none;margin-left:8px;padding:8px 18px;white-space:nowrap;flex:none">Sign out</a>
+</div></nav>
+
+<main id="home">
+  <section class="hero" id="hero" aria-roledescription="carousel" aria-label="Campus photos">
+    <div class="slides" id="slides"></div>
+    <div class="wrap">
+      <h1 id="hTitle"></h1><p class="sub2" id="hSub"></p><p class="desc" id="hDesc"></p>
+      <div class="cta"><a class="btn" id="hEnroll" href="#"></a><a class="btn ghost" id="hDiscover" href="#"></a></div>
+    </div>
+    <div class="ctl"><button class="arrow" id="prev" aria-label="Previous slide">‹</button><div class="dots" id="dots"></div><button class="arrow" id="next" aria-label="Next slide">›</button></div>
+  </section>
+  <section class="values" id="homepage-values" aria-label="Our values"><ul id="values"></ul></section>
+  <div id="sections"></div>
+</main>
+
+<svg class="wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 C240 0 480 70 720 36 S1200 4 1440 38 V70 H0Z" fill="#FF941F"/><path d="M0 52 C300 18 560 72 860 44 S1260 24 1440 50 V70 H0Z" fill="#0648AD"/><path d="M0 62 C360 36 700 70 1000 54 S1320 44 1440 60 V70 H0Z" fill="#062E70"/></svg>
+<footer class="foot" id="homepage-contact"><div class="wrap">
+  <div><h3>Moreh Academy</h3><p id="fLoc"></p></div>
+  <div><h3>Contact</h3><p id="fPhone"></p><p><a id="fMail"></a></p></div>
+  <div><h3>Follow Us</h3><div class="soc" id="fSoc"></div></div>
+</div><p class="copy" id="fCopy"></p></footer>
+
+<div class="modal" id="mSignin" role="dialog" aria-modal="true" aria-labelledby="siT"><div class="box">
+  <button class="x" data-close aria-label="Close">×</button><h2 id="siT">Sign in</h2>
+  <div class="f"><label for="siUser">Username or email</label><input id="siUser" autocomplete="username"></div>
+  <div class="f"><label for="siPass">Password</label><input id="siPass" type="password" autocomplete="current-password"></div>
+  <p class="err" id="siErr" role="alert"></p>
+  <button class="btn blue" id="siGo" style="width:100%">Sign in</button>
+  <button class="swap" data-swap="mForgot">Forgot password?</button><br>
+  <button class="swap" data-swap="mCreate">No account yet? Create one</button>
+</div></div>
+<div class="modal" id="mCreate" role="dialog" aria-modal="true" aria-labelledby="caT"><div class="box">
+  <button class="x" data-close aria-label="Close">×</button><h2 id="caT">Create account</h2>
+  <div class="f"><label for="caSurname">Surname</label><input id="caSurname" autocomplete="family-name"></div>
+  <div class="f"><label for="caFirst">First name</label><input id="caFirst" autocomplete="given-name"></div>
+  <div class="f"><label for="caLrn">LRN (12 digits)</label><input id="caLrn" inputmode="numeric" maxlength="12" placeholder="123456789012"></div>
+  <div class="f"><label for="caBirth">Birth date</label><input id="caBirth" type="date" autocomplete="bday" onchange="caGuard()"></div>
+  <div class="f"><label for="caMail">Email (your username)</label><input id="caMail" type="email" autocomplete="email"></div>
+  <div class="f"><label for="caMobile">Mobile number</label><input id="caMobile" type="tel" inputmode="tel" autocomplete="tel" placeholder="09171234567"></div>
+  <div class="f"><label for="caPass">Password</label><input id="caPass" type="password" autocomplete="new-password"></div>
+  <p class="note">8 or more characters, with at least one letter and one number.</p>
+  <div class="f"><label for="caPass2">Confirm password</label><input id="caPass2" type="password" autocomplete="new-password"></div>
+  <div id="caGuardBox" style="display:none">
+    <p class="note">Applicant below 18: a parent / legal guardian is required.</p>
+    <div class="f"><label for="caGuardName">Parent / guardian full name</label><input id="caGuardName" autocomplete="name"></div>
+    <div class="f"><label for="caGuardRel">Relationship</label><input id="caGuardRel" placeholder="e.g. Mother"></div>
+    <div class="f"><label for="caGuardEmail">Parent / guardian email</label><input id="caGuardEmail" type="email"></div>
+    <div class="f"><label for="caGuardMobile">Parent / guardian mobile (11 digits)</label><input id="caGuardMobile" type="tel" inputmode="numeric" maxlength="11"></div>
+  </div>
+  <div class="hp" aria-hidden="true"><label for="caHp">Leave this empty</label><input id="caHp" tabindex="-1" autocomplete="off"></div>
+  <label class="chk"><input type="checkbox" id="caTerms"><span>I agree to the <a id="lnkTerms" href="#" target="_blank" rel="noopener">Terms of Service</a> and <a id="lnkPriv" href="#" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>
+  <p class="err" id="caErr" role="alert"></p>
+  <button class="btn blue" id="caGo" style="width:100%">Create account</button>
+  <button class="swap" data-swap="mSignin">Already registered? Sign in</button>
+</div></div>
+<div class="modal" id="mVerify" role="dialog" aria-modal="true" aria-labelledby="vT"><div class="box">
+  <button class="x" data-close aria-label="Close">×</button><h2 id="vT">Verify your email</h2>
+  <p class="note" id="vMsg"></p>
+  <div class="f"><label for="vCode">6-digit code</label><input id="vCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" style="letter-spacing:6px;font-size:20px;text-align:center"></div>
+  <p class="err" id="vErr" role="alert"></p>
+  <button class="btn blue" id="vGo" style="width:100%">Verify</button>
+  <button class="swap" id="vResend" type="button">Resend code</button>
+  <p class="note">The code expires in 10 minutes. Check your spam folder if you do not see it.</p>
+</div></div>
+<div class="modal" id="mForgot" role="dialog" aria-modal="true" aria-labelledby="fT"><div class="box">
+  <button class="x" data-close aria-label="Close">×</button><h2 id="fT">Forgot password</h2>
+  <p class="note">Enter your account email. We will send a 6-digit code.</p>
+  <div class="f"><label for="fgMail">Username or email</label><input id="fgMail" autocomplete="username"></div>
+  <p class="err" id="fErr" role="alert"></p>
+  <button class="btn blue" id="fGo" style="width:100%">Send code</button>
+  <button class="swap" data-swap="mSignin">Back to sign in</button>
+</div></div>
+<div class="modal" id="mReset" role="dialog" aria-modal="true" aria-labelledby="rT"><div class="box">
+  <button class="x" data-close aria-label="Close">×</button><h2 id="rT">Set a new password</h2>
+  <div class="f"><label for="rCode">6-digit code</label><input id="rCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></div>
+  <div class="f"><label for="rPass">New password</label><input id="rPass" type="password" autocomplete="new-password"></div>
+  <div class="f"><label for="rPass2">Confirm new password</label><input id="rPass2" type="password" autocomplete="new-password"></div>
+  <p class="err" id="rErr" role="alert"></p>
+  <button class="btn blue" id="rGo" style="width:100%">Change password</button>
+</div></div>
+<div id="toast" role="status"></div>
+
+<script>
+/* ===== Backend hooks. Sign-in functions live in Auth.gs. createAccount is still a placeholder (item 3, later). ===== */
+/* Auth is Old AP's single account system, reached through HomepageBridge.gs. */
+var API={getHomepage:'getPublishedHomepage',getDraft:'getDraftHomepage',getPage:'getPublishedPage',getPageDraft:'getDraftPage',signIn:'homepageSignIn',signOut:'homepageSignOut',whoAmI:'',register:'homepageRegister',verify:'homepageVerifyCode',confirmReg:'homepageConfirmRegistration',forgot:'homepageForgotPassword',reset:'homepageResetPassword'};
+
+/* ===== Content model (Phase 2 will load this from Sheets, published copy) ===== */
+var DEFAULT_HOME={
+ ids:[{name:'Moreh Academy',short:'MA',logo:'',fb:'https://facebook.com/ilovemoreh'},
+      {name:'Moreh Global Innovative College',short:'MG',logo:'',fb:'https://facebook.com/MorehGlobal2019'},
+      {name:'Moreh College',short:'MC',logo:'',fb:'https://facebook.com/morehcollege'}],
+ tagline:'Learn · Grow · Excel',
+ hero:{title:'Welcome to',name:'Moreh Academy',subtitle:'School of Righteousness and Excellence.',
+  desc:'Welcome to Moreh Academy. School of Righteousness and Excellence.',
+  enroll:{label:'Enroll Now!',to:'#create'},discover:{label:'Discover Moreh Academy',to:'route:about'},
+  slides:['','',''],intervalMs:6500},
+ values:[{label:'Quality Education',icon:'📘',on:true},{label:'Holistic Development',icon:'🧍',on:true},{label:'Academic Excellence',icon:'🏆',on:true},{label:'Supportive Community',icon:'🤝',on:true},{label:'A Brighter Future',icon:'⭐',on:true}],
+ footer:{loc:'Moreh Academy, Taguig City, Philippines',phone:'Admissions: 0961 876 6886',email:'registrar@morehacademy.com',fb:'https://facebook.com/ilovemoreh',yt:'https://youtube.com/'},
+sectionTitle:'Your Journey to Moreh Academy',sectionSub:'Six simple steps toward becoming a Moreh Academy student.',
+ steps:[{t:'Create an Account',d:'Register your applicant account.',i:'👤'},{t:'Complete Application',d:'Fill out the application form.',i:'📝'},{t:'Submit Requirements',d:'Upload the required documents.',i:'📎'},{t:'Application Review',d:'Application assessment by the school.',i:'🔍'},{t:'Admission Decision',d:'Receive your application result.',i:'📬'},{t:'Enrollment Confirmation',d:'Complete your enrollment.',i:'✅'}],
+ aboutPreview:{heading:'Building a Strong Foundation for Lifelong Success',linkLabel:'Learn More',text:'Moreh Academy is a learning community committed to providing excellent and values-driven education from Kindergarten to Grade 12.',photo:''},
+ progDesc:{'Kindergarten':'A caring start to learning.','Elementary':'Strong foundations in core subjects.','Junior High School':'Skills and character for adolescence.','Senior High School':'Clusters that prepare for college and career.','College Program':'Higher education pathways.'},
+ pages:{},
+ nav:[
+  {id:'about',label:'About Us',lead:'Who we are and what we believe.',subs:[['Vision, Mission & Core Values','The vision, mission and values that guide everything we do.','🎯'],['History','From one campus in 2001 to a multi-campus school community.','📜'],['School Leadership','Meet the people who lead Moreh Academy.','👥']]},
+  {id:'admissions',label:'Admissions',lead:'Everything you need to enroll.',subs:[['Enrollment Procedure','The steps to become a Moreh Academy student.','📝'],['Admission Requirements','The documents and conditions you need to prepare.','📋'],['Scholarships','Programs that help families with the cost of education.','🎓'],['Frequently Asked Questions','Quick answers to common admission questions.','❓']]},
+  {id:'academics',label:'Academics',lead:'Learning programs from Kindergarten to College.',subs:[['Kindergarten','A caring start to learning.','🧸'],['Elementary','Strong foundations in core subjects.','📚'],['Junior High School','Skills and character for adolescence.','🧭'],['Senior High School','Strands that prepare for college and career.','🎓'],['College Program','Higher education pathways.','🏛️']]},
+  {id:'campus-life',label:'Campus Life',lead:'Life beyond the classroom.',subs:[['Student Organizations','Student-led groups that build leadership and service.','🧑‍🤝‍🧑'],['School Activities & Events','Programs and celebrations throughout the school year.','🎉'],['Sports & Athletics','Teams, training and friendly competition.','⚽'],['Clubs & Societies','Interest groups for every talent and passion.','🎨'],['Campus Facilities & Tour','Take a look around our learning spaces.','🏫']]},
+  {id:'forms',label:'Downloadable Forms',lead:'Forms you can download and print.',subs:[['Downloadable Forms','Download and print the school forms.','📄']]},
+  {id:'news',label:'News & Updates',lead:'The latest from Moreh Academy.',subs:[['School Announcements','Official notices from the school.','📢'],['Latest News','Stories and updates from our community.','📰'],['Upcoming Events','Dates to mark on your calendar.','📅'],['Enrollment Announcements','Enrollment schedules and reminders.','📣'],['School Achievements','Celebrating our students and staff.','🏅']]}
+ ]
+};
+var APP_BASE='<?= baseUrl ?>';
+var APP_PAGE='<?= page ?>';
+var APP_PREVIEW='<?= preview ?>';
+var APP_TICKET='<?= ticket ?>';
+var HOME=DEFAULT_HOME,$=function(i){return document.getElementById(i)};
+function safeUrl(u){return /^(https?:|mailto:|#|route:)/i.test(u||'')?u:'#'}
+function esc(s){var d=document.createElement('div');d.textContent=s==null?'':s;return d.innerHTML.replace(/"/g,'&quot;')}
+function slug(s){return s.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+function toast(m,bad){var t=$('toast');t.textContent=m;t.className=bad?'bad':'';t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(function(){t.style.display='none'},3500)}
+function call(fn,args,ok,fail){
+ if(typeof google==='undefined'||!google.script){fail&&fail('Backend not connected (preview mode).');return}
+ google.script.run.withSuccessHandler(ok).withFailureHandler(function(e){fail&&fail(e&&e.message||'Something went wrong. Try again.')})[fn].apply(null,args)}
+
+/* ===== Routing: home + dedicated pages (server doGet passes APP_PAGE; hash used in preview) ===== */
+function link(r){return APP_BASE?APP_BASE+'?page='+r:'#/'+r}
+function tgt(){return APP_BASE?' target="_top"':''}
+function cur_route(){return APP_PAGE||location.hash.replace(/^#\/?/,'')||'home'}
+function routeHref(to){return to.indexOf('route:')===0?link(to.slice(6)):safeUrl(to)}
+var PG={loading:''};
+function pageInfo(r){
+ var parts=r.split('/'),n=HOME.nav.filter(function(x){return x.id===parts[0]})[0],sub=null,title='';
+ if(r==='contact')title='Contact Information';else if(r==='terms')title='Terms of Service';else if(r==='privacy')title='Privacy Policy';
+ else if(n){if(parts[1]){sub=n.subs.filter(function(s){return slug(s[0])===parts[1]})[0];title=sub?sub[0]:''}else title=n.label}
+ return {n:n,sub:sub,title:title,blocks:(HOME.pages&&HOME.pages[r])||[]}}
+function rtFmt(t){return esc(t).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<u>$1</u>').replace(/\*([^*]+)\*/g,'<em>$1</em>')}
+function rtInl(s){var out='',re=/\[([^\]\n]+)\]\(([^)\s]+)\)/g,last=0,m;
+ while((m=re.exec(s))){out+=rtFmt(s.slice(last,m.index));var u=m[2],isR=/^route:/i.test(u);
+  out+='<a href="'+esc(routeHref(u))+'"'+(isR?tgt():' target="_blank" rel="noopener"')+'>'+rtFmt(m[1])+'</a>';last=re.lastIndex}
+ return out+rtFmt(s.slice(last))}
+function richHtml(t){var out=[],cur=null;
+ String(t||'').split('\n').forEach(function(l){var m=/^(-|\d+\.)\s+(.*)$/.exec(l),k=m?(m[1]==='-'?'ul':'ol'):(l.trim()?'p':'');
+  if(!k){cur=null;return}
+  if(!cur||cur.k!==k){cur={k:k,r:[]};out.push(cur)}
+  cur.r.push(m?m[2]:l)});
+ return '<div class="rt">'+out.map(function(g){return g.k==='p'?'<p>'+g.r.map(rtInl).join('<br>')+'</p>':'<'+g.k+'>'+g.r.map(function(x){return '<li>'+rtInl(x)+'</li>'}).join('')+'</'+g.k+'>'}).join('')+'</div>'}
+function blockHtml(b){var t=b.type;
+ if(t==='h2')return '<h3 class="bh">'+esc(b.text)+'</h3>';
+ if(t==='p')return richHtml(b.text);
+ if(t==='ul')return '<ul>'+(b.items||[]).map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>';
+ if(t==='img'&&/^https:\/\//i.test(b.url||''))return '<figure class="bf'+(b.place==='banner'?' banner':'')+'"><img src="'+esc(b.url)+'" alt="'+esc(b.alt||b.name)+'" loading="lazy">'+((b.name||b.caption)?'<figcaption>'+(b.name?'<strong>'+esc(b.name)+'</strong>':'')+esc(b.caption)+'</figcaption>':'')+'</figure>';
+ if(t==='link'||t==='download'){var isR=/^route:/i.test(b.url||'');return '<p><a class="btn blue" href="'+esc(routeHref(b.url||''))+'"'+(isR?tgt():' target="_blank" rel="noopener"')+'>'+(t==='download'?'⬇ ':'')+esc(b.label)+'</a></p>'}
+ return ''}
+var TLN=0;
+function tlParse(t){var m=/^(.*?)\s*\|\s*((?:19|20)\d{2}(?:\s*[–—-]\s*(?:(?:19|20)\d{2}|\d{2}))?)\s*$/.exec(t||'');return m&&m[1]?{title:m[1],year:m[2]}:null}
+function tlHtml(it){
+ var n=it.length,id='tl'+(++TLN);
+ return '<div class="tl" data-tl="'+id+'" data-k="0" style="--n:'+n+'"><div class="tl-rail"><div class="tl-in" role="tablist" aria-label="Timeline"><div class="tl-track"><div class="tl-fill"></div></div>'
+  +it.map(function(x,k){return '<button type="button" role="tab" class="tl-n'+(k?'':' on')+'" id="'+id+'t'+k+'" aria-controls="'+id+'p'+k+'" aria-selected="'+(k?'false':'true')+'" tabindex="'+(k?'-1':'0')+'" data-tlk="'+k+'"><span class="dot"></span><span class="yr">'+esc(x.year)+'</span></button>'}).join('')
+  +'</div></div><div class="tl-stage">'
+  +it.map(function(x,k){return '<article class="tl-p'+(k?'':' on')+'" role="tabpanel" id="'+id+'p'+k+'" aria-labelledby="'+id+'t'+k+'"><div class="tl-big" aria-hidden="true">'+esc(x.year)+'</div><div class="tl-tx"><h3>'+esc(x.title)+'</h3><div class="sb">'+x.body+'</div></div></article>'}).join('')
+  +'<div class="tl-ctl"><span class="tl-cnt" aria-live="polite">1 / '+n+'</span><button type="button" class="tl-a" data-tlp="-1" aria-label="Previous milestone">‹</button><button type="button" class="tl-a" data-tlp="1" aria-label="Next milestone">›</button></div></div></div>'}
+function tlGo(root,k){
+ var ns=root.querySelectorAll('.tl-n'),ps=root.querySelectorAll('.tl-p'),n=ns.length;k=Math.max(0,Math.min(n-1,k));
+ ns.forEach(function(b,i){b.classList.toggle('on',i===k);b.classList.toggle('past',i<k);b.setAttribute('aria-selected',i===k?'true':'false');b.tabIndex=i===k?0:-1});
+ ps.forEach(function(p,i){p.classList.toggle('on',i===k)});
+ root.querySelector('.tl-fill').style.width=(n>1?k/(n-1)*100:0)+'%';
+ root.querySelector('.tl-cnt').textContent=(k+1)+' / '+n;
+ root.dataset.k=k;
+ if(ns[k].scrollIntoView)ns[k].scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+ return k}
+document.addEventListener('click',function(e){var r=e.target.closest('[data-tl]');if(!r)return;
+ var t=e.target.closest('[data-tlk]'),p=e.target.closest('[data-tlp]');
+ if(t)tlGo(r,+t.dataset.tlk);else if(p)tlGo(r,(+r.dataset.k||0)+(+p.dataset.tlp))});
+document.addEventListener('keydown',function(e){var b=e.target.closest&&e.target.closest('.tl-n');if(!b)return;
+ var r=b.closest('[data-tl]'),k=+r.dataset.k||0,d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:e.key==='Home'?-k:e.key==='End'?1000:0;
+ if(!d)return;e.preventDefault();k=tlGo(r,k+d);r.querySelectorAll('.tl-n')[k].focus()});
+var NO_ACC_ROUTES=['academics','academics/kindergarten','academics/elementary','academics/junior-high-school','academics/senior-high-school','academics/college-program','campus-life','campus-life/student-organizations','campus-life/school-activities-and-events','campus-life/sports-and-athletics','campus-life/clubs-and-societies','campus-life/campus-facilities-and-tour','news','news/school-announcements','news/latest-news','news/upcoming-events','news/enrollment-announcements','news/school-achievements','contact','terms','privacy'];
+var TBN=0;
+function tbParse(t){var m=/^tab\s*:\s*(.+)$/i.exec(String(t||'').trim());if(!m)return null;var l=m[1].trim();return /^end$/i.test(l)?'end':l}
+function tbHtml(it){
+ var id='tb'+(++TBN);
+ return '<div class="tb" data-tb="'+id+'" data-k="0"><p class="tb-cap">Select an option</p><div class="tb-list" role="tablist" aria-label="Options">'
+  +it.map(function(x,k){return '<button type="button" role="tab" class="tb-t'+(k?'':' on')+'" id="'+id+'t'+k+'" aria-controls="'+id+'p'+k+'" aria-selected="'+(k?'false':'true')+'" tabindex="'+(k?'-1':'0')+'" data-tbk="'+k+'">'+esc(x.label)+'</button>'}).join('')
+  +'</div>'+it.map(function(x,k){return '<div class="tb-p'+(k?'':' on')+'" role="tabpanel" id="'+id+'p'+k+'" aria-labelledby="'+id+'t'+k+'" tabindex="0">'+x.body+'</div>'}).join('')+'</div>'}
+function tbGo(root,k){var ts=root.querySelectorAll('.tb-t'),ps=root.querySelectorAll('.tb-p');k=Math.max(0,Math.min(ts.length-1,k));
+ ts.forEach(function(b,i){b.classList.toggle('on',i===k);b.setAttribute('aria-selected',i===k?'true':'false');b.tabIndex=i===k?0:-1});
+ ps.forEach(function(p,i){p.classList.toggle('on',i===k)});root.dataset.k=k;return k}
+document.addEventListener('click',function(e){var t=e.target.closest('[data-tbk]');if(!t)return;var r=t.closest('[data-tb]');if(r)tbGo(r,+t.dataset.tbk)});
+document.addEventListener('keydown',function(e){var b=e.target.closest&&e.target.closest('.tb-t');if(!b)return;
+ var r=b.closest('[data-tb]'),k=+r.dataset.k||0,n=r.querySelectorAll('.tb-t').length,d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:e.key==='Home'?-k:e.key==='End'?n:0;
+ if(!d)return;e.preventDefault();k=tbGo(r,k+d);r.querySelectorAll('.tb-t')[k].focus()});
+function accHtml(s){return '<details class="fq"><summary>'+esc(s[0].text)+'</summary><div class="sb">'+s.slice(1).map(blockHtml).join('')+'</div></details>'}
+function blocksHtml(bl,route){
+ var acc=NO_ACC_ROUTES.indexOf(route)<0,segs=[],c=[],out=[],cards=[],tl=[],tabs=[];
+ bl.forEach(function(b){if(b.type==='img'&&b.place==='banner'){if(c.length){segs.push(c);c=[]}segs.push([b]);return}if(b.type==='h2'&&c.length){segs.push(c);c=[]}c.push(b)});
+ if(c.length)segs.push(c);
+ function flush(){if(cards.length){out.push('<div class="cards">'+cards.join('')+'</div>');cards=[]}if(tl.length){out.push(tlHtml(tl));tl=[]}}
+ function flushTabs(){if(tabs.length){out.push(tbHtml(tabs));tabs=[]}}
+ segs.forEach(function(s){
+  var tb=s[0].type==='h2'?tbParse(s[0].text):null;
+  if(tb&&tb!=='end'){flush();tabs.push({label:tb,body:s.slice(1).map(blockHtml).join('')});return}
+  if(tabs.length){
+   if(tb==='end'){flushTabs();out.push(s.slice(1).map(blockHtml).join(''));return}
+   if(!(s[0].type==='img'&&s[0].place==='banner')){tabs[tabs.length-1].body+=(acc&&s[0].type==='h2')?accHtml(s):s.map(blockHtml).join('');return}
+   flushTabs()}
+  if(tb==='end'){out.push(s.slice(1).map(blockHtml).join(''));return}
+  var side=s.filter(function(b){return b.type==='img'&&b.place==='side'}),hasImg=s.some(function(b){return b.type==='img'});
+  if(side.length){flush();var rest=s.filter(function(b){return side.indexOf(b)<0});
+   out.push('<div class="split2"><div class="txt">'+rest.map(blockHtml).join('')+'</div><div class="side">'+side.map(blockHtml).join('')+'</div></div>');return}
+  if(s[0].type==='h2'&&!hasImg&&(/\?\s*$/.test(s[0].text)||(acc&&!tlParse(s[0].text)))){flush();out.push('<details class="fq"><summary>'+esc(s[0].text)+'</summary><div class="sb">'+s.slice(1).map(blockHtml).join('')+'</div></details>');return}
+  if(s[0].type==='h2'&&!hasImg){var y=tlParse(s[0].text);
+   if(y){if(cards.length){out.push('<div class="cards">'+cards.join('')+'</div>');cards=[]}
+    tl.push({year:y.year,title:y.title,body:s.slice(1).map(blockHtml).join('')});return}
+   if(tl.length){out.push(tlHtml(tl));tl=[]}
+   cards.push('<section class="seg"><h3 class="bh">'+esc(s[0].text)+'</h3><div class="sb">'+s.slice(1).map(blockHtml).join('')+'</div></section>');return}
+  flush();out.push(s.map(blockHtml).join(''))});
+ flush();
+ flushTabs();return '<div class="blocks">'+out.join('')+'</div>'}
+function renderPage(r){
+ var i=pageInfo(r),f=HOME.footer,out;
+ if(!i.title){out='<h2>Page not found</h2><p class="lead">This page does not exist. <a href="'+link('home')+'"'+tgt()+'>Return home</a>.</p>'}
+ else{
+  var crumb='<div class="crumb"><a href="'+link('home')+'"'+tgt()+'>Home</a>'+(i.n?' › <a href="'+link(i.n.id)+'"'+tgt()+'>'+esc(i.n.label)+'</a>':'')+(i.sub?' › '+esc(i.title):'')+'</div>';
+  var has=i.blocks.length>0,loading=PG.loading===r,
+  cards=i.n&&!i.sub?'<div class="navgrid">'+i.n.subs.map(function(s){return '<a class="nc" href="'+link(i.n.id+'/'+slug(s[0]))+'"'+tgt()+'>'+(s[2]?'<span class="ni" aria-hidden="true">'+esc(s[2])+'</span>':'')+'<h3>'+esc(s[0])+'</h3>'+(s[1]?'<p>'+esc(s[1])+'</p>':'')+'<span class="go">Open page<i aria-hidden="true">›</i></span></a>'}).join('')+'</div>':'',
+  main=has?blocksHtml(i.blocks,r):(loading?'<p>Loading…</p>':''),
+  ci=r==='contact'?'<div class="empty" style="margin-bottom:24px"><h3 style="color:var(--orange);margin-bottom:6px">Moreh Academy</h3><p style="margin:0">'+esc(f.loc)+'<br>'+esc(f.phone)+'<br><a href="mailto:'+esc(f.email)+'" style="color:#fff">'+esc(f.email)+'</a></p></div>':'',
+  body=ci+main+(has&&cards?'<div style="height:24px"></div>':'')+cards;
+  if(r==='forms/downloadable-forms')body+='<section class="seg" style="margin-top:18px"><h3 class="bh">Parental Consent &amp; Data Privacy Undertaking</h3><div class="sb"><p>Download and print the required two-copy consent form. Print on Letter-size paper; the Student\'s Copy and Admission\'s Copy are arranged on one page.</p><p><a class="btn blue" href="'+link('parental-consent')+'"'+tgt()+'>Open / Print Consent Form</a></p></div></section>';
+  if(!has&&!cards&&!loading&&r!=='contact')body='<div class="empty"><p style="margin:0">Content coming soon.</p></div>';
+  out=crumb+'<div class="bar"></div><h2>'+esc(i.title)+'</h2><p class="lead">'+esc(i.sub?'':(i.n?i.n.lead:''))+'</p>'+body}
+ return '<section class="page"><div class="wrap">'+out+'</div></section>'}
+function renderHome(){
+ var h=HOME,d=h.display||{},T=tgt(),ab=h.aboutPreview,nw=h.newsPreview||{title:'News & Announcements',items:[]},
+ ac=h.nav.filter(function(n){return n.id==='academics'})[0],
+ prog=((h.programs&&h.programs.items)||ac.subs.map(function(x){return {name:x[0],desc:h.progDesc[x[0]]||'',on:true}})).filter(function(x){return x.on!==false}),
+ items=(nw.items||[]).filter(function(x){return x.title});
+ var S={
+ admission:'<section class="sec" id="admission-process"><div class="wrap"><div class="bar"></div><h2>'+esc(h.sectionTitle)+'</h2><p class="lead">'+esc(h.sectionSub)+'</p><ol class="steps">'+h.steps.map(function(s,k){return '<li class="step"><div class="n">'+(k+1)+'</div><div class="si" aria-hidden="true">'+esc(s.i)+'</div><h3>'+esc(s.t)+'</h3><p>'+esc(s.d)+'</p></li>'}).join('')+'</ol><a class="btn blue" href="#create">Enroll Now!</a></div></section>',
+ about:'<section class="sec" id="about-preview"><div class="wrap split"><div class="photo" style="'+(ab.photo?'background-image:url('+esc(ab.photo)+')':'')+'" role="img" aria-label="Moreh Academy students"></div><div><div class="bar"></div><h2>'+esc(ab.heading)+'</h2><p>'+esc(ab.text)+'</p><a class="btn blue" href="'+link('about')+'"'+T+'>'+esc(ab.linkLabel||'Learn More')+'</a></div></div></section>',
+ programs:'<section class="sec" id="academics-preview"><div class="wrap"><div class="bar"></div><h2>'+esc((h.programs&&h.programs.title)||'Academic Programs')+'</h2><p class="lead">'+esc(ac.lead)+'</p><div class="grid five">'+prog.map(function(x){return '<article class="card"><h3>'+esc(x.name)+'</h3><p>'+esc(x.desc)+'</p><a class="more" href="'+link('academics/'+slug(x.name))+'"'+T+'>Learn more</a></article>'}).join('')+'</div></div></section>',
+ news:'<section class="sec" id="news-preview"><div class="wrap"><div class="bar"></div><h2>'+esc(nw.title||'News & Announcements')+'</h2>'+(items.length?'<div class="grid">'+items.map(function(x){return '<article class="card"><h3>'+esc(x.title)+'</h3>'+(x.date?'<p style="font-size:13px;opacity:.7">'+esc(x.date)+'</p>':'')+'<p>'+esc(x.summary)+'</p>'+(x.link?'<a class="more" href="'+esc(routeHref(x.link))+'"'+T+'>Read more</a>':'')+'</article>'}).join('')+'</div><p style="margin-top:18px"><a class="btn blue" href="'+link('news/latest-news')+'"'+T+'>View all news</a></p>':'<div class="empty"><strong>No announcements yet.</strong><p style="margin:4px 0 12px">Follow Moreh Academy for future updates.</p><a class="btn" href="'+link('news/latest-news')+'"'+T+'>View all news</a></div>')+'</div></section>'};
+ var order=(d.order||[]).filter(function(k){return S[k]});Object.keys(S).forEach(function(k){if(order.indexOf(k)<0)order.push(k)});
+ return order.filter(function(k){return (d.hidden||[]).indexOf(k)<0}).map(function(k){return S[k]}).join('')}
+
+/* ===== Published / draft content from the backend ===== */
+function applyContent(c){
+ if(!c||!c.sections)return;var s=c.sections,H=HOME;
+ if(s.masthead){if(Array.isArray(s.masthead.ids)&&s.masthead.ids.length)H.ids=s.masthead.ids;if(s.masthead.tagline!=null)H.tagline=s.masthead.tagline}
+ if(s.hero){var o=s.hero;['title','name','subtitle','desc','intervalMs'].forEach(function(k){if(o[k]!=null&&o[k]!=='')H.hero[k]=o[k]});['enroll','discover'].forEach(function(k){if(o[k])H.hero[k]=Object.assign({},H.hero[k],o[k])});if(Array.isArray(o.slides)&&o.slides.length)H.hero.slides=o.slides}
+ if(s.values&&Array.isArray(s.values.items))H.values=s.values.items;
+ if(s.admission){var a=s.admission;if(a.title)H.sectionTitle=a.title;if(a.sub!=null)H.sectionSub=a.sub;if(Array.isArray(a.steps))H.steps=a.steps.filter(function(x){return x.on!==false})}
+ if(s.about)H.aboutPreview=Object.assign({},H.aboutPreview,s.about);
+ if(s.programs)H.programs=s.programs;if(s.news)H.newsPreview=s.news;
+ if(s.footer)H.footer=Object.assign({},H.footer,s.footer);if(s.display)H.display=s.display}
+
+/* ===== Render ===== */
+function render(){
+ var h=HOME;
+ $('ids').innerHTML=h.ids.map(function(i){return '<a class="id" href="'+esc(safeUrl(i.fb))+'" target="_blank" rel="noopener">'+(i.logo?'<img class="logo" src="'+esc(i.logo)+'" alt="">':'<span class="logo">'+esc(i.short)+'</span>')+'<span>'+esc(i.name)+'</span></a>'}).join('');
+ $('tag').textContent=h.tagline;
+ var soc='<a href="'+esc(safeUrl(h.footer.fb))+'" target="_blank" rel="noopener" aria-label="Facebook">f</a><a href="'+esc(safeUrl(h.footer.yt))+'" target="_blank" rel="noopener" aria-label="YouTube">▶</a><a href="mailto:'+esc(h.footer.email)+'" aria-label="Email">✉</a>';
+ $('soc').innerHTML=soc;$('fSoc').innerHTML=soc;
+ $('menu').innerHTML='<li><a href="'+link('home')+'"'+tgt()+'>Home</a></li>'+h.nav.map(function(n){
+  return '<li><button aria-haspopup="true" aria-expanded="false">'+esc(n.label)+'</button><ul class="sub">'+n.subs.map(function(s){return '<li><a href="'+link(n.id+'/'+slug(s[0]))+'"'+tgt()+'>'+esc(s[0])+'</a></li>'}).join('')+'</ul></li>'}).join('')
+  +'<li><a href="'+link('contact')+'"'+tgt()+'>Contact Information</a></li>';
+ $('hTitle').innerHTML=esc(h.hero.title)+'<span>'+esc(h.hero.name)+'</span>';
+ $('hSub').textContent=h.hero.subtitle;$('hDesc').textContent=h.hero.desc;
+ $('hEnroll').textContent=h.hero.enroll.label;$('hEnroll').href=routeHref(h.hero.enroll.to);
+ $('hDiscover').textContent=h.hero.discover.label;$('hDiscover').href=routeHref(h.hero.discover.to);if(APP_BASE)$('hDiscover').target='_top';
+ var fall=['linear-gradient(135deg,#062E70,#0648AD)','linear-gradient(135deg,#0648AD,#062E70)','linear-gradient(135deg,#062E70,#FF941F)'];
+ $('slides').innerHTML=h.hero.slides.map(function(u,i){return '<div class="slide" style="background-image:'+(u?'url('+esc(u)+')':fall[i%3])+'"></div>'}).join('');
+ $('dots').innerHTML=h.hero.slides.map(function(_,i){return '<button aria-label="Go to slide '+(i+1)+'" data-i="'+i+'"></button>'}).join('');
+ $('values').innerHTML=h.values.filter(function(v){return v.on}).map(function(v){return '<li><span class="ic" aria-hidden="true">'+esc(v.icon)+'</span>'+esc(v.label)+'</li>'}).join('');
+ var r=cur_route(),home=(r==='home');$('hero').hidden=!home;$('homepage-values').hidden=!home||((HOME.display||{}).hidden||[]).indexOf('values')>-1;if(APP_PREVIEW&&!$('pvBar')){var pb=document.createElement('div');pb.id='pvBar';pb.textContent='Draft preview. Visitors do not see this version.';pb.style.cssText='background:#FF941F;color:#062E70;text-align:center;font:700 13px Poppins,sans-serif;padding:6px';document.body.insertBefore(pb,document.body.firstChild)}$('sections').innerHTML=home?renderHome():renderPage(r);document.title=(home?'Moreh Academy':pageInfo(r).title+' | Moreh Academy');if(!home)window.scrollTo(0,0);
+ $('fLoc').textContent=h.footer.loc;$('fPhone').textContent=h.footer.phone;$('fMail').textContent=h.footer.email;$('fMail').href='mailto:'+h.footer.email;
+ $('fCopy').textContent='© '+new Date().getFullYear()+' Moreh Academy. All rights reserved.'; $('lnkTerms').href=link('terms');$('lnkPriv').href=link('privacy');
+ bindNav();if(home)initCarousel();else clearInterval(timer);
+}
+
+/* ===== Navigation ===== */
+function bindNav(){
+ var menu=$('menu');
+ menu.querySelectorAll('li>button').forEach(function(b){b.onclick=function(e){
+  var li=b.parentNode,was=li.classList.contains('open');
+  menu.querySelectorAll('li.open').forEach(function(x){x.classList.remove('open');x.firstChild.setAttribute('aria-expanded','false')});
+  if(!was){li.classList.add('open');b.setAttribute('aria-expanded','true')}e.stopPropagation()}});
+ menu.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){menu.classList.remove('show');$('burger').setAttribute('aria-expanded','false')})});
+}
+$('burger').onclick=function(){var s=$('menu').classList.toggle('show');this.setAttribute('aria-expanded',s)};
+document.addEventListener('click',function(){document.querySelectorAll('#menu li.open').forEach(function(x){x.classList.remove('open')})});
+
+/* ===== Carousel ===== */
+var cur=0,timer=null,paused=false;
+function go(i){var n=HOME.hero.slides.length;cur=(i+n)%n;$('slides').style.transform='translateX(-'+cur*100+'%)';
+ document.querySelectorAll('#dots button').forEach(function(d,k){d.classList.toggle('on',k===cur)})}
+function restart(){clearInterval(timer);timer=setInterval(function(){if(!paused)go(cur+1)},HOME.hero.intervalMs||6500)}
+function initCarousel(){
+ go(0);restart();
+ $('prev').onclick=function(){go(cur-1);restart()};$('next').onclick=function(){go(cur+1);restart()};
+ $('dots').onclick=function(e){var i=e.target.dataset.i;if(i!=null){go(+i);restart()}};
+ var h=$('hero'),x0=null;
+ h.onmouseenter=function(){paused=true};h.onmouseleave=function(){paused=false};
+ h.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;paused=true},{passive:true});
+ h.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40){go(cur+(dx<0?1:-1));restart()}paused=false},{passive:true});
+}
+
+/* ===== Modals ===== */
+function openM(id){document.querySelectorAll('.modal').forEach(function(m){m.classList.remove('show')});$(id).classList.add('show');var f=$(id).querySelector('input');f&&f.focus()}
+function closeM(){document.querySelectorAll('.modal').forEach(function(m){m.classList.remove('show')})}
+document.querySelectorAll('[data-close]').forEach(function(b){b.onclick=closeM});
+document.querySelectorAll('[data-swap]').forEach(function(b){b.onclick=function(){openM(b.dataset.swap)}});
+document.querySelectorAll('.modal').forEach(function(m){m.addEventListener('mousedown',function(e){if(e.target===m)closeM()})});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeM()});
+$('loginBtn').onclick=function(e){e.preventDefault();openM('mSignin')};
+document.addEventListener('click',function(e){var a=e.target.closest('a[href="#create"],a[href="#signin"]');if(a){e.preventDefault();openM(a.getAttribute('href')==='#create'?'mCreate':'mSignin')}});
+
+/* ===== Session: the token lives in this tab only (sessionStorage, memory fallback). Never in a URL. ===== */
+var MEM_TOKEN='';
+/* Same tab-scoped key the portal resumes from (Script: sessionStorage 'mrh_t'). */
+function getToken(){try{return sessionStorage.getItem('mrh_t')||MEM_TOKEN}catch(e){return MEM_TOKEN}}
+function saveToken(t){MEM_TOKEN=t;try{sessionStorage.setItem('mrh_t',t)}catch(e){}}
+function clearToken(){MEM_TOKEN='';try{sessionStorage.removeItem('mrh_t')}catch(e){}}
+function resetLoginBtn(){$('outBtn').style.display='none';var b=$('loginBtn');b.textContent='Portal Login';b.removeAttribute('target');b.href='#';b.onclick=function(e){e.preventDefault();openM('mSignin')}}
+/* Signed-in users keep the existing Homepage controls, with a direct entry to the
+   migrated Admissions Portal. */
+function showSignedIn(u,quiet){
+ var b=$('loginBtn');
+ var menu=$('menu');
+ if(u.role==='Owner'||u.role==='Website Administrator'){
+  b.textContent='Homepage Management';b.onclick=null;
+  if(APP_BASE){b.href=APP_BASE+'?page=admin-homepage';b.target='_top'}else{b.href='#'}
+ }else{
+  b.textContent='Admissions Portal';b.onclick=null;
+  b.href=APP_BASE?APP_BASE+'?page='+(u.role==='Applicant'||u.role==='Student'?'applicant-portal':'admission'):'#/'+(u.role==='Applicant'||u.role==='Student'?'applicant-portal':'admission');
+  if(APP_BASE)b.target='_top';
+ }
+ $('outBtn').style.display='';
+ $('outBtn').onclick=function(e){
+  e.preventDefault();var t=getToken();clearToken();resetLoginBtn();toast('Signed out.');
+  call(API.signOut,[t],function(){},function(){});
+ };
+ if(!quiet)toast('Signed in as '+u.role+'.');
+}
+
+function mark(ids,bad){ids.forEach(function(i){$(i).classList.toggle('bad',bad.indexOf(i)>-1)})}
+$('siGo').onclick=function(){
+ var u=$('siUser').value.trim(),p=$('siPass').value,bad=[];if(!u)bad.push('siUser');if(!p)bad.push('siPass');
+ mark(['siUser','siPass'],bad);$('siErr').textContent=bad.length?'Enter your username and password.':'';if(bad.length)return;
+ var b=this;b.disabled=true;b.textContent='Signing in…';
+ call(API.signIn,[u,p],function(r){b.disabled=false;b.textContent='Sign in';
+  if(r&&r.otp){PEND.mode='otp';PEND.email=u;PEND.challenge=r.challenge;startVerify('Staff sign-in: enter the 6-digit code sent to '+(r.hint||u)+'.');return}
+  if(!r||r.success!==true){$('siErr').textContent=(r&&r.error)||'Invalid username or password.';return}
+  $('siPass').value='';saveToken(r.token);closeM();
+  /* Signing in leaves the homepage and opens the portal with the same session. */
+  location.href=(APP_BASE||'')+'?page=portal'},
+  function(m){b.disabled=false;b.textContent='Sign in';$('siErr').textContent=m})};
+/* ===== Accounts: register, verify email, forgot / reset password ===== */
+var PEND={email:'',challenge:'',mode:'',form:null},rsT=null,PWRULE='Use 8 or more characters with at least one letter and one number.';
+function pwBad(p){return p.length<8||p.length>200||!/[A-Za-z]/.test(p)||!/\d/.test(p)}
+function mobileOk(v){return /^(09\d{9}|\+639\d{9}|639\d{9})$/.test(String(v).replace(/[\s\-()]/g,''))}
+function busyBtn(b,on,txt){if(on){b.dataset.t=b.textContent;b.textContent=txt}else b.textContent=b.dataset.t||b.textContent;b.disabled=on}
+function cool(sec){var b=$('vResend'),s=sec;clearInterval(rsT);b.disabled=true;b.textContent='Resend code ('+s+')';
+ rsT=setInterval(function(){s--;if(s<=0){clearInterval(rsT);b.disabled=false;b.textContent='Resend code'}else b.textContent='Resend code ('+s+')'},1000)}
+function ageFrom(iso){if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||''))return '';var d=new Date(iso),n=new Date(),a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;return a>=0&&a<=120?a:''}
+function caGuard(){var box=$('caGuardBox'),a=ageFrom($('caBirth').value);if(box)box.style.display=(a!==''&&a<18)?'block':'none'}
+function startVerify(msg){$('vMsg').textContent=msg||('Enter the 6-digit code we sent to '+PEND.email+'.');$('vCode').value='';$('vErr').textContent='';openM('mVerify');cool(60);
+ $('vResend').style.visibility=(PEND.mode==='reg')?'visible':'hidden'}
+$('caGo').onclick=function(){
+ var sn=$('caSurname').value.trim(),fn=$('caFirst').value.trim(),lrn=$('caLrn').value.trim(),bd=$('caBirth').value,m=$('caMail').value.trim(),mo=$('caMobile').value.trim(),p=$('caPass').value,p2=$('caPass2').value,bad=[],msg='',age=ageFrom(bd);
+ if(sn.length<1)bad.push('caSurname');if(fn.length<1)bad.push('caFirst');if(!/^[1-5]\d{11}$/.test(lrn))bad.push('caLrn');if(age==='')bad.push('caBirth');
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))bad.push('caMail');if(!mobileOk(mo))bad.push('caMobile');
+ if(pwBad(p))bad.push('caPass');if(p2!==p)bad.push('caPass2');
+ var g={};
+ if(age!==''&&age<18){g={guardName:$('caGuardName').value.trim(),guardRel:$('caGuardRel').value.trim(),guardEmail:$('caGuardEmail').value.trim(),guardMobile:$('caGuardMobile').value.trim()};
+  if(!g.guardName)bad.push('caGuardName');if(!g.guardRel)bad.push('caGuardRel');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g.guardEmail))bad.push('caGuardEmail');if(!/^\d{11}$/.test(g.guardMobile))bad.push('caGuardMobile')}
+ if(bad.length)msg=(bad.length===1&&bad[0]==='caPass2')?'Passwords do not match.':bad.indexOf('caPass')>-1?PWRULE:'Complete all fields. LRN must be 12 digits and start with 1-5; guardian details are required below 18.';
+ else if(!$('caTerms').checked)msg='Please accept the Terms of Service and Privacy Policy.';
+ mark(['caSurname','caFirst','caLrn','caBirth','caMail','caMobile','caPass','caPass2','caGuardName','caGuardRel','caGuardEmail','caGuardMobile'],bad);$('caErr').textContent=msg;if(msg)return;
+ var b=this;busyBtn(b,true,'Creating…');
+ PEND.form={surname:sn,firstName:fn,lrn:lrn,birthdate:bd,email:m,mobile:mo,password:p,password2:p2,consent:true,guardName:g.guardName||'',guardRel:g.guardRel||'',guardEmail:g.guardEmail||'',guardMobile:g.guardMobile||''};
+ call(API.register,[PEND.form],function(r){busyBtn(b,false);
+  if(!r||r.success!==true){$('caErr').textContent=(r&&r.error)||'Could not create the account.';return}
+  $('caPass').value=$('caPass2').value='';
+  if(!r.challenge){closeM();$('siUser').value=m;toast(r.message||'Account created. Please sign in.');openM('mSignin');return}
+  PEND.mode='reg';PEND.email=m;PEND.challenge=r.challenge;startVerify(r.message||('Enter the 6-digit code we sent to '+m+'.'))},
+  function(e){busyBtn(b,false);$('caErr').textContent=e})};
+$('vGo').onclick=function(){var c=$('vCode').value.replace(/\D/g,'');if(c.length!==6){$('vErr').textContent='Enter the 6-digit code.';return}
+ var b=this;busyBtn(b,true,'Verifying…');
+ var fn=(PEND.mode==='otp')?API.verify:API.confirmReg;
+ call(fn,[PEND.challenge,c],function(r){busyBtn(b,false);
+  if(!r||r.success!==true){$('vErr').textContent=(r&&r.error)||'Verification failed.';return}
+  if(PEND.mode==='otp'&&r.token){saveToken(r.token);closeM();location.href=(APP_BASE||'')+'?page=portal';return}
+  closeM();PEND.mode='';PEND.challenge='';
+  $('siUser').value=PEND.email;$('siPass').value='';
+  toast(r.message||'Email verified. Please sign in.');openM('mSignin')},
+  function(e){busyBtn(b,false);$('vErr').textContent=e})};
+$('vResend').onclick=function(){
+ if(PEND.mode!=='reg'||!PEND.form){$('vErr').textContent='Use "Forgot password?" if you need a new sign-in code.';return}
+ call(API.register,[PEND.form],function(r){
+  if(!r||r.success!==true){$('vErr').textContent=(r&&r.error)||'Could not send the code.';return}
+  if(r.challenge){PEND.challenge=r.challenge;cool(60)}
+  $('vErr').textContent='';toast(r.message||'A new code was sent.')},function(e){$('vErr').textContent=e})};
+$('fGo').onclick=function(){var m=$('fgMail').value.trim();
+ if(!m){$('fErr').textContent='Enter your username or registered email.';return}
+ var b=this;busyBtn(b,true,'Sending…');
+ call(API.forgot,[m],function(r){busyBtn(b,false);
+  if(!r||r.success!==true){$('fErr').textContent=(r&&r.error)||'Could not send the code.';return}
+  PEND.email=m;$('fErr').textContent='';$('rErr').textContent='';$('rCode').value=$('rPass').value=$('rPass2').value='';toast(r.message||'If the account exists, a code has been sent.');openM('mReset')},
+  function(e){busyBtn(b,false);$('fErr').textContent=e})};
+$('rGo').onclick=function(){var c=$('rCode').value.replace(/\D/g,''),p=$('rPass').value,p2=$('rPass2').value,msg='';
+ if(c.length!==6)msg='Enter the 6-digit code.';else if(pwBad(p))msg=PWRULE;else if(p!==p2)msg='Passwords do not match.';
+ $('rErr').textContent=msg;if(msg)return;
+ var b=this;busyBtn(b,true,'Saving…');
+ call(API.reset,[PEND.email,c,p],function(r){busyBtn(b,false);
+  if(!r||r.success!==true){$('rErr').textContent=(r&&r.error)||'Could not reset the password.';return}
+  $('rPass').value=$('rPass2').value='';$('siUser').value=PEND.email;toast('Password changed. Please sign in.');openM('mSignin')},
+  function(e){busyBtn(b,false);$('rErr').textContent=e})};
+document.querySelectorAll('.modal input').forEach(function(i){i.addEventListener('keydown',function(e){
+ if(e.key==='Enter'&&i.type!=='checkbox'){var b=i.closest('.box').querySelector('.btn.blue');if(b)b.click()}})});
+
+window.addEventListener('hashchange',function(){if(!APP_PAGE)render()});
+/* ===== Boot: published content from backend, falling back to defaults ===== */
+PG.loading=(cur_route()!=='home')?cur_route():'';render();
+(function(){var r=cur_route();if(r==='home')return;
+ call(APP_PREVIEW?API.getPageDraft:API.getPage,APP_PREVIEW?[r,APP_TICKET]:[r],
+  function(d){PG.loading='';HOME.pages=HOME.pages||{};HOME.pages[r]=(d&&d.blocks)||[];render()},
+  function(m){PG.loading='';render();if(APP_PREVIEW)toast(m,true)})})();
+/* Sessions are held by the portal; the homepage only signs in and hands over. */
+call(APP_PREVIEW?API.getDraft:API.getHomepage,APP_PREVIEW?[APP_TICKET]:[],function(d){applyContent(d);render()},function(m){if(APP_PREVIEW)toast(m,true)});
+</script>
+</body>
+</html>

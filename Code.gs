@@ -105,6 +105,8 @@ add('hidden','TempUntil','Temporary enrollment until','auto');
 add('hidden','TempBy','Temporary enrollment approved by','auto');
 add('hidden','IDNumber','Student ID card number','auto');
 add('hidden','IDPhotoID','ID photo file','auto');
+// ---- MERGE v1: application lifecycle (appended LAST so existing sheet columns never shift) ----
+add('hidden','ApplicationStatus','Application status','auto');
 
 const COLS = ['StudentID','CreatedAt'].concat(FIELDS.map(f => f[1]));
 /* ---------- Requirements by level ---------- */
@@ -150,15 +152,7 @@ const ok = (data, message) => ({ success:true, message:message||'', data:data })
 const fail = e => ({ success:false, error:e.message });
 const deptOf_ = g => { const i = GRADES.indexOf(g); return i<0?'':i<3?'Preschool':i<9?'Elementary':i<13?'Junior High School':'Senior High School'; };
 
-function doGet(e) {
-  const p = (e && e.parameter) || {}, portal = String(p.page || '') === 'portal';
-  const t = HtmlService.createTemplateFromFile(portal ? 'Index' : 'PublicHome');
-  t.reg = portal && String(p.reg || '') === '1';     // ?page=portal&reg=1 opens the Create an Account form
-  return t.evaluate()
-    .setTitle(portal ? 'Moreh Academy Portal' : 'Moreh Academy')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-}
-function include(f) { return HtmlService.createHtmlOutputFromFile(f).getContent(); }
+/* doGet() and include() live in Router.gs after the merge. */
 
 function rows_(k) {
   const sh = sh_(k), h = k==='S'?COLS:UCOLS;
