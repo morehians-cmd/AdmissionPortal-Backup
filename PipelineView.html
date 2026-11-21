@@ -111,7 +111,7 @@ act.pipsave = function (v) {
 (function () {
   ['hphome', 'hphome0'].forEach(function (id) {
     var a = document.getElementById(id);
-    if (a) a.onclick = function (e) { if (e) e.preventDefault(); location.href = '?page=home'; };
+    if (a) a.onclick = function (e) { if (e) e.preventDefault(); try { window.top.location.href = '?page=home'; } catch (x) { window.open('?page=home', '_top'); } };
   });
 })();
 </script>

@@ -268,6 +268,13 @@ function call(fn,args,ok,fail){
    signed-in visitor would land on Google Drive's "You need access" page instead of the portal. */
 function hereBase(){try{if(location.host==='script.google.com'&&/^\/macros\/s\/[^\/]+\/(exec|dev)$/.test(location.pathname))return location.origin+location.pathname}catch(e){}return ''}
 function appUrl(q){var b=hereBase()||APP_BASE;return b?b+(q||''):''}
+/* Apps Script serves this page inside a sandboxed iframe. Setting location.href here loads script.google.com
+   INSIDE that iframe, and Google refuses framing: "script.google.com refused to connect". Navigate the TOP window. */
+function goPortal(){var u=appUrl('?page=portal');if(!u){toast('Portal link unavailable.',true);return}
+ try{window.top.location.href=u;return}catch(e){}
+ try{var w=window.open(u,'_top');if(w)return}catch(e){}
+ var m=$('siErr');if(m){m.innerHTML='Signed in. <a href="'+esc(u)+'" target="_top" rel="noopener">Continue to the portal</a>'}
+ toast('Signed in. Tap "Continue to the portal".')}
 function link(r){return appUrl('?page='+r)||('#/'+r)}
 function tgt(){return (hereBase()||APP_BASE)?' target="_top"':''}
 function cur_route(){return APP_PAGE||location.hash.replace(/^#\/?/,'')||'home'}
@@ -499,7 +506,7 @@ $('siGo').onclick=function(){
   if(!r||r.success!==true){$('siErr').textContent=(r&&r.error)||'Invalid username or password.';return}
   $('siPass').value='';saveToken(r.token);closeM();
   /* Signing in leaves the homepage and opens the portal with the same session. */
-  location.href=appUrl('?page=portal')},
+  goPortal()},
   function(m){b.disabled=false;b.textContent='Sign in';$('siErr').textContent=m})};
 /* ===== Accounts: register, verify email, forgot / reset password ===== */
 var PEND={email:'',challenge:'',mode:'',form:null},rsT=null,PWRULE='Use 8 or more characters with at least one letter and one number.';
@@ -536,7 +543,7 @@ $('vGo').onclick=function(){var c=$('vCode').value.replace(/\D/g,'');if(c.length
  var fn=(PEND.mode==='otp')?API.verify:API.confirmReg;
  call(fn,[PEND.challenge,c],function(r){busyBtn(b,false);
   if(!r||r.success!==true){$('vErr').textContent=(r&&r.error)||'Verification failed.';return}
-  if(PEND.mode==='otp'&&r.token){saveToken(r.token);closeM();location.href=appUrl('?page=portal');return}
+  if(PEND.mode==='otp'&&r.token){saveToken(r.token);closeM();goPortal();return}
   closeM();PEND.mode='';PEND.challenge='';
   $('siUser').value=PEND.email;$('siPass').value='';
   toast(r.message||'Email verified. Please sign in.');openM('mSignin')},
