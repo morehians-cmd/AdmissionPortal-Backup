@@ -263,8 +263,13 @@ function call(fn,args,ok,fail){
  google.script.run.withSuccessHandler(ok).withFailureHandler(function(e){fail&&fail(e&&e.message||'Something went wrong. Try again.')})[fn].apply(null,args)}
 
 /* ===== Routing: home + dedicated pages (server doGet passes APP_PAGE; hash used in preview) ===== */
-function link(r){return APP_BASE?APP_BASE+'?page='+r:'#/'+r}
-function tgt(){return APP_BASE?' target="_top"':''}
+/* Navigation must stay on the address the visitor already opened. ScriptApp.getService().getUrl()
+   can return a /dev deployment address, which only the script's editors are allowed to open, so a
+   signed-in visitor would land on Google Drive's "You need access" page instead of the portal. */
+function hereBase(){try{if(location.host==='script.google.com'&&/^\/macros\/s\/[^\/]+\/(exec|dev)$/.test(location.pathname))return location.origin+location.pathname}catch(e){}return ''}
+function appUrl(q){var b=hereBase()||APP_BASE;return b?b+(q||''):''}
+function link(r){return appUrl('?page='+r)||('#/'+r)}
+function tgt(){return (hereBase()||APP_BASE)?' target="_top"':''}
 function cur_route(){return APP_PAGE||location.hash.replace(/^#\/?/,'')||'home'}
 function routeHref(to){return to.indexOf('route:')===0?link(to.slice(6)):safeUrl(to)}
 var PG={loading:''};
@@ -470,10 +475,10 @@ function showSignedIn(u,quiet){
  var menu=$('menu');
  if(u.role==='Owner'||u.role==='Website Administrator'){
   b.textContent='Homepage Management';b.onclick=null;
-  if(APP_BASE){b.href=APP_BASE+'?page=admin-homepage';b.target='_top'}else{b.href='#'}
+  if(APP_BASE){b.href=appUrl('?page=admin-homepage');b.target='_top'}else{b.href='#'}
  }else{
   b.textContent='Admissions Portal';b.onclick=null;
-  b.href=APP_BASE?APP_BASE+'?page='+(u.role==='Applicant'||u.role==='Student'?'applicant-portal':'admission'):'#/'+(u.role==='Applicant'||u.role==='Student'?'applicant-portal':'admission');
+  b.href=link(u.role==='Applicant'||u.role==='Student'?'applicant-portal':'admission');
   if(APP_BASE)b.target='_top';
  }
  $('outBtn').style.display='';
@@ -494,7 +499,7 @@ $('siGo').onclick=function(){
   if(!r||r.success!==true){$('siErr').textContent=(r&&r.error)||'Invalid username or password.';return}
   $('siPass').value='';saveToken(r.token);closeM();
   /* Signing in leaves the homepage and opens the portal with the same session. */
-  location.href=(APP_BASE||'')+'?page=portal'},
+  location.href=appUrl('?page=portal')},
   function(m){b.disabled=false;b.textContent='Sign in';$('siErr').textContent=m})};
 /* ===== Accounts: register, verify email, forgot / reset password ===== */
 var PEND={email:'',challenge:'',mode:'',form:null},rsT=null,PWRULE='Use 8 or more characters with at least one letter and one number.';
@@ -531,7 +536,7 @@ $('vGo').onclick=function(){var c=$('vCode').value.replace(/\D/g,'');if(c.length
  var fn=(PEND.mode==='otp')?API.verify:API.confirmReg;
  call(fn,[PEND.challenge,c],function(r){busyBtn(b,false);
   if(!r||r.success!==true){$('vErr').textContent=(r&&r.error)||'Verification failed.';return}
-  if(PEND.mode==='otp'&&r.token){saveToken(r.token);closeM();location.href=(APP_BASE||'')+'?page=portal';return}
+  if(PEND.mode==='otp'&&r.token){saveToken(r.token);closeM();location.href=appUrl('?page=portal');return}
   closeM();PEND.mode='';PEND.challenge='';
   $('siUser').value=PEND.email;$('siPass').value='';
   toast(r.message||'Email verified. Please sign in.');openM('mSignin')},
