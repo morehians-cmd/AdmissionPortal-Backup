@@ -283,7 +283,7 @@ function getPublishedHomepage() {
 }
 
 function siteMediaPublic_(ref) { const m=String(ref||'').match(/^gallery:([^:]+):(.+)$/); if(!m)return /^https?:\/\//i.test(String(ref||''))?String(ref):''; try{if(!galRead_(m[1]).list.some(x=>x.id===String(m[2])))return '';return photo_(String(m[2]))||'';}catch(_){return '';} }
-function siteResolveSectionMedia_(sections) { const s=sections||{}; if(s.about&&s.about.photo)s.about.photo=siteMediaPublic_(s.about.photo); if(s.hero&&Array.isArray(s.hero.slides))s.hero.slides=s.hero.slides.map(siteMediaPublic_); return s; }
+function siteResolveSectionMedia_(sections) { const s=sections||{}; if(s.masthead&&Array.isArray(s.masthead.ids))s.masthead.ids=s.masthead.ids.map(x=>Object.assign({},x,{logo:siteMediaPublic_(x&&x.logo)})); if(s.about&&s.about.photo)s.about.photo=siteMediaPublic_(s.about.photo); if(s.hero&&Array.isArray(s.hero.slides))s.hero.slides=s.hero.slides.map(siteMediaPublic_); if(s.programs&&Array.isArray(s.programs.items))s.programs.items=s.programs.items.map(x=>Object.assign({},x,{photo:siteMediaPublic_(x&&x.photo)})); if(s.news&&Array.isArray(s.news.items))s.news.items=s.news.items.map(x=>Object.assign({},x,{photo:siteMediaPublic_(x&&x.photo)})); return s; }
 
 /** PUBLIC. The homepage's draft preview reads the same saved copy. */
 function getDraftHomepage() { return getPublishedHomepage(); }
