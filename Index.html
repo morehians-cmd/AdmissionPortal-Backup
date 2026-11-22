@@ -2909,8 +2909,21 @@ function topInit(){const u=S.user;$('gsw').classList.remove('hidden');
  if(A()){const f=FULL();rb.className='rbd'+(f?'':' warn');rb.title='Your access level and the active school year';rb.innerHTML='<b>'+esc(ROLEN(u.Clearance))+'</b><span class="rs"> \u00b7 SY '+esc(String(S.cfg.sy).replace('-','\u2013'))+'</span>'}
  else rb.className='rbd hidden';
  $('dd').innerHTML=`<div class="ddh"><b>${esc(tc(u.FullName||u.Username))}</b><small>${esc($('urole').textContent)}</small></div><button role="menuitem" data-act="nav" data-v="me">${I.me}My Profile</button><button role="menuitem" data-act="nav" data-v="pp">${I.rep}Data Privacy Policy</button><div class="ddl"></div><button role="menuitem" data-act="out">${I.out}Sign out</button>`;
- bnInit();tbMeasure()}
-
+ bnInit();tbMeasure()
+  const tr=document.querySelector('.top .tr');
+  if(tr&&!$('tdate')){
+    const d=document.createElement('span');
+    d.id='tdate';d.className='tdate';
+    d.innerHTML=I.cal+new Date().toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});
+    tr.insertBefore(d,tr.firstChild);
+  }
+  if(tr&&!tr.querySelector('.theme-switch'))tr.insertBefore(thMake(),tr.firstChild);
+  const dd=$('dd');
+  if(dd&&!dd.querySelector('[data-act=thtoggle]')){
+    const l=dd.querySelector('.ddl');
+    if(l)l.insertAdjacentHTML('beforebegin','<button role="menuitem" data-act="thtoggle">'+I.star+'<span id="thl"></span></button>')
+  }
+  MRH_THEME.sync();thLabel()}
 /* search: pages for everyone, plus learner records for admins */
 const gsItems=()=>{const f=[];(S.menu||[]).forEach(e=>Array.isArray(e)?f.push(e):e.items.forEach(x=>f.push(x)));if(!f.some(x=>x[0]==='pp'))f.push(['pp','Data Privacy Policy',I.rep]);return f};
 function gsDraw(){const r=$('gsr'),q=$('gs').value.trim();
@@ -4061,25 +4074,6 @@ body:not(.stu) .rbd.warn{background:#fbbf24;color:#3a2a00}
 DC.splice(0, DC.length, '#f59e0b', '#2563eb', '#16a34a', '#7c3aed', '#e11d48');
 
 /* ---------- top bar: date pill ---------- */
-const _topInitBase=topInit;
-topInit=function(){
-  _topInitBase();
-  const tr=document.querySelector('.top .tr');
-  if(tr&&!$('tdate')){
-    const d=document.createElement('span');
-    d.id='tdate';d.className='tdate';
-    d.innerHTML=I.cal+new Date().toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});
-    tr.insertBefore(d,tr.firstChild);
-  }
-  if(tr&&!tr.querySelector('.theme-switch'))tr.insertBefore(thMake(),tr.firstChild);
-  const dd=$('dd');
-  if(dd&&!dd.querySelector('[data-act=thtoggle]')){
-    const l=dd.querySelector('.ddl');
-    if(l)l.insertAdjacentHTML('beforebegin','<button role="menuitem" data-act="thtoggle">'+I.star+'<span id="thl"></span></button>')
-  }
-  MRH_THEME.sync();thLabel()
-};
-
 /* ---------- KPI helpers ---------- */
 /** One gradient KPI card. o = {cl, l, ic, v, d, a, id, bar}. bar (0-100) draws a share bar; otherwise a sparkline slot is reserved. */
 const gkCard = o => `<div class="gk ${o.cl}"${o.a ? ` data-act="dflt" data-v="${o.a}"` : ''}${o.id ? ` id="${o.id}"` : ''}>
@@ -4141,20 +4135,13 @@ function gkDemoDraw(D) {
     ${chartHTML({ type: 'donut', center: 'Applicants', items: items(D.sex, SC) })}</div>
     <div class="card"><div class="ch"><h3>Per School</h3><span style="color:var(--mut);font-size:13px">Top 5, all levels</span></div>
     ${sc.length ? chartHTML({ type: 'donut', center: 'Learners', items: sc }) : '<div class="aemp">No previous school recorded yet.</div>'}</div></div>`;
-}
 
-/* after the shared panels draw: swap in the table and load the demographic charts */
-const _dxDrawBase=dxDraw;
-dxDraw=function(X,H){
-  _dxDrawBase(X,H);
   if(X)gkAttention();
   gkDemoLoad();
   const rec=$('dxrec');if(!rec||$('maov'))return;
   rec.insertAdjacentHTML('beforebegin','<div id="maov"></div>');
   if(S.dsh&&S.dsh.stats)maDraw(S.dsh.stats);
-  else google.script.run.withSuccessHandler(r=>{if(r&&r.success){S.dsh=r.data;maDraw(r.data.stats)}}).withFailureHandler(()=>{}).dashboard(S.token)
-};
-
+  else google.script.run.withSuccessHandler(r=>{if(r&&r.success){S.dsh=r.data;maDraw(r.data.stats)}}).withFailureHandler(()=>{}).dashboard(S.token)}
 /* ---------- the admin Home page (REPLACES homeAdmin) ---------- */
 homeAdmin = function () {
   head('Dashboard', 'Enrollment overview for School Year ' + S.cfg.sy.replace('-', '\u2013'));
