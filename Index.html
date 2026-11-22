@@ -2513,11 +2513,11 @@ function pgsCard(){
   <div class="f"><label for="pgSel">Page</label><select id="pgSel">${groups}</select></div>
   <div class="f"><label for="pgTxt">Content</label><textarea id="pgTxt" rows="14" maxlength="6000" placeholder="Write this page here.&#10;&#10;## A heading&#10;A paragraph with **bold**, *italic* and [a link](https://example.com).&#10;- a bullet&#10;&#10;![Photo caption](https://example.com/photo.jpg)">${esc(txt)}</textarea></div>
   <p style="color:var(--mut);font-size:13px;margin-top:6px">Start a line with <b>##</b> for a heading, <b>-</b> for a bullet and <b>![alt](https://…)</b> or a Media Library reference for a photo. Blank lines separate paragraphs.</p>
-  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="pgsave">Save pages</button><button class="btn alt" data-act="pgreload">Discard changes</button><button class="btn red" data-act="pgreset">Reset all pages</button></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="pgsave">Save page drafts</button><button class="btn alt" data-act="pgreload">Discard changes</button><button class="btn red" data-act="pgreset">Discard page drafts</button></div>
   ${g.meta&&g.meta.updatedAt?`<p style="color:var(--mut);font-size:13px;margin-bottom:0">Last saved ${esc(new Date(g.meta.updatedAt).toLocaleString())} by ${esc(g.meta.updatedBy||'—')}.</p>`:''}</div>`;
 }
 function websitePage(){
- head('Website Management','Edit the public homepage and its inner pages. Saved changes go live immediately.');
+ head('Website Management','Edit drafts, review the published version, then publish when ready.');
  call('getSiteAdmin',[T()],r=>{
   S.site=r.data.sections;S.siteMeta=r.data;
   call('getPagesAdmin',[T()],p=>{
@@ -2598,9 +2598,7 @@ function wsRender(){
     pages:S.pg&&S.pg.text?Object.values(S.pg.text).filter(x=>String(x||'').trim()).length:0
   };
   const stamp=m.updatedAt?new Date(m.updatedAt).toLocaleString():'Not published yet';
-  const status=m.saved
-    ? '<span class="chip ok">Published</span>'
-    : '<span class="chip warn">Using built-in defaults</span>';
+  const status=(m.draftSaved?'<span class="chip warn">Draft changes</span>':'')+(m.saved?'<span class="chip ok">Published</span>':'<span class="chip warn">Using built-in defaults</span>');
   const home=m.home||'';
   const shell=document.createElement('div');
   shell.className='card';
@@ -2615,7 +2613,7 @@ function wsRender(){
       '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
         status+
         (home?'<button class="btn alt" data-act="wsview">Open website</button>':'')+
-        '<button class="btn" data-act="wssave">Save &amp; publish</button>'+
+        '<button class="btn alt" data-act="wssave">Save draft</button>'+ '<button class="btn" data-act="wspublish">Publish website</button>'+ 
       '</div>'+
     '</div>'+
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin-top:18px">'+
@@ -2629,8 +2627,8 @@ function wsRender(){
         '<button class="btn alt" style="font-size:12px;padding:7px 11px" data-act="wsjump" data-v="'+esc(x[1])+'">'+esc(x[0])+'</button>').join('')+
     '</div>'+
     '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut)">'+
-      '<span>Last published: <b style="color:var(--txt)">'+esc(stamp)+'</b>'+(m.updatedBy?' · '+esc(m.updatedBy):'')+'</span>'+
-      '<span>Changes are published immediately when saved.</span>'+
+      '<span>Last published: <b style="color:var(--txt)">'+esc(m.publishedAt?new Date(m.publishedAt).toLocaleString():stamp)+'</b>'+(m.publishedBy?' · '+esc(m.publishedBy):'')+'</span>'+ 
+      '<span>Saving creates a private draft. Only Publish website changes the public site.</span>'+ 
     '</div>';
   v.insertBefore(shell,v.firstChild);
   wsMediaLoad();
@@ -2710,15 +2708,16 @@ act.wsadd=k=>{const L=WS_LISTS[k];if(!L)return;const a=wspGet(S.site,L.p);if(!Ar
 act.wsdel=v=>{const p=String(v).split(':'),L=WS_LISTS[p[0]];if(!L)return;const a=wspGet(S.site,L.p);if(!Array.isArray(a))return;a.splice(+p[1],1);wsRender()};
 act.wsmove=v=>{const p=String(v).split(':'),k=p[0],i=+p[1],step=+p[2],a=k==='order'?S.site.display.order:wspGet(S.site,WS_LISTS[k].p);if(!Array.isArray(a))return;const j=i+step;if(j<0||j>=a.length)return;const t=a[i];a[i]=a[j];a[j]=t;wsRender()};
 act.wstoggle=k=>{const dp=S.site.display,h=dp.hidden||(dp.hidden=[]),i=h.indexOf(k);if(i<0)h.push(k);else h.splice(i,1);wsRender()};
-act.wssave=()=>call('saveSiteAdmin',[T(),S.site],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()});
+act.wssave=()=>call('saveSiteAdmin',[T(),S.site],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);websitePage()});
+act.wspublish=()=>{if(!confirm('Publish the saved homepage and inner-page drafts to the public website?'))return;call('publishWebsiteAdmin',[T()],r=>{toast(r.message);websitePage()})};
 act.wsreload=()=>{if(confirm('Discard unsaved changes?'))websitePage()};
 act.wsview=()=>{if(S.siteMeta&&S.siteMeta.home)window.open(S.siteMeta.home,'_blank','noopener')};
 act.wsbulletin=()=>{try{document.querySelector('[data-act="nav"][data-v="ev"]')?.click()}catch(_){} };
 act.wsabout=()=>{try{document.querySelector('[data-act="nav"][data-v="cp"]')?.click()}catch(_){} };
-act.wsreset=()=>{if(!confirm('Return the homepage to its built-in content? The saved copy is removed and the built-in text is shown again.'))return;call('resetSiteAdmin',[T()],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()})};
-act.pgsave=()=>{if(!S.pg)return;call('savePagesAdmin',[T(),S.pg.text],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
+act.wsreset=()=>{if(!confirm('Discard the homepage draft and reload the latest published version? The public website will not change.'))return;call('resetSiteAdmin',[T()],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()})};
+act.pgsave=()=>{if(!S.pg)return;call('savePagesAdmin',[T(),S.pg.text],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);websitePage()})};
 act.pgreload=()=>{if(confirm('Discard unsaved page changes?'))websitePage()};
-act.pgreset=()=>{if(!S.pg)return;if(!confirm('Remove the saved copy of every inner page? They go back to their built-in text.'))return;call('resetPagesAdmin',[T()],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
+act.pgreset=()=>{if(!S.pg)return;if(!confirm('Discard all inner-page drafts and reload the latest published pages?'))return;call('resetPagesAdmin',[T()],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
 
 /* ===== Scoop-style sidebar: replaces navBtn, renderNav and act.ngtoggle ===== */
 // Optional badges. Key = menu id or group name. c = r (red) | y (yellow) | g (green)
