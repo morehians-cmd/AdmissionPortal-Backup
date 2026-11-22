@@ -2620,22 +2620,33 @@ act.wsjump=label=>{
   const hit=cards.find(card=>String(card.querySelector('h3')&&card.querySelector('h3').textContent||'').trim()===String(label).trim());
   if(hit){hit.scrollIntoView({behavior:'smooth',block:'start'});const h=hit.querySelector('h3');if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}}
 };
+<style>.wsmfilters{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:8px;margin:10px 0}.wsmfilters input,.wsmfilters select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface,#fff);color:var(--txt)}.wsmgrid{display:grid;gap:8px}.wsmrow{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface,#fff)}.wsmthumb{width:64px;height:52px;border-radius:8px;background-position:center;background-size:cover;background-repeat:no-repeat;flex:none}.wsmdata{min-width:0;flex:1}.wsmdata b,.wsmdata span,.wsmdata small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wsmdata span{font-size:12px;color:var(--mut);margin-top:2px}.wsmdata small{font-size:11.5px;color:var(--mut);margin-top:4px}.wsmact{flex:none}.wsmtop{display:flex;justify-content:space-between;align-items:center;gap:12px}.wsmtop span{display:block;color:var(--mut);font-size:12px;margin-top:3px}@media(max-width:620px){.wsmfilters{grid-template-columns:1fr}.wsmrow{align-items:flex-start}.wsmact .btn{padding:7px 9px}.wsmthumb{width:54px;height:48px}}</style>
 function wsMediaLoad(){
  const el=$('wsMediaBody'); if(!el)return;
  call('getMediaLibraryAdmin',[T()],r=>{
-  const d=r.data||{}, hero=Array.isArray(d.hero)?d.hero:[], gal=Array.isArray(d.gallery)?d.gallery:[];
-  const cards=hero.concat(gal).map(x=>'<div style="display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;background:#fff">'+
-    '<div style="width:58px;height:46px;border-radius:8px;background:var(--soft) center/cover no-repeat;flex:none;'+(x.url?'background-image:url('+esc(x.url)+')':'')+'"></div>'+
-    '<div style="min-width:0;flex:1"><b style="display:block;color:var(--navy);font-size:13px">'+esc(x.title||x.caption||'Untitled media')+'</b><span style="font-size:12px;color:var(--mut)">'+esc(x.source||'Website media')+(x.page?' · '+esc(x.page):'')+'</span></div></div>').join('');
-  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-bottom:10px">'+
-    '<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)"><small style="color:var(--mut)">Total assets</small><b style="display:block;font-size:22px;color:var(--navy)">'+esc(String(d.total||0))+'</b></div>'+
-    '<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)"><small style="color:var(--mut)">Hero images</small><b style="display:block;font-size:22px;color:var(--navy)">'+esc(String(hero.length))+'</b></div>'+
-    '<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)"><small style="color:var(--mut)">Gallery photos</small><b style="display:block;font-size:22px;color:var(--navy)">'+esc(String(gal.length))+'</b></div></div>'+
-    (cards||'<p style="color:var(--mut);margin-bottom:0">No website media has been registered yet.</p>')+
-    '<p style="font-size:12px;color:var(--mut);margin:10px 0 0">'+esc(d.note||'')+'</p>';
- },m=>{el.innerHTML='<p style="color:#b3261e;margin-bottom:0">'+esc(m||'Could not load media inventory.')+'</p>';});
+  const d=r.data||{},items=Array.isArray(d.items)?d.items:[],state={q:'',source:'All'};
+  const sources=['All',...Array.from(new Set(items.map(x=>x.source).filter(Boolean)))];
+  const render=()=>{
+   const q=state.q.toLowerCase(),vis=items.filter(x=>(state.source==='All'||x.source===state.source)&&(!q||[x.title,x.caption,x.alt,x.source,x.page].join(' ').toLowerCase().includes(q)));
+   const opts=sources.map(s=>'<option '+(s===state.source?'selected':'')+'>'+esc(s)+'</option>').join('');
+   const rows=vis.map(x=>{
+    const thumb=x.url?"background-image:url('"+esc(x.url)+"')":'background:var(--soft)';
+    return '<div class="wsmrow" data-mid="'+esc(x.id)+'"><div class="wsmthumb" style="'+thumb+'"></div><div class="wsmdata"><b>'+esc(x.title||'Untitled media')+'</b><span>'+esc(x.source||'Website media')+(x.page?' · '+esc(x.page):'')+'</span><small>'+esc(x.alt||'No alt text set')+'</small></div><div class="wsmact"><button class="btn alt" data-act="wsmedit" data-v="'+esc(x.id)+'">Edit</button></div></div>';
+   }).join('');
+   el.innerHTML='<div class="wsmtop"><div><b>Website Media</b><span>'+vis.length+' of '+items.length+' assets</span></div><button class="btn" data-act="wsmediaadd">+ Add photo</button></div><div class="wsmfilters"><input id="wsmq" placeholder="Search media…" value="'+esc(state.q)+'"><select id="wsms">'+opts+'</select></div><div class="wsmgrid">'+(rows||'<div class="aemp">No media matches your filter.</div>')+'</div><p style="font-size:12px;color:var(--mut);margin:10px 0 0">Media stays in the existing Gallery/Drive storage. Metadata is managed centrally here.</p>';
+   const qel=$('wsmq'),sel=$('wsms');if(qel){qel.oninput=()=>{state.q=qel.value;render()};qel.onkeydown=e=>{if(e.key==='Escape'){state.q='';render()}}}if(sel)sel.onchange=()=>{state.source=sel.value;render()};
+  };render();window.__WS_MEDIA__={items,render};
+ },m=>{el.innerHTML='<p style="color:#b3261e;margin-bottom:0">'+esc(m||'Could not load media library.')+'</p>';});
 }
-
+function wsMediaFind(id){const s=window.__WS_MEDIA__;return s&&s.items.find(x=>x.id===id)}
+act.wsmedit=id=>{
+ const x=wsMediaFind(id);if(!x)return;const m=document.createElement('div');m.className='mod';m.id='wsmm';m.dataset.id=id;
+ m.innerHTML='<div style="max-width:560px;width:100%"><div class="bd"><h3 style="color:var(--navy);margin-bottom:6px">Edit media</h3><p style="color:var(--mut);font-size:13px;margin-top:0">'+esc(x.source||'Website media')+(x.page?' · '+esc(x.page):'')+'</p><div class="f"><label>Title</label><input id="wsmmt" value="'+esc(x.title||'')+'" style="text-transform:none"></div><div class="f"><label>Alt text</label><input id="wsmma" value="'+esc(x.alt||'')+'" style="text-transform:none"></div><div class="f"><label>Caption</label><textarea id="wsmmc" rows="3" style="text-transform:none">'+esc(x.caption||'')+'</textarea></div></div><div class="ft"><button class="btn alt" data-act="wsmmx">Cancel</button><button class="btn" data-act="wsmmgo">Save details</button></div></div>';
+ document.body.appendChild(m);$('wsmmt').focus();
+}
+act.wsmmx=()=>{const m=$('wsmm');if(m)m.remove()};
+act.wsmmgo=()=>{const m=$('wsmm'),x=wsMediaFind(m&&m.dataset.id||'');if(!m||!x)return;call('saveMediaMetaAdmin',[T(),x.id,{title:$('wsmmt').value,alt:$('wsmma').value,caption:$('wsmmc').value}],r=>{m.remove();toast(r.message);wsMediaLoad()})};
+act.wsmediaadd=()=>{const f=document.createElement('input');f.type='file';f.accept='image/jpeg,image/png,image/webp';f.onchange=()=>{const file=f.files&&f.files[0];if(!file)return;const im=new Image();im.onerror=()=>toast('That file could not be read as an image.',false);im.onload=()=>{const k=Math.min(1,1000/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);const cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0,cv.width,cv.height);const url=cv.toDataURL('image/jpeg',.8);if(url.length>2100000)return toast('Photo is still too large after resizing. Try a smaller image.',false);const title=prompt('Media title:','Moreh Academy Facilities Photo');if(title===null)return;const alt=prompt('Alt text:',title);if(alt===null)return;const cap=prompt('Caption (optional):','');if(cap===null)return;call('addMediaLibraryPhoto',[T(),url,title,cap,alt],r=>{toast(r.message);wsMediaLoad()})};im.src=URL.createObjectURL(file)};f.click()};
 function wsBind(){const v=$('view');v.querySelectorAll('[data-sp]').forEach(el=>{const h=()=>{wspSet(S.site,el.dataset.sp,el.type==='checkbox'?el.checked:el.value)};el.oninput=h;el.onchange=h});
  const sel=$('pgSel'),ta=$('pgTxt');
  if(sel&&S.pg)sel.onchange=()=>{S.pg.route=sel.value;wsRender()};
