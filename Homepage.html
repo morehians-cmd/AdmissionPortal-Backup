@@ -369,7 +369,7 @@ function resolveHeroMedia(done){
   var m=String(u||'').match(/^gallery:([^:]+):(.+)$/);
   if(!m)return;
   pending++;
-  call('getGalleryPhoto',[m[1],m[2],m[3]],function(r){
+  call('getPublicGalleryPhoto',[m[1],m[2]],function(r){
    if(r&&r.success&&r.data)HOME.hero.slides[i]=r.data;
    else HOME.hero.slides[i]='';
    if(--pending===0)finish();
