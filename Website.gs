@@ -182,6 +182,22 @@ const SITE_SEED_ = {
 
 /* ---------- storage ---------- */
 const SITE_DRAFT_KEY_ = 'site_draft_data', PAGES_DRAFT_KEY_ = 'pages_draft_data';
+const SITE_PREVIOUS_KEY_ = 'site_previous_publish', PAGES_PREVIOUS_KEY_ = 'pages_previous_publish', WEBSITE_PUBLISH_META_KEY_ = 'website_previous_publish_meta';
+function websiteRaw_(key) {
+  const b=blockRow_(key);
+  return b.row ? String(b.sh.getRange(b.row,2).getValue()||'') : '';
+}
+function websitePutRaw_(key, raw) {
+  const b=blockRow_(key);
+  put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[key,String(raw||'')]]);
+}
+function websiteSnapshot_(liveKey, backupKey) {
+  const b=blockRow_(liveKey), raw=b.row?String(b.sh.getRange(b.row,2).getValue()||''):'';
+  websitePutRaw_(backupKey,JSON.stringify({exists:!!raw,raw:raw}));
+}
+function websiteRollbackMeta_() {
+  try { const x=JSON.parse(websiteRaw_(WEBSITE_PUBLISH_META_KEY_)||'{}'); return x&&typeof x==='object'?x:{}; } catch(_) { return {}; }
+}
 function siteRow_() { return blockRow_(SITE_KEY); }
 function siteDraftRow_() { return blockRow_(SITE_DRAFT_KEY_); }
 function pagesDraftRow_() { return blockRow_(PAGES_DRAFT_KEY_); }
@@ -432,7 +448,7 @@ function getSiteAdmin(token) {
     const published = siteRead_(), draft = websiteDraftRead_(SITE_DRAFT_KEY_, 'site'), current = draft || published;
     return ok({ home:ScriptApp.getService().getUrl(), saved:!!published, draftSaved:!!draft,
       updatedAt:current?current.updatedAt:'', updatedBy:current?current.updatedBy:'',
-      publishedAt:published?published.updatedAt:'', publishedBy:published?published.updatedBy:'',
+      publishedAt:published?published.updatedAt:'', publishedBy:published?published.updatedBy:'', rollbackAvailable:!!(websiteRollbackMeta_().site||websiteRollbackMeta_().pages),
       sections:current?current.sections:siteClean_(SITE_SEED_) });
   } catch (e) { return fail(e); }
 }
@@ -460,7 +476,7 @@ function getPagesAdmin(token) {
     PAGES_ROUTES_.forEach(r => { pages[r] = pagesText_(saved[r]); });
     const sd = websiteDraftRead_(SITE_DRAFT_KEY_, 'site') || siteRead_(), nv = sd && sd.sections && sd.sections.nav && sd.sections.nav.menus;
     return ok({ saved:!!published, draftSaved:!!draft, updatedAt:d?d.updatedAt:'', updatedBy:d?d.updatedBy:'',
-      publishedAt:published?published.updatedAt:'', publishedBy:published?published.updatedBy:'', pages:pages,
+      publishedAt:published?published.updatedAt:'', publishedBy:published?published.updatedBy:'', rollbackAvailable:!!(websiteRollbackMeta_().site||websiteRollbackMeta_().pages), pages:pages,
       catalogue:PAGE_MENU_.map((g,gi)=>{ const m=nv&&nv[gi]; return {
         id:g.id,label:(m&&m.label)||g.label,noRoot:!!g.noRoot,
         subs:g.subs.map((s,si)=>({r:pageRoute_(g,s),label:((m&&m.subs&&m.subs[si])||{}).label||s[1]}))
@@ -497,11 +513,35 @@ function publishWebsiteAdmin(token) {
     const pagesJson=pd?JSON.stringify({updatedAt:now,updatedBy:ou.Username,pages:pd.pages}):'';
     if(siteJson&&siteJson.length>SITE_MAX)throw new Error('The homepage content is too long to publish.');
     if(pagesJson&&pagesJson.length>PAGES_MAX)throw new Error('The inner-page content is too long to publish.');
-    if(sd){const b=siteRow_();put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[SITE_KEY,siteJson]]);}
-    if(pd){const b=pagesRow_();put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[PAGES_KEY,pagesJson]]);}
+    if(sd){websiteSnapshot_(SITE_KEY,SITE_PREVIOUS_KEY_);const b=siteRow_();put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[SITE_KEY,siteJson]]);}
+    if(pd){websiteSnapshot_(PAGES_KEY,PAGES_PREVIOUS_KEY_);const b=pagesRow_();put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[PAGES_KEY,pagesJson]]);}
+    websitePutRaw_(WEBSITE_PUBLISH_META_KEY_,JSON.stringify({site:!!sd,pages:!!pd,publishedAt:now,publishedBy:ou.Username}));
     CacheService.getScriptCache().removeAll([SITE_CACHE_KEY,PAGES_CACHE_KEY]);
     audit_(ou,'website.publish','homepage+pages','');
     return ok({publishedAt:now,publishedBy:ou.Username,homepage:!!sd,pages:!!pd},'Website drafts published. Visitors will now see the updated content.');
+  } catch(e) { return fail(e); } finally { try { lock.releaseLock(); } catch(_) {} }
+}
+
+/** OWNER ONLY. Restores the content immediately preceding the most recent publish operation. */
+function rollbackWebsiteAdmin(token) {
+  const lock=LockService.getScriptLock();
+  try {
+    lock.waitLock(20000);
+    const ou=owner_(token), meta=websiteRollbackMeta_();
+    if(!meta.site&&!meta.pages)throw new Error('There is no previous website version available to restore.');
+    const restore=(backupKey,liveKey)=>{
+      let snap={}; try{snap=JSON.parse(websiteRaw_(backupKey)||'{}')}catch(_){}
+      if(!snap||typeof snap.exists!=='boolean')throw new Error('The previous website snapshot is invalid.');
+      const b=blockRow_(liveKey);
+      if(snap.exists)put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[liveKey,String(snap.raw||'')]]);
+      else if(b.row)put_(b.sh,b.row,2,[['']]);
+    };
+    if(meta.site)restore(SITE_PREVIOUS_KEY_,SITE_KEY);
+    if(meta.pages)restore(PAGES_PREVIOUS_KEY_,PAGES_KEY);
+    websitePutRaw_(WEBSITE_PUBLISH_META_KEY_,JSON.stringify({site:false,pages:false,rolledBackAt:new Date().toISOString(),rolledBackBy:ou.Username}));
+    CacheService.getScriptCache().removeAll([SITE_CACHE_KEY,PAGES_CACHE_KEY]);
+    audit_(ou,'website.rollback','homepage+pages','');
+    return ok({rolledBack:true,site:!!meta.site,pages:!!meta.pages},'The previous published website version has been restored.');
   } catch(e) { return fail(e); } finally { try { lock.releaseLock(); } catch(_) {} }
 }
 
