@@ -10,9 +10,57 @@ const LETTERHEAD_URL = '';
 const SCHOOL = 'MOREH ACADEMY', HEAD_NAME = 'JOSE JAY I. CABARDO', HEAD_TITLE = 'Head, Admissions Office', FEE = 1000;
 // Scholarship benefits printed on the confirmation slip, by Category. Edit freely.
 const B7 = ['100% Free Tuition Fee','100% Free Miscellaneous Fee','Free 1 Set of School Uniform','Free 1 Physical Education Shirt','Free School ID','Free Teambuilding','Free Swimming Lessons'];
-const SCHOLARSHIP = { 'PUB-QVR':B7.concat(['1,000.00 Academic Incentive (G11)']), 'REGULAR':['Full-fee paying student'], 'TLC':B7.concat(['2,000.00 Annual Allowance from LGU']),
+const SCHOLARSHIP = { 'VP-QVR':B7.concat(['1,000.00 Academic Incentive (G11)']), 'REGULAR':['Full-fee paying student'], 'TLC SCHOLAR':B7.concat(['2,000.00 Annual Allowance from LGU']),
   'TLC-OVAP':['Additional Free 1 Set of School Uniform','1,000.00 Academic Incentive (G11)'], 'ESC-JHS':['100% Free Tuition Fee','Miscellaneous Fee - JHS 9,750.00'], 'ESC-SHS':['100% Free Tuition Fee','Miscellaneous Fee - SHS 5,125.00'],
-  'QVA PASSER':['100% Free Tuition Fee','Miscellaneous Fee - SHS 5,125.00'], 'IS':B7 };
+  'VP-QVA':['100% Free Tuition Fee','Miscellaneous Fee - SHS 5,125.00'], 'IS':B7 };
+/* ---------- Standard Category list (one list for the whole portal) ----------
+   VP-QVR = PUB-QVR (voucher, public school completer).  VP-QVA = QVA Passer.
+   TLC-OVAP and TLC-ESC are NOT categories: they are the SECONDARY category of a TLC SCHOLAR (field SecondaryCategory). */
+const CAT_LIST = ['REGULAR','TLC SCHOLAR','ESC GRANTEE','VP-QVR','VP-QVA','IS'];
+const SEC_CAT_LIST = ['TLC-OVAP','TLC-ESC','Not Applicable'];
+const CAT_TLC = 'TLC SCHOLAR', CAT_ESC = 'ESC GRANTEE';
+// Old spellings still found in the sheet / old history. They are converted on read (catFix_) and by migrateCategories().
+const CAT_LEGACY = { 'PUB-QVR':'VP-QVR', 'PUB QVR':'VP-QVR', 'QVA PASSER':'VP-QVA', 'QVA':'VP-QVA', 'TLC':'TLC SCHOLAR', 'TLC-OVAP':'TLC SCHOLAR', 'TLC-ESC':'TLC SCHOLAR', 'ESC':'ESC GRANTEE', 'ESC JHS':'ESC GRANTEE', 'ESC SHS':'ESC GRANTEE' };
+const catNorm_ = v => { const t = String(v == null ? '' : v).trim().toUpperCase(); return CAT_LEGACY[t] || (CAT_LIST.indexOf(t) >= 0 ? t : String(v == null ? '' : v).trim()); };
+/** Converts an old Category / PrevScholarship to the standard names (in place). TLC-OVAP / TLC-ESC become TLC SCHOLAR + SecondaryCategory; a plain TLC becomes "Not Applicable". Returns o. */
+function catFix_(o) {
+  const raw = String(o.Category || '').trim().toUpperCase();
+  if (raw && CAT_LEGACY[raw]) {
+    o.Category = CAT_LEGACY[raw];
+    if (o.Category === CAT_TLC && !o.SecondaryCategory) o.SecondaryCategory = raw === 'TLC-OVAP' ? 'TLC-OVAP' : raw === 'TLC-ESC' ? 'TLC-ESC' : 'Not Applicable';
+  }
+  if (o.PrevScholarship) o.PrevScholarship = catNorm_(o.PrevScholarship);
+  return o;
+}
+/** OWNER ONLY. Run ONCE from the script editor after deploying the standard Category list.
+ *  Rewrites the saved Category / Secondary Category / Scholarship-in-previous-school columns of the Students sheet and the Category
+ *  column of the Enrollment History sheet to the standard names. Nothing else is touched. The portal also converts old values on the fly,
+ *  so it keeps working before this is run; this only makes the sheet itself match. Safe to run again. */
+function migrateCategories() {
+  ownerOnly_();
+  const sh = sh_('S'), n = sh.getLastRow() - 1; let changed = 0, hist = 0;
+  if (n >= 1) {
+    const cc = COLS.indexOf('Category') + 1, sc = COLS.indexOf('SecondaryCategory') + 1, pc = COLS.indexOf('PrevScholarship') + 1;
+    const cat = sh.getRange(2, cc, n, 1).getValues(), sec = sh.getRange(2, sc, n, 1).getValues(), prv = sh.getRange(2, pc, n, 1).getValues();
+    for (let i = 0; i < n; i++) {
+      const o = { Category:String(cat[i][0] || ''), SecondaryCategory:String(sec[i][0] || ''), PrevScholarship:String(prv[i][0] || '') }, before = JSON.stringify(o);
+      catFix_(o);
+      if (o.Category !== CAT_TLC) o.SecondaryCategory = '';
+      if (JSON.stringify(o) !== before) changed++;
+      cat[i][0] = o.Category; sec[i][0] = o.SecondaryCategory; prv[i][0] = o.PrevScholarship;
+    }
+    put_(sh, 2, cc, cat); put_(sh, 2, sc, sec); put_(sh, 2, pc, prv);
+  }
+  const hs = histSh_(), hn = hs.getLastRow() - 1;
+  if (hn >= 1) {
+    const hv = hs.getRange(2, 4, hn, 1).getValues();
+    hv.forEach(r => { const v = catNorm_(r[0]); if (v !== String(r[0])) { r[0] = v; hist++; } });
+    put_(hs, 2, 4, hv);
+  }
+  stBump_();
+  Logger.log('Categories standardized. Students changed: ' + changed + '. History rows changed: ' + hist + '.');
+  return { success:true, message:'Categories standardized. Students changed: ' + changed + '. History rows changed: ' + hist + '.' };
+}
 const GRADES = ['Nursery','Kinder 1','Kinder 2','Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7','Grade 8','Grade 9','Grade 10','Grade 11','Grade 12'];
 const CL = { STEM:'Science, Technology, Engineering, and Mathematics', ASSH:'Arts, Social Sciences, and Humanities', BE:'Business and Entrepreneurship', ICT:'ICT Support and Computer Programming Technologies', HT:'Hospitality and Tourism' };
 const w = s => s.split(' ');
@@ -36,7 +84,7 @@ const EDU = ['','Elementary Level','High School Level','High School Graduate','C
 const O3 = x => [x+' Original', x+' Photocopy', x+' O|P'];
 const LIVING = ['Both Father and Mother','Father only','Mother only','Relatives / Legal Guardian','Independent / Boarding / Living alone'];
 const CIVIL = ['','Single','Married','Widowed','Separated','Divorced','Annulled','Live-in'];
-const CERT_CATS = ['PUB-QVR','ESC','QVA PASSER'];
+const CERT_CATS = ['VP-QVR','ESC GRANTEE','VP-QVA'];
 const REASONS = ['','Transferring to a private / public school','Relocation / Moving family residence','Financial constraints / Difficulty in tuition payment','Health / Medical reasons','Migrating abroad','Online / Distance learning compatibility issues','Distance / Transportation difficulties','Academic adjustment / Program fit','Personal / Family reasons','Other'];
 // [section, key, label, type(sel|date|auto|tel|lrn|sec|chk|txt|rad|src), options]
 const SY_LIST = [''], PSY_LIST = [''];
@@ -46,13 +94,13 @@ add('academic','Classification','Classification','sel',['','New','Old']);
 add('academic','SchoolYear','School Year','sel',SY_LIST);
 add('academic','LRN','Learner Reference Number (LRN)','lrn');
 add('academic','Surname','Surname'); add('academic','FirstName','First Name'); add('academic','MiddleName','Middle Name'); add('academic','Suffix','Suffix (JR., III, etc.)'); add('hidden','FullName','Full Name','auto');
-add('academic','Category','Category','sel',['','PUB-QVR','TLC','REGULAR','ESC','TLC-OVAP','QVA PASSER','IS']);
+add('academic','Category','Category','sel',[''].concat(CAT_LIST));
 add('academic','GradeLevel','Grade Level','sel',[''].concat(GRADES));
 add('academic','Department','Department','sel',['','Preschool','Elementary','Junior High School','Senior High School']);
 add('academic','Cluster','Cluster (Senior High only)','sel',[''].concat(Object.values(CL)));
 add('academic','Section','Section','sec');
 add('academic','ReferredBy','Referred By');
-add('prev','PrevSchool','School Name'); add('prev','PrevSY','School Year','sel',PSY_LIST); add('prev','PrevGrade','Grade Level','sel',[''].concat(GRADES)); add('prev','PrevCluster','Cluster (editable for Grade 11 or 12)','sel',[''].concat(Object.values(CL))); add('prev','PrevSection','Section'); add('prev','PrevAdviser','Adviser'); add('prev','PrevScholarship','Scholarship, if any','sel',['','PUB-QVR','TLC','ESC JHS','ESC SHS','QVA PASSER']); add('hidden','EscCertNo','ESC Certificate Number (legacy)'); add('hidden','VoucherCertNo','Voucher Certificate Number (legacy)'); add('hidden','EscSchoolNo','School ESC Number (legacy)');
+add('prev','PrevSchool','School Name'); add('prev','PrevSY','School Year','sel',PSY_LIST); add('prev','PrevGrade','Grade Level','sel',[''].concat(GRADES)); add('prev','PrevCluster','Cluster (editable for Grade 11 or 12)','sel',[''].concat(Object.values(CL))); add('prev','PrevSection','Section'); add('prev','PrevAdviser','Adviser'); add('prev','PrevScholarship','Scholarship, if any','sel',['','TLC SCHOLAR','ESC GRANTEE','VP-QVR','VP-QVA']); add('hidden','EscCertNo','ESC Certificate Number (legacy)'); add('hidden','VoucherCertNo','Voucher Certificate Number (legacy)'); add('hidden','EscSchoolNo','School ESC Number (legacy)');
 add('personal','AddressLine1','Address Line 1 (House/Unit #, Building Name, Street Name)'); add('personal','AddressLine2','Address Line 2 (Subdivision, Village, or Phase)'); add('personal','Barangay','Barangay'); add('personal','City','City'); add('hidden','Province','Province (legacy)');
 add('personal','Birthdate','Birth Date','date'); add('personal','Age','Age (auto)','auto');
 add('personal','Mobile','Contact Number (11 digits)','tel');
@@ -116,6 +164,8 @@ add('req','ReqEnrollFormDate','Signed Online Enrollment Form \u2013 Date Submitt
 // ---- IDENTIFIERS (Identifiers.gs): appended LAST so existing sheet columns never shift ----
 add('hidden','AppRef','Application / Enrollment Reference','auto');
 add('hidden','PermanentID','Permanent Student ID','auto');
+// ---- STANDARD CATEGORY: secondary category of a TLC SCHOLAR (appended LAST so existing sheet columns never shift) ----
+add('academic','SecondaryCategory','Secondary Category (TLC Scholar)','sel',[''].concat(SEC_CAT_LIST));
 
 const COLS = ['StudentID','CreatedAt'].concat(FIELDS.map(f => f[1]));
 /* ---------- Requirements by level ---------- */
@@ -131,7 +181,7 @@ const REQ_RULES = {
   JHS:  { req:REQ_STD, opt:['ReqTransferee'] },                               // Grade 7 - 10
   SHS:  { req:REQ_STD, opt:['ReqTransferee'] }                                // Grade 11 - 12
 };
-const REQ_TF_CATS = ['TLC','ESC','PUB-QVR','QVA PASSER']; // categories that may need a transfer / voucher certificate
+const REQ_TF_CATS = ['TLC SCHOLAR','ESC GRANTEE','VP-QVR','VP-QVA']; // categories that may need a transfer / voucher certificate
 const H_COM = { ReqBirth:'PSA Birth Certificate (photocopy)', ReqPhoto:'Three (3) 2"x2" photos, white background, with nametag', ReqEnvelope:'Long brown expandable envelope, clean and free of writings/markings', ReqConsent:'Original, signed by parent / legal guardian' };
 const H_STD = Object.assign({ ReqSF9:'Original official report card', ReqF137:'Original Form 137 / Permanent Record', ReqMoral:'Original certificate' }, H_COM);
 const REQ_HINTS = {
@@ -139,7 +189,7 @@ const REQ_HINTS = {
   ELEM: H_STD,
   JHS:  Object.assign({}, H_STD, { ReqF137:'Original Form 137 / SF10', ReqTransferee:'TLC Transfer Form (TLC scholars only) or ESC Certification (ESC grantees only)' }),
   SHS:  Object.assign({}, H_COM, { ReqSF9:'Photocopy (grades up to 3rd grading) for evaluation; original upon admission', ReqBirth:'Photocopy for evaluation; original upon admission',
-          ReqMoral:'Original, upon admission', ReqF137:'Original Form 137 / SF10, upon admission', ReqTransferee:'ESC Certificate, TLC Transfer Form, or Voucher Certificate (SHSVP / PUB-QVR / QVA)' })
+          ReqMoral:'Original, upon admission', ReqF137:'Original Form 137 / SF10, upon admission', ReqTransferee:'ESC Certificate, TLC Transfer Form, or Voucher Certificate (SHSVP / VP-QVR / VP-QVA)' })
 };
 // lv = levels, g = optional list of grades. {Y} = first year of the active school year.
 const REQ_NOTES = [
@@ -164,7 +214,7 @@ function reqPlan_(r) {
   return { initial:['ReqEnrollForm'].concat(ru.req.filter(k => REQ_INITIAL.includes(k))), completion:ru.req.filter(k => !REQ_INITIAL.includes(k)) };
 }
 const STU_SECS = ['prev','personal','family','living','rel','emergency','guard'];
-const stuCan_ = f => STU_SECS.includes(f[0]) || (f[0]==='academic' && !['Section','ReferredBy','Category','Classification'].includes(f[1]));
+const stuCan_ = f => STU_SECS.includes(f[0]) || (f[0]==='academic' && !['Section','ReferredBy','Category','SecondaryCategory','Classification'].includes(f[1]));
 const addr_ = r => [r.AddressLine1,r.AddressLine2,r.Barangay,r.City].filter(Boolean).join(', ');
 const ok = (data, message) => ({ success:true, message:message||'', data:data });
 const fail = e => ({ success:false, error:e.message });
@@ -175,7 +225,7 @@ const deptOf_ = g => { const i = GRADES.indexOf(g); return i<0?'':i<3?'Preschool
 function rows_(k) {
   const sh = sh_(k), h = k==='S'?COLS:UCOLS;
   if (sh.getLastRow()<2) return [];
-  return sh.getRange(2,1,sh.getLastRow()-1,h.length).getValues().map(r => { const o={}; h.forEach((c,i)=>o[c]=String(r[i])); return o; });
+  return sh.getRange(2,1,sh.getLastRow()-1,h.length).getValues().map(r => { const o={}; h.forEach((c,i)=>o[c]=String(r[i])); return k==='S' ? catFix_(o) : o; });
 }
 function age_(b) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(b||'')) return '';
@@ -236,6 +286,10 @@ function saveStudent(token, rec) {
     row = old ? Object.assign({}, old) : {}; oldStatus = old ? old.EnrollStatus : ''; isNew = !old;
     FIELDS.forEach(f => { if (f[3]==='auto'||(!admin&&!stuCan_(f))) return; row[f[1]] = String(rec[f[1]]==null?'':rec[f[1]]).trim(); if (f[3]==='txt' && !/(Email|Facebook)$/.test(f[1])) row[f[1]] = row[f[1]].toUpperCase(); });
     if (!admin && old && old.EnrollStatus === 'Enrolled') IDLOCK.forEach(k => { if (old[k]) row[k] = old[k]; });   // identity lock (Hardening): filled values are locked; a blank one (e.g. birth date of a self-registered current student) may still be completed once
+    catFix_(row);   // standard Category names; an old TLC-OVAP / TLC-ESC value becomes TLC SCHOLAR + Secondary Category
+    if (admin && row.Category && CAT_LIST.indexOf(row.Category) < 0) throw new Error('Select a valid Category.');
+    if (row.Category === CAT_TLC) { if (admin && SEC_CAT_LIST.indexOf(row.SecondaryCategory) < 0) throw new Error('Select the Secondary Category of the TLC Scholar (TLC-OVAP, TLC-ESC or Not Applicable).'); }
+    else row.SecondaryCategory = '';   // only a TLC Scholar has a secondary category
     if (!row.EnrollStatus) row.EnrollStatus = 'Not Enrolled';
     if (isNew) row.ApplicationStatus = 'Submitted';   // staff-encoded walk-in: nothing for the enrollee to submit; goes straight to review
     if (row.Email && !EMAIL_RE.test(row.Email)) throw new Error('Enter a valid student email address.');
@@ -301,7 +355,7 @@ transferred:all.filter(r=>r.EnrollStatus==='Transferred Out').length,cancelled:a
 }
 
 const GROUPS = ['Preschool','Elementary','Junior High School','Senior High \u2013 Grade 11','Senior High \u2013 Grade 12'];
-const CATS = ['PUB-QVR','TLC','REGULAR','ESC','TLC-OVAP','QVA PASSER','IS'];
+const CATS = CAT_LIST;
 const grpOf_ = g => { const i = GRADES.indexOf(g); return i<0 ? '' : i<3 ? GROUPS[0] : i<9 ? GROUPS[1] : i<13 ? GROUPS[2] : GROUPS[i===13?3:4]; };
 function report(token, type, arg) {
   try {
@@ -347,7 +401,7 @@ function report(token, type, arg) {
       daily: () => ({ title:'ADMISSION DAILY REPORT', blocks:[
         matrix('SENIOR HIGH GRADE 12',Object.keys(CL),r=>r.GradeLevel==='Grade 12',clab,CATS,'CLUSTER'),
         matrix('SENIOR HIGH GRADE 11',Object.keys(CL),r=>r.GradeLevel==='Grade 11',clab,CATS,'CLUSTER'),
-        matrix('JUNIOR HIGH SCHOOL',GRADES.slice(9,13),r=>grpOf_(r.GradeLevel)===GROUPS[2],r=>r.GradeLevel,['REGULAR','TLC','ESC','IS'],'LEVEL'),
+        matrix('JUNIOR HIGH SCHOOL',GRADES.slice(9,13),r=>grpOf_(r.GradeLevel)===GROUPS[2],r=>r.GradeLevel,['REGULAR','TLC SCHOLAR','ESC GRANTEE','IS'],'LEVEL'),
         oldnew('ELEMENTARY',GRADES.slice(3,9)), oldnew('PRESCHOOL',GRADES.slice(0,3)) ].map((b,i)=>Object.assign(b,{ color:['#7c3aed','#7c3aed','#2563eb','#16a34a','#db2777'][i] })) }),
       school: () => ({ title:'PER SCHOOL REPORT', blocks:GROUPS.map((g,gi) => {
         const x = all.filter(r=>grpOf_(r.GradeLevel)===g), m = {};
@@ -445,12 +499,30 @@ function report(token, type, arg) {
         return { title:'REQUIREMENTS STATUS REPORT', blocks:[{ kpis:[{label:'Learners',value:T,sub:P.g,c:'c1'},{label:'Complete',value:tally.ok,sub:pct(tally.ok,T),c:'c2'},{label:'Deficient',value:tally.bad,sub:pct(tally.bad,T),c:'c5'}],
           charts:[{ type:'donut', title:'Requirements completion', center:'Learners', items:[{label:'Complete',value:tally.ok,color:'#16a34a'},{label:'Deficient',value:tally.bad,color:'#dc2626'}] }] }].concat(bl) };
       },
+      tlc: () => {   // TLC Scholars, with their secondary category. arg = { sec:'All'|'TLC-OVAP'|'TLC-ESC'|'Not Applicable'|'(Not set)', lvl:'All'|<school level> }
+        const A = (arg && typeof arg === 'object') ? arg : {}, sec = String(A.sec || 'All'), lvl = String(A.lvl || 'All');
+        if (sec !== 'All' && SEC_CAT_LIST.concat(['(Not set)']).indexOf(sec) < 0) throw new Error('Unknown secondary category.');
+        if (lvl !== 'All' && !GROUPS.includes(lvl)) throw new Error('Unknown level.');
+        const secOf = r => r.SecondaryCategory || '(Not set)';
+        const base = s.filter(r => r.Category === CAT_TLC && (lvl === 'All' || grpOf_(r.GradeLevel) === lvl)), pop = base.filter(r => sec === 'All' || secOf(r) === sec);
+        const scols = SEC_CAT_LIST.concat(base.some(r => !r.SecondaryCategory) ? ['(Not set)'] : []);
+        const labels = lvl === 'All' ? GROUPS : GRADES.filter(g => grpOf_(g) === lvl), lab = r => lvl === 'All' ? grpOf_(r.GradeLevel) : r.GradeLevel;
+        const sumRows = labels.map(l => { const x = base.filter(r => lab(r) === l); return [l].concat(scols.map(c => n(x, r => secOf(r) === c)), [x.length]); });
+        sumRows.push(['TOTAL'].concat(scols.map((c, i) => sumRows.reduce((a, r) => a + r[i + 1], 0)), [base.length]));
+        const list = pop.slice().sort((a, b) => (GRADES.indexOf(a.GradeLevel) - GRADES.indexOf(b.GradeLevel)) || String(a.Section || '').localeCompare(String(b.Section || '')) || byName(a, b));
+        const rows = list.map((r, i) => [i + 1, r.StudentID, r.LRN, r.FullName, (r.GradeLevel + ' ' + (r.Section || '')).trim(), secOf(r), r.IDNumber || '', r.EnrollStatus || 'Not Enrolled']);
+        const cnt = c => n(base, r => secOf(r) === c);
+        return { title:'TLC SCHOLARS REPORT' + (sec === 'All' ? '' : ' \u2013 ' + sec.toUpperCase()) + (lvl === 'All' ? '' : ' \u2013 ' + lvl.toUpperCase()), asof:asof, blocks:[
+          { kpis:[{label:'TLC Scholars',value:base.length,sub:lvl === 'All' ? 'All levels' : lvl,c:'c1'},{label:'TLC-OVAP',value:cnt('TLC-OVAP'),sub:pct(cnt('TLC-OVAP'), base.length) + ' of TLC scholars',c:'c2'},{label:'TLC-ESC',value:cnt('TLC-ESC'),sub:pct(cnt('TLC-ESC'), base.length) + ' of TLC scholars',c:'c3'}] },
+          { title:'TLC Scholars by ' + (lvl === 'All' ? 'level' : 'grade level') + ' and secondary category', color:'#d97706', cols:[lvl === 'All' ? 'LEVEL' : 'GRADE'].concat(scols, ['TOTAL']), rows:sumRows },
+          { title:'Learner list' + (sec === 'All' ? '' : ' \u2022 ' + sec) + '  \u2022  ' + rows.length + ' learner' + (rows.length === 1 ? '' : 's'), color:'#d97706', cols:['No.', 'Enrollment ID', 'LRN', 'Full Name', 'Grade & Section', 'Secondary Category', 'TLC ID No.', 'Enrollment Status'], rows:rows, plain:true }] };
+      },
       scholar: () => {
         const lvl = String(arg||'All'); let cd;
         if (lvl==='All') cd = GROUPS.map(g=>[g,r=>grpOf_(r.GradeLevel)===g]);
         else { if (!GROUPS.includes(lvl)) throw new Error('Unknown level.'); cd = GRADES.filter(g=>grpOf_(g)===lvl).map(g=>[g,r=>r.GradeLevel===g]); }
         const pop = lvl==='All' ? s : s.filter(r=>grpOf_(r.GradeLevel)===lvl);
-        const defs = [['PUB-QVR','PUB-QVR','#2563eb'],['ESC','ESC','#16a34a'],['TLC','TLC','#d97706'],['TLC-OVAP','TLC-OVAP','#7c3aed'],['IS','IS','#db2777'],['REGULAR','Regular / Non-Scholar','#64748b'],['QVA PASSER','QVA PASSER','#0891b2']];
+        const defs = [['VP-QVR','VP-QVR','#2563eb'],['ESC GRANTEE','ESC GRANTEE','#16a34a'],['TLC SCHOLAR','TLC SCHOLAR','#d97706'],['IS','IS','#db2777'],['REGULAR','Regular / Non-Scholar','#64748b'],['VP-QVA','VP-QVA','#0891b2']];
         if (pop.some(r=>!r.Category)) defs.push(['','(Not set)','#94a3b8']);
         const cnt = defs.map(d => { const x = pop.filter(r=>(r.Category||'')===d[0]); return { d:d, x:x, per:cd.map(c=>n(x,c[1])) }; });
         const rows = cnt.map(c=>[c.d[1]].concat(c.per,[c.x.length])), tot = ['TOTAL'].concat(cd.map((c,i)=>cnt.reduce((a,z)=>a+z.per[i],0)),[pop.length]); rows.push(tot);
@@ -703,7 +775,7 @@ function getScholarships(token) {
     // Admin only: active learners per program (cancelled / transferred-out excluded)
     let counts = null;
     if (u.Role==='admin' && ACAD_ROLES.indexOf(u.Clearance) < 0) {
-      const MAP = { TLC:['TLC','TLC-OVAP'], ESC:['ESC'], QVR:['PUB-QVR'], QVA:['QVA PASSER'] };
+      const MAP = { TLC:['TLC SCHOLAR'], ESC:['ESC GRANTEE'], QVR:['VP-QVR'], QVA:['VP-QVA'] };
       const act = rowsSY_().filter(s=>s.EnrollStatus!=='Cancelled' && s.EnrollStatus!=='Transferred Out');
       counts = {};
       SCH_KEYS.forEach(k => { const x = act.filter(s=>MAP[k].includes(s.Category)); counts[k] = { total:x.length, enrolled:x.filter(s=>s.EnrollStatus==='Enrolled').length }; });

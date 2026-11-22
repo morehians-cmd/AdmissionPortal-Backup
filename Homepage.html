@@ -202,7 +202,8 @@ img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflo
   <div class="f"><label for="cuSection">Section</label><select id="cuSection" disabled><option value="">Select grade level first</option></select></div>
   <div class="f"><label for="cuCat">Category</label><select id="cuCat"><option value="">Select category</option></select></div>
   <div class="f" id="cuTlcBox" style="display:none"><label for="cuTlc">TLC ID number</label><input id="cuTlc" maxlength="13" autocapitalize="characters" spellcheck="false" placeholder="TLC2026-0001">
-    <p class="note" id="cuTlcNote">Enter your current TLC ID number, the same one reported to the TLC Office. It will be used as is for your school ID.</p></div>
+    <p class="note" id="cuTlcNote">Enter your current TLC ID number, the same one reported to the TLC Office. It will be used as is for your school ID.</p>
+    <label for="cuSec" style="margin-top:12px;display:block">Secondary Category</label><select id="cuSec"><option value="">Select secondary category</option></select></div>
   <div class="f"><label for="cuUser">Username (you will sign in with this)</label><input id="cuUser" autocomplete="username" maxlength="30" autocapitalize="none" spellcheck="false"></div>
   <p class="note">4 to 30 characters: letters, numbers, dot, underscore or hyphen. No spaces and no @.</p>
   <div class="f"><label for="cuMail">Email (for notices and password reset codes)</label><input id="cuMail" type="email" autocomplete="email"></div>
@@ -560,6 +561,7 @@ var CUR={opt:null,loading:false};
 function curFill(){var o=CUR.opt;if(!o)return;
  var g=$('cuGrade');if(g.options.length<=1)o.grades.forEach(function(x){var e=document.createElement('option');e.value=x;e.textContent=x;g.appendChild(e)});
  var c=$('cuCat');if(c.options.length<=1)o.categories.forEach(function(x){var e=document.createElement('option');e.value=x.v;e.textContent=x.l;e.dataset.tlc=x.tlc?'1':'';c.appendChild(e)});
+ var sc=$('cuSec');if(sc&&sc.options.length<=1)(o.secondary||[]).forEach(function(x){var e=document.createElement('option');e.value=x;e.textContent=x;sc.appendChild(e)});
  $('cuTlcNote').textContent='Enter your current TLC ID number, the same one reported to the TLC Office for SY '+String(o.sy).replace('-','\u2013')+'. It will be used as is for your school ID.'}
 function curInit(){if(CUR.opt){curFill();return}if(CUR.loading)return;CUR.loading=true;
  call(API.curOpts,[],function(r){CUR.loading=false;var d=r&&r.success?r.data:null;if(!d){$('cuErr').textContent='Could not load the grade levels. Please try again.';return}CUR.opt=d;curFill()},
@@ -571,18 +573,18 @@ $('cuGrade').onchange=function(){var s=$('cuSection'),g=this.value,L=(CUR.opt&&C
   Object.keys(grp).forEach(function(k){var og=document.createElement('optgroup');og.label=k+' \u2013 '+(CUR.opt.clusters[k]||'');grp[k].forEach(function(n){var e=document.createElement('option');e.value=n;e.textContent=n;og.appendChild(e)});s.appendChild(og)})}
  else L.forEach(function(x){var e=document.createElement('option');e.value=x[0];e.textContent=x[0];s.appendChild(e)});
  s.disabled=!g};
-$('cuCat').onchange=function(){var o=this.options[this.selectedIndex],on=!!(o&&o.dataset.tlc);$('cuTlcBox').style.display=on?'block':'none';if(!on)$('cuTlc').value=''};
+$('cuCat').onchange=function(){var o=this.options[this.selectedIndex],on=!!(o&&o.dataset.tlc);$('cuTlcBox').style.display=on?'block':'none';if(!on){$('cuTlc').value='';$('cuSec').value=''}};
 $('cuGo').onclick=function(){
- var v=function(i){return $(i).value.trim()},sn=v('cuSurname'),fn=v('cuFirst'),mn=v('cuMiddle'),lrn=v('cuLrn'),gr=v('cuGrade'),sec=v('cuSection'),cat=v('cuCat'),tlc=v('cuTlc').toUpperCase(),
+ var v=function(i){return $(i).value.trim()},sn=v('cuSurname'),fn=v('cuFirst'),mn=v('cuMiddle'),lrn=v('cuLrn'),gr=v('cuGrade'),sec=v('cuSection'),cat=v('cuCat'),tlc=v('cuTlc').toUpperCase(),sc2=v('cuSec'),
   un=v('cuUser').toLowerCase(),m=v('cuMail'),p=$('cuPass').value,p2=$('cuPass2').value,bad=[],msg='',tlcOn=$('cuTlcBox').style.display!=='none';
  if(!sn)bad.push('cuSurname');if(!fn)bad.push('cuFirst');if(!/^[1-5]\d{11}$/.test(lrn))bad.push('cuLrn');if(!gr)bad.push('cuGrade');if(!sec)bad.push('cuSection');if(!cat)bad.push('cuCat');
- if(tlcOn&&!/^TLC\d{4}-\d{4}$/.test(tlc))bad.push('cuTlc');
+ if(tlcOn&&!/^TLC\d{4}-\d{4}$/.test(tlc))bad.push('cuTlc');if(tlcOn&&!sc2)bad.push('cuSec');
  if(!/^[a-z0-9][a-z0-9._-]{3,29}$/.test(un))bad.push('cuUser');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))bad.push('cuMail');if(pwBad(p))bad.push('cuPass');if(p2!==p)bad.push('cuPass2');
- if(bad.length)msg=bad.indexOf('cuTlc')>-1?'Enter your TLC ID number exactly as issued, like TLC2026-0001.':(bad.length===1&&bad[0]==='cuPass2')?'Passwords do not match.':bad.indexOf('cuPass')>-1?PWRULE:bad.indexOf('cuUser')>-1?'Choose a username of 4 to 30 characters: letters, numbers, dot, underscore or hyphen.':'Complete all fields. LRN must be 12 digits and start with 1-5.';
+ if(bad.length)msg=bad.indexOf('cuTlc')>-1?'Enter your TLC ID number exactly as issued, like TLC2026-0001.':bad.indexOf('cuSec')>-1?'Select your Secondary Category (TLC-OVAP, TLC-ESC or Not Applicable).':(bad.length===1&&bad[0]==='cuPass2')?'Passwords do not match.':bad.indexOf('cuPass')>-1?PWRULE:bad.indexOf('cuUser')>-1?'Choose a username of 4 to 30 characters: letters, numbers, dot, underscore or hyphen.':'Complete all fields. LRN must be 12 digits and start with 1-5.';
  else if(!$('cuTerms').checked)msg='Please accept the Terms of Service and Privacy Policy.';
- mark(['cuSurname','cuFirst','cuLrn','cuGrade','cuSection','cuCat','cuTlc','cuUser','cuMail','cuPass','cuPass2'],bad);$('cuErr').textContent=msg;if(msg)return;
+ mark(['cuSurname','cuFirst','cuLrn','cuGrade','cuSection','cuCat','cuTlc','cuSec','cuUser','cuMail','cuPass','cuPass2'],bad);$('cuErr').textContent=msg;if(msg)return;
  var b=this;busyBtn(b,true,'Creating\u2026');
- PEND.form={surname:sn,firstName:fn,middleName:mn,lrn:lrn,grade:gr,section:sec,category:cat,tlcId:tlc,username:un,email:m,password:p,consent:true};
+ PEND.form={surname:sn,firstName:fn,middleName:mn,lrn:lrn,grade:gr,section:sec,category:cat,secondaryCategory:sc2,tlcId:tlc,username:un,email:m,password:p,consent:true};
  call(API.registerCur,[PEND.form],function(r){busyBtn(b,false);
   if(!r||r.success!==true){$('cuErr').textContent=(r&&r.error)||'Could not create the account.';return}
   $('cuPass').value=$('cuPass2').value='';

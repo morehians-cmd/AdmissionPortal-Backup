@@ -1219,7 +1219,7 @@ const act={out:()=>{clearInterval(CD);if($('idm'))$('idm').remove();try{google.s
  evnew:()=>{S.evEdit={};evRender()},evedit:id=>{S.evEdit=Object.assign({},S.evs.find(x=>x.EventID===id));evRender()},evcancel:()=>{S.evEdit=null;evRender()},
  evsave:()=>{const g=i=>$(i).value;call('saveEvent',[T(),{EventID:S.evEdit.EventID||'',Title:g('evT'),EventDate:g('evD'),EventTime:g('evTm'),Venue:g('evV'),Details:g('evX')}],r=>{toast(r.message);S.evEdit=null;eventsPage()})},
  evdel:id=>{if(confirm('Delete this event?'))call('deleteEvent',[T(),id],r=>{toast(r.message);eventsPage()})},menu:()=>$('side').classList.toggle('open'),nav:v=>nav(v),
- rp:t=>selRep(t),rgo:()=>{const a={grade:$('rfg').value,section:$('rfs').value};S.rf={grade:a.grade,section:a.section};if(S.rt==='personal'){a.fields=[...document.querySelectorAll('.pfx:checked')].map(x=>x.value);if(!a.fields.length)return toast('Tick at least one data field.',false);S.pf=a.fields}runRep(S.rt,a)},pfall:()=>pfSet(()=>true),pfnone:()=>pfSet(()=>false),pfdef:()=>pfSet(x=>PDEF.includes(x.value)),pfstep:v=>{const xs=[...document.querySelectorAll('.pfx')].filter(x=>x.dataset.st===v),all=xs.every(x=>x.checked);xs.forEach(x=>x.checked=!all)},rlvl:v=>{S.rlv=v;selRep('scholar')},mlist:v=>{const q=v.split('|');call('report',[T(),'advisory',{grade:q[0],section:q[1]||'(none)',ml:1}],r=>printReport(r.data,'advisory'))},refv:n=>runRep('refd',n),refp:n=>call('report',[T(),'refd',n],r=>printRef(n,r.data.blocks[0].rows)),prref:()=>printRef(S.refName,S.rep.blocks[0].rows),
+ rp:t=>selRep(t),rgo:()=>{const a={grade:$('rfg').value,section:$('rfs').value};S.rf={grade:a.grade,section:a.section};if(S.rt==='personal'){a.fields=[...document.querySelectorAll('.pfx:checked')].map(x=>x.value);if(!a.fields.length)return toast('Tick at least one data field.',false);S.pf=a.fields}runRep(S.rt,a)},pfall:()=>pfSet(()=>true),pfnone:()=>pfSet(()=>false),pfdef:()=>pfSet(x=>PDEF.includes(x.value)),pfstep:v=>{const xs=[...document.querySelectorAll('.pfx')].filter(x=>x.dataset.st===v),all=xs.every(x=>x.checked);xs.forEach(x=>x.checked=!all)},rlvl:v=>{S.rlv=v;selRep('scholar')},tsec:v=>{S.tsec=v;selRep('tlc')},tlvl:v=>{S.tlv=v;selRep('tlc')},mlist:v=>{const q=v.split('|');call('report',[T(),'advisory',{grade:q[0],section:q[1]||'(none)',ml:1}],r=>printReport(r.data,'advisory'))},refv:n=>runRep('refd',n),refp:n=>call('report',[T(),'refd',n],r=>printRef(n,r.data.blocks[0].rows)),prref:()=>printRef(S.refName,S.rep.blocks[0].rows),
  prrep:()=>printReport(S.rep,S.rtype),slip:()=>printSlip(S.t.rec,!A()),eform:()=>printEnrollForm(S.t.rec),cform:()=>cancelModal(S.t.rec),ccl:()=>$('cm').remove(),
  cprint:()=>{const o=cxOpts();$('cm').remove();printCancel(S.cr,o)},cpdf:()=>{const o=cxOpts(),r=S.cr;$('cm').remove();savePdf(cancelHTML(r,o),fileName(r,'Cancellation'))},slippdf:()=>{const r=S.t.rec;savePdf(confirmHTML(r),fileName(r))},
  stay:()=>{clearInterval(CD);if($('idm'))$('idm').remove();idleReset()},
@@ -1276,6 +1276,7 @@ document.addEventListener('input',e=>{if(e.target.dataset.num){e.target.value=e.
 document.addEventListener('change',e=>{const k=e.target.dataset.k,t=S.t;if(!k||!t)return;collect(t);const r=t.rec;
  if(k==='GradeLevel'){r.Department=deptOf(r.GradeLevel);r.Section='';if(r.Department!=='Senior High School')r.Cluster=''}
  if(k==='Cluster')r.Section='';
+ if(k==='Category'&&r.Category!=='TLC SCHOLAR')r.SecondaryCategory='';
  if(k==='EnrollStatus'&&cxOn(r)&&!r.CancelDate)r.CancelDate=today();
  if(['GradeLevel','Cluster','Classification','PrevGrade','Category','Religion','FatherReligion','MotherReligion','EmSameAddr','Birthdate','LivingWith','RelSameAddr','RelGender','RelBirthdate','EnrollStatus','CancelReason'].includes(k))paint()});
 document.addEventListener('change',e=>{const s=e.target.dataset.src,t=S.t;if(!s||!t)return;collect(t);const r=t.rec;
@@ -1323,8 +1324,8 @@ function home(){
   <div class="dside"><div class="card"><div class="ch"><h3>Quick Actions</h3></div><div class="qas">${qa('c1',I.adm,'Student Profile','nav','sp')}${qa('c3',I.rep,'School Requirements','nav','rq')}${qa('c4',I.rep,'Print Consent Form','pconsent')}${qa('c2',I.rep,'Data Privacy Policy','nav','pp')}${qa('c5',I.sch,'Scholarships','nav','sch')}${qa('c1',I.tf,'Schedule of Fees','nav','tf')}</div></div>${evSide()}${actCard()}</div></div>`;renderAct();homeEvents()})}}
 
 const RGROUPS=['Preschool','Elementary','Junior High School','Senior High \u2013 Grade 11','Senior High \u2013 Grade 12'],RGC=['#db2777','#16a34a','#2563eb','#7c3aed','#d97706'];
-const RL=()=>[['daily','Daily Report','Admission counts per level, cluster and category','c1',I.rep],['overview','Admission Conversion','Applicants vs enrolled, with conversion rates','c2',I.home],['section','Section Report','Male, female and total per section, with masterlists','c3',I.users],['advisory','Advisory Class','Class list per section, split by sex','c4',I.adm],['personal','Learner Personal Data','Personal, family and primary contact data','c5',I.me],['requirements','Requirements Status','Submitted vs deficient documents','c3',I.rep],['scholar','Scholarship Beneficiaries','Recipients by voucher / scholarship type','c1',I.sch],['demographic','Demographic Report','Sex, religion, age, school and address by level','c4',I.rep],['school','Per School','Learners per previous school, by level','c2',I.rep],['adviser','Per Previous Adviser','Learners per previous adviser and school, by level','c4',I.users],['referral','Referral','Referrers, referred learners and the claim form','c5',I.cal],['noconsent','No Parental Consent','Learners without the consent form','c3',I.rep]];
-const RGRP=[['Admissions',['daily','overview','referral','noconsent']],['Classes and learners',['section','advisory','personal','requirements']],['Insights',['scholar','demographic','school','adviser']]];
+const RL=()=>[['daily','Daily Report','Admission counts per level, cluster and category','c1',I.rep],['overview','Admission Conversion','Applicants vs enrolled, with conversion rates','c2',I.home],['section','Section Report','Male, female and total per section, with masterlists','c3',I.users],['advisory','Advisory Class','Class list per section, split by sex','c4',I.adm],['personal','Learner Personal Data','Personal, family and primary contact data','c5',I.me],['requirements','Requirements Status','Submitted vs deficient documents','c3',I.rep],['scholar','Scholarship Beneficiaries','Recipients by voucher / scholarship type','c1',I.sch],['tlc','TLC Scholars','TLC scholars by secondary category (TLC-OVAP, TLC-ESC)','c2',I.sch],['demographic','Demographic Report','Sex, religion, age, school and address by level','c4',I.rep],['school','Per School','Learners per previous school, by level','c2',I.rep],['adviser','Per Previous Adviser','Learners per previous adviser and school, by level','c4',I.users],['referral','Referral','Referrers, referred learners and the claim form','c5',I.cal],['noconsent','No Parental Consent','Learners without the consent form','c3',I.rep]];
+const RGRP=[['Admissions',['daily','overview','referral','noconsent']],['Classes and learners',['section','advisory','personal','requirements']],['Insights',['scholar','tlc','demographic','school','adviser']]];
 function rep(){head('Reports','Choose a report to generate');S.rt='';S.rep=null;S.rf=S.rf||{grade:'Grade 7',section:'*'};
  const R=Object.fromEntries(RL().map(x=>[x[0],x]));
  const quick=['daily','overview','section','scholar'].map(k=>{const x=R[k];return `<div class="shc rq" data-act="rp" data-v="${k}"><div class="shh"><span class="ki ${x[3]}">${x[4]}</span><span>${x[1]}</span></div><p>${x[2]}</p><span class="go">Open report</span></div>`}).join('');
@@ -1343,6 +1344,7 @@ function rfGrade(){S.rf={grade:$('rfg').value,section:'*'};$('rfs').innerHTML=se
 function selRep(t){S.rt=t;document.querySelectorAll('.rc').forEach(b=>b.classList.toggle('on',b.dataset.v===t));const f=$('rfil');$('rout').innerHTML='';
  if(['advisory','personal','requirements'].includes(t)){f.innerHTML=`<div class="card rfc"><div class="ch"><h3>Choose a class</h3></div><div class="g" style="align-items:end"><div class="f"><label>Grade level</label><select id="rfg" onchange="rfGrade()">${S.grades.map(g=>`<option ${g===S.rf.grade?'selected':''}>${g}</option>`).join('')}</select></div><div class="f"><label>Section</label><select id="rfs">${secOpts()}</select></div><div class="f"><button class="btn" data-act="rgo">Generate report</button></div></div></div>${t==='personal'?pickerHTML():''}`;f.scrollIntoView({behavior:'smooth',block:'start'})}
  else if(t==='scholar'){S.rlv=S.rlv||'All';f.innerHTML=`<div class="card rfc"><div class="ch"><h3>School level</h3></div><div class="rpills">${['All'].concat(RGROUPS).map(x=>`<button class="pill ${x===S.rlv?'on':''}" data-act="rlvl" data-v="${esc(x)}">${x==='All'?'All levels':esc(x)}</button>`).join('')}</div></div>`;runRep('scholar',S.rlv)}
+ else if(t==='tlc'){S.tsec=S.tsec||'All';S.tlv=S.tlv||'All';const pl=(a,cur,xs,lb)=>xs.map(x=>`<button class="pill ${x===cur?'on':''}" data-act="${a}" data-v="${esc(x)}">${esc(lb&&lb[x]||x)}</button>`).join('');f.innerHTML=`<div class="card rfc"><div class="ch"><h3>Secondary category</h3></div><div class="rpills">${pl('tsec',S.tsec,['All','TLC-OVAP','TLC-ESC','Not Applicable'],{All:'All TLC scholars'})}</div><div class="ch" style="margin-top:14px"><h3>School level</h3></div><div class="rpills">${pl('tlvl',S.tlv,['All'].concat(RGROUPS),{All:'All levels'})}</div></div>`;runRep('tlc',{sec:S.tsec,lvl:S.tlv})}
  else{f.innerHTML='';runRep(t)}}
 function runRep(t,a){S.rtype=t;call('report',[T(),t,a==null?'':a],r=>{S.rep=r.data;S.refName=a;const d=r.data,x=RL().find(y=>y[0]===({refd:'referral',advd:'adviser'}[t]||t))||['','','','c1',I.rep];
  $('rout').innerHTML=`<div class="rhd"><div class="rht"><span class="ao ${x[3]}">${x[4]}</span><div><h3>${esc(d.title)}</h3><small>${esc(d.asof)}</small></div></div><div class="rha"><button class="btn alt" data-act="prrep">Print / Save as PDF</button><button class="btn alt" data-act="csv">Download CSV</button>${t==='refd'?'<button class="btn" data-act="prref">Print referral form</button>':''}${t==='advd'?'<button class="btn alt" data-act="advback">&larr; Back to adviser report</button>':''}</div></div><div id="rpbody">${(d.blocks||[]).map(b=>blockHTML(b,t)).join('')}</div>`;
@@ -1368,15 +1370,16 @@ function blockHTML(b,t){let h='';if(b.kpis)h+=`<div class="kpis">${b.kpis.map(k=
 function repHTML(d,t){return `<p style="color:var(--mut);margin:0 0 12px">${esc(d.asof)}</p>`+(d.blocks||[]).map(b=>blockHTML(b,t)).join('')}
 function printReport(d,t){const land=(d.blocks||[]).some(b=>b.cols&&b.cols.length>8);printHTML(`<style>@page{size:A4 ${land?'landscape':'portrait'};margin:0}</style><div class="rpp"><div class="rh"><img src="${LOGO}" alt=""><div><b>MOREH ACADEMY</b><span>${esc(d.title)}</span></div></div>${repHTML(d,t)}</div>`,false,d.title)}
 
-const CERTC=['PUB-QVR','ESC','QVA PASSER'],certNeeded=r=>CERTC.includes(r.Category),certRequired=r=>certNeeded(r)&&r.Classification==='New',guardOn=r=>(r.Birthdate&&ageOf(r.Birthdate)<18)||r.GuardName||r.GuardEmail,cxOn=r=>r.EnrollStatus==='Cancelled'||r.EnrollStatus==='Transferred Out',cxReason=r=>r.CancelReason==='Other'&&r.CancelReasonOther?'OTHER: '+r.CancelReasonOther:(r.CancelReason||'');
-const schBox=r=>r.Category?`<div style="grid-column:1/-1;background:var(--soft);border-radius:12px;padding:12px 18px"><b>Scholarship details \u2013 ${esc(r.Category)}</b><ul style="margin:6px 0 0;padding-left:20px">${schOf(r).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';
+const CERTC=['VP-QVR','ESC GRANTEE','VP-QVA'],catLabel=r=>(r.Category||'')+(r.Category==='TLC SCHOLAR'&&r.SecondaryCategory&&r.SecondaryCategory!=='Not Applicable'?' / '+r.SecondaryCategory:''),certNeeded=r=>CERTC.includes(r.Category),certRequired=r=>certNeeded(r)&&r.Classification==='New',guardOn=r=>(r.Birthdate&&ageOf(r.Birthdate)<18)||r.GuardName||r.GuardEmail,cxOn=r=>r.EnrollStatus==='Cancelled'||r.EnrollStatus==='Transferred Out',cxReason=r=>r.CancelReason==='Other'&&r.CancelReasonOther?'OTHER: '+r.CancelReasonOther:(r.CancelReason||'');
+const schBox=r=>r.Category?`<div style="grid-column:1/-1;background:var(--soft);border-radius:12px;padding:12px 18px"><b>Scholarship details \u2013 ${esc(catLabel(r))}</b><ul style="margin:6px 0 0;padding-left:20px">${schOf(r).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:'';
 function fld(f,t){const [sec,k,l,type,o]=f,r=t.rec,v=r[k]||'';
  if(/(Religion|Gender)Other$/.test(k)&&r[k.replace('Other','')]!=='Others, specify')return '';
  if(k==='CancelReasonOther'&&r.CancelReason!=='Other')return '';
  if(k==='ReferredBy'&&!A())return '';
+ if(k==='SecondaryCategory'&&r.Category!=='TLC SCHOLAR')return '';
  if(/^Guard/.test(k)&&!guardOn(r))return '';if(k==='ConsentAt'&&(!A()||!v))return '';
  if(k==='CertNo'&&!certNeeded(r))return '';
- let dis=!(t.edit&&(A()||STU.includes(sec)||(sec==='academic'&&!['Section','Category','Classification'].includes(k))))||type==='auto';if(k==='Cluster'&&r.Department!=='Senior High School')dis=true;if(k==='PrevCluster'&&!['Grade 11','Grade 12'].includes(r.PrevGrade))dis=true;if(k==='EmAddress'&&r.EmSameAddr==='Yes')dis=true;if(k==='RelAddress'&&r.RelSameAddr==='Yes')dis=true;
+ let dis=!(t.edit&&(A()||STU.includes(sec)||(sec==='academic'&&!['Section','Category','SecondaryCategory','Classification'].includes(k))))||type==='auto';if(k==='Cluster'&&r.Department!=='Senior High School')dis=true;if(k==='PrevCluster'&&!['Grade 11','Grade 12'].includes(r.PrevGrade))dis=true;if(k==='EmAddress'&&r.EmSameAddr==='Yes')dis=true;if(k==='RelAddress'&&r.RelSameAddr==='Yes')dis=true;
  if(!A()&&['LRN','Surname','FirstName','MiddleName','Suffix','Birthdate','SchoolYear','GradeLevel','Cluster'].includes(k)&&r.EnrollStatus==='Enrolled')dis=true;
  if(type==='chk')return `<div class="f"><label class="chk"><input type="checkbox" data-k="${k}" ${v?'checked':''} ${dis?'disabled':''}> ${l}</label></div>`;
  if(type==='rad')return `<div class="f wide"><label>${l}</label><div class="rad">${o.map(x=>`<label><input type="radio" name="${k}" data-k="${k}" value="${esc(x)}" ${v===x?'checked':''} ${dis?'disabled':''}> ${esc(x)}</label>`).join('')}</div></div>`;
@@ -1460,7 +1463,7 @@ function flagPanel(r){if(!A()||OFC()||!r.StudentID)return '';setTimeout(()=>load
  return '<div class="card"><h3>Enrollment Holds</h3><div id="flbox"><div class="aemp">Loading&hellip;</div></div></div>'}
 
  /* ===== Student ID card (TLC) ===== */
-const idOk=r=>['TLC','TLC-OVAP'].includes(r.Category)&&['Junior High School','Senior High School'].includes(r.Department);
+const idOk=r=>['TLC SCHOLAR'].includes(r.Category)&&['Junior High School','Senior High School'].includes(r.Department);
 const IDF=n=>(n*54/644).toFixed(3)+'mm',IDB=n=>(n*54/638).toFixed(3)+'mm';           // front = 644 px wide design, back = 638 px
 const idBox=(U,x,y,w,h,st,inner)=>`<div style="position:absolute;left:${U(x)};top:${U(y)};width:${U(w)};height:${U(h)};${st||''}">${inner||''}</div>`;
 const IDFONT='Montserrat,Arial,sans-serif',IDCSS='position:relative;width:54mm;height:85.6mm;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact';
@@ -1569,7 +1572,7 @@ const COR_CSS=`<style>
 </style>`;
 const corLearner=(r,photo,sid)=>{const L={lw:48};return efBar('Learner Academic Information',49)
  +efAt(13.7,56.9,33.5,photo?`<img src="${esc(photo)}" alt="">`:'','ph',38)
- +efAt(48.5,56.9,150.1,efColIndex3(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:20}),efFd('Student ID',sid))))
+ +efAt(48.5,56.9,150.1,efColIndex3(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:26}),efFd('Student ID',sid))))
  +efAt(48.5,62.9,150.1,'','dv')
  +efAt(48.5,65.6,150.1,efColIndex3(4.3,1.05,efRw(efFd('Learner\u2019s Full Name',r.FullName,L)),efRw(efFd('Learner Reference Number',r.LRN,L)),efRw(efFd('Grade Level',r.GradeLevel,L)),
    efRw(efFd('Cluster',r.Cluster,L)),efRw(efFd('Section',r.Section,L)),efRw(efFd('Enrollment Status',r.EnrollStatus,{lw:48,bw:34}),efFd('School Year',r.SchoolYear))))};
@@ -1651,7 +1654,7 @@ function profile(){head('My Profile','Your account details');const u=S.user,e=S.
  const R=(l,v,id,t,on)=>`<div class="f"><label>${l}</label><input ${id?`id="${id}"`:''} type="${t||'text'}" value="${esc(v)}" ${on?'':'disabled'}></div>`;
  $('view').innerHTML=`<div class="act">${e?'<button class="btn" data-act="psave">Save</button>':'<button class="btn" data-act="pedit">Edit</button>'}</div><div class="card" style="max-width:760px"><div class="photo" id="ph" style="${u.Photo?`background-image:url(${u.Photo})`:''}"></div>${e?'<input type="file" id="pf" accept="image/png,image/jpeg,image/webp" style="margin-bottom:20px">':''}<div class="g">${R('Full name',u.FullName)}${R('Designation',u.Designation)}${R('Department',u.Department)}${R('Clearance',u.Clearance)}${R('Username',u.Username)}${R('Email',u.Email,'em','text',e)}${e?R('New password (min 8 characters)','','npw','password',1):''}</div></div>`}
 
-const addrOf=r=>[r.AddressLine1,r.AddressLine2,r.Barangay,r.City].filter(Boolean).join(', '),schOf=r=>{const k=r.Category==='ESC'?(r.Department==='Junior High School'?'ESC-JHS':'ESC-SHS'):r.Category;return S.cfg.sch[k]||[]};
+const addrOf=r=>[r.AddressLine1,r.AddressLine2,r.Barangay,r.City].filter(Boolean).join(', '),schOf=r=>{const k=r.Category==='ESC GRANTEE'?(r.Department==='Junior High School'?'ESC-JHS':'ESC-SHS'):r.Category;return S.cfg.sch[k]||[]};
 let LOGO='https:\x2f\x2fi.imgur.com/roCMSYf.jpeg',today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const fmtD=d=>d?new Date(d+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}):'';
 const hd=t=>`<div class="hd"><img src="${LOGO}"><div><div class="h1">MOREH ACADEMY</div><div class="h2">${esc(t)}</div></div></div>`;
@@ -1727,7 +1730,7 @@ function enrollFormHTML(r,photo){
 
  ${bar('Learner Academic Information',49)}
  ${at(13.7,56.9,33.5,photo?`<img src="${esc(photo)}" alt="">`:'','ph" style="height:38mm;left:13.7mm;top:56.9mm;width:33.5mm')}
- ${at(48.5,56.9,150.1,col(4.4,0,rw(fd('Classification',r.Classification,{bw:20}),fd('Category',r.Category,{bw:20}),fd(idLabel(r),idValue(r)))))}
+ ${at(48.5,56.9,150.1,col(4.4,0,rw(fd('Classification',r.Classification,{bw:20}),fd('Category',r.Category,{bw:26}),fd(idLabel(r),idValue(r)))))}
  ${at(48.5,62.9,150.1,'','dv')}
  ${at(48.5,65.6,150.1,col(4.3,1.05,
    rw(fd('Learner\u2019s Full Name',r.FullName,L)),rw(fd('Learner Reference Number',r.LRN,L)),rw(fd('Grade Level',r.GradeLevel,L)),
@@ -1780,7 +1783,7 @@ const efHead=title=>`<div class="ab hdr"><img src="${LOGO}" alt=""><div class="w
 
 const efLearner=(r,photo)=>{const L={lw:48};return efBar('Learner Academic Information',49)
  +efAt(13.7,56.9,33.5,photo?`<img src="${esc(photo)}" alt="">`:'','ph',38)
- +efAt(48.5,56.9,150.1,efColIndex3(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:20}),efFd(idLabel(r),idValue(r)))))
+ +efAt(48.5,56.9,150.1,efColIndex3(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:26}),efFd(idLabel(r),idValue(r)))))
  +efAt(48.5,62.9,150.1,'','dv')
  +efAt(48.5,65.6,150.1,efColIndex3(4.3,1.05,
    efRw(efFd('Learner\u2019s Full Name',r.FullName,L)),efRw(efFd('Learner Reference Number',r.LRN,L)),efRw(efFd('Grade Level',r.GradeLevel,L)),
@@ -1866,11 +1869,11 @@ function letterhead(){if(S.cfg.letterhead)return `<img class="lh" src="${esc(S.c
  <div class="ct"><div>${cic(CIC.pin)}<span>Ricahuerta St. corner A. Bonifacio Avenue,<br>Upper Bicutan, Taguig City 1633 Philippines</span></div><div>${cic(CIC.mail)}<span>morehacademy2002@yahoo.com.ph<br>morehadmissionoffice@gmail.com</span></div><div>${cic(CIC.tel)}<span>8.839.01.35 | 8.838.90.77</span></div><div>${cic(CIC.fb)}<span>Moreh Academy Taguig</span></div></div><div class="hr0"></div>`}
 function printConfirm(r){printHTML(confirmHTML(r),true,fileName(r))}
 function confirmHTML(r){const C=S.cfg,sch=schOf(r);
- const cat=(r.Category||'')+(certNeeded(r)&&r.CertNo?' (Cert. No. '+r.CertNo+')':'');
+ const cat=catLabel(r)+(certNeeded(r)&&r.CertNo?' (Cert. No. '+r.CertNo+')':'');
  const L=[['Learner\u2019s Name',r.FullName,idLabel(r),idValue(r)],['Grade Level',r.GradeLevel,'Learner Reference Number',r.LRN],['Grade Section',r.Section,'Birth Date',fmtD(r.Birthdate)],['Cluster',abbr(r.Cluster)||'','Age',r.Birthdate?ageOf(r.Birthdate):''],['Category',cat,'Sex & Gender',[r.SexualOrient,r.GenderOrient].filter(Boolean).join(' / ')],['Classification',r.Classification,'Religion',r.Religion==='Others, specify'?r.ReligionOther:r.Religion],['Address',addrOf(r),'Contact Number',r.Mobile]];
  const prof=L.map((x,i)=>`<div class="rw${i===0?' f1':''}${i===L.length-1?' last':''}"><span>${esc(x[0])}</span><b${x[0]==='Address'?' class="sm"':''}>${esc(x[1])}</b><span>${esc(x[2])}</span><b>${esc(x[3])}</b></div>`).join('');
  const Q=S.fields.filter(f=>f[0]==='req'&&f[3]!=='date'&&(f[1]!=='ReqRemarks'||(r.ReqRemarks&&r.ReqRemarks!=='None'))).map(f=>[f[2],r[f[1]]||'None']),N=Math.max(Q.length,sch.length,7);
- let rq='',sc='';for(let i=0;i<N;i++){const lc=(i===0?' f1':'')+(i===N-1?' last':'');rq+=`<div class="rw2${lc}"><span>${Q[i]?esc(Q[i][0]):''}</span><b>${Q[i]?esc(Q[i][1]):''}</b></div>`;sc+=`<div class="rw2 sc${lc}"><b>${i===0?esc(r.Category||''):''}</b><span class="v" style="font-weight:500">${esc(sch[i]||'')}</span></div>`}
+ let rq='',sc='';for(let i=0;i<N;i++){const lc=(i===0?' f1':'')+(i===N-1?' last':'');rq+=`<div class="rw2${lc}"><span>${Q[i]?esc(Q[i][0]):''}</span><b>${Q[i]?esc(Q[i][1]):''}</b></div>`;sc+=`<div class="rw2 sc${lc}"><b>${i===0?esc(catLabel(r)):''}</b><span class="v" style="font-weight:500">${esc(sch[i]||'')}</span></div>`}
  return `<div class="cs">${letterhead()}<div class="cb"><div class="ttl">ENROLLMENT CONFIRMATION SLIP</div>
  <h4>LEARNER PROFILE</h4>${prof}
  <div class="two"><div><h4>REQUIREMENTS</h4>${rq}</div><div><h4>SCHOLARSHIP</h4>${sc}</div></div>
@@ -1964,6 +1967,7 @@ function secFields(s,t){let fs=S.fields.filter(f=>f[0]===s);
  if(s==='family')return ['Father','Mother'].map(p=>`<div style="grid-column:1/-1"><div class="sec">${p.toUpperCase()}'S DATA</div><div class="g">${fs.filter(f=>f[1].startsWith(p)).map(f=>fld(f,t)).join('')}</div></div>`).join('');
 if(s!=='academic')return (s==='personal'?ageNotice(t.rec):s==='cancel'?cxPolicy(t.rec):'')+fs.map(f=>fld(f,t)).join('');
  const c=fs.find(f=>f[1]==='CertNo');if(c){fs=fs.filter(f=>f!==c);fs.splice(fs.findIndex(f=>f[1]==='Category')+1,0,c)}
+ const sc=fs.find(f=>f[1]==='SecondaryCategory');if(sc){fs=fs.filter(f=>f!==sc);fs.splice(fs.findIndex(f=>f[1]==='Category')+1,0,sc)}
  let o='',d=false;fs.forEach(f=>{if(NAMEK.includes(f[1])){if(!d){d=true;o+=`<div class="name4">${fs.filter(x=>NAMEK.includes(x[1])).map(x=>fld(x,t)).join('')}</div>`}}else{o+=fld(f,t);if(f[1]==='CertNo')o+=schBox(t.rec)}});return o}
 const CONS=`<ol><li><b>Accuracy of Information:</b> All information provided in this application and attached documents are true, complete, and correct to the best of my knowledge. I understand that providing false, fraudulent, or misleading information will result in the disqualification of my application or immediate cancellation of admission/enrollment.</li><li><b>Explicit Consent:</b> I have read and understood this Data Privacy Statement and voluntarily give my explicit consent to Moreh Academy and Moreh College to collect, store, process, and share my personal information and sensitive personal information in accordance with RA 10173 for admission and enrollment processing.</li><li><b>Parent / Legal Guardian Consent (For Minors below 18 years old):</b> If the applicant is below 18 years of age, I certify that I am the parent/legal guardian granting authorization on behalf of the minor data subject.</li></ol>`;
 const PRIV=`<h3>DATA PRIVACY NOTICE &amp; DISCLAIMER</h3><p><b>Moreh Academy and Moreh College Admission Portal</b></p>
@@ -2250,7 +2254,7 @@ document.addEventListener('change',e=>{if(e.target.classList&&e.target.classList
 const DK=()=>'mrh_draft_'+((S.user&&S.user.StudentID)||''),DRAFT_MS=864e5;let DT=null,LP=0;
 const IDLOCK_C=['LRN','Surname','FirstName','MiddleName','Suffix','Birthdate','SchoolYear','GradeLevel','Cluster'];
 /** Fields a student may edit (mirrors the server rule), minus the identity fields once Enrolled. */
-function draftKeys(rec){return S.fields.filter(f=>f[3]!=='auto'&&(STU.includes(f[0])||(f[0]==='academic'&&!['Section','Category','Classification','ReferredBy'].includes(f[1])))&&!(rec.EnrollStatus==='Enrolled'&&IDLOCK_C.includes(f[1]))).map(f=>f[1])}
+function draftKeys(rec){return S.fields.filter(f=>f[3]!=='auto'&&(STU.includes(f[0])||(f[0]==='academic'&&!['Section','Category','SecondaryCategory','Classification','ReferredBy'].includes(f[1])))&&!(rec.EnrollStatus==='Enrolled'&&IDLOCK_C.includes(f[1]))).map(f=>f[1])}
 const dv=x=>String(x==null?'':x);
 function draftSave(){try{if(!S.user||A()||!S.user.StudentID||!S.t||!S.t.edit)return;collect(S.t);
  const r=S.t.rec,b=S.t.base||{},f={};draftKeys(r).forEach(k=>{if(dv(r[k])!==dv(b[k]))f[k]=dv(r[k])});
@@ -3229,7 +3233,7 @@ cpRender=function(){_cpR6();const c=S.cp;if(!c||c.id!=='handbook'||c.edit)return
 @media(max-width:600px){.dxst{grid-template-columns:1fr}}
 `;document.head.appendChild(s)})();
 
-const DXC={'PUB-QVR':'#2563eb','ESC':'#16a34a','TLC':'#d97706','TLC-OVAP':'#7c3aed','IS':'#db2777','REGULAR':'#64748b','QVA PASSER':'#0891b2','':'#94a3b8'};
+const DXC={'VP-QVR':'#2563eb','ESC GRANTEE':'#16a34a','TLC SCHOLAR':'#d97706','IS':'#db2777','REGULAR':'#64748b','VP-QVA':'#0891b2','':'#94a3b8'};
 const dxLab=k=>k===''?'(Not set)':k==='REGULAR'?'Regular':k;
 const dxSkel=t=>`<div class="card"><div class="ch"><h3>${t}</h3></div><div style="height:130px"><i class="galsk" style="border-radius:10px"></i></div></div>`;
 const DXK=[['All',()=>true],['Missing consent',b=>b==='Missing consent'],['Requirements',b=>b==='Requirements incomplete'],['Certificate No.',b=>b==='Certificate No. blank'],['Holds',b=>/^Hold:/.test(b)],['Temporary overdue',b=>b==='Temporary overdue']];
@@ -3667,8 +3671,8 @@ function releaseDocs(r) {
   if (r.EnrollStatus === 'Cancelled') return [['All submitted admission and enrollment requirements', 'All submitted requirements']];
   const d = [['SF9 / Report Card (original copy)', 'SF9 / Report Card (Orig.)'], ['Good Moral Certificate (original copy)', 'Good Moral Cert. (Orig.)']];
   if (r.Department === 'Senior High School') d.push(['Voucher Certificate', 'Voucher Certificate']);   // narrow to voucher categories if you prefer
-  if (r.Category === 'ESC') d.push(['ESC Certificate', 'ESC Certificate']);
-  if (['TLC', 'TLC-OVAP'].includes(r.Category)) d.push(['TLC Transfer Form', 'TLC Transfer Form']);
+  if (r.Category === 'ESC GRANTEE') d.push(['ESC Certificate', 'ESC Certificate']);
+  if (r.Category === 'TLC SCHOLAR') d.push(['TLC Transfer Form', 'TLC Transfer Form']);
   return d;
 }
 
@@ -4241,7 +4245,7 @@ function railHTML(t){const r=t.rec,st=r.EnrollStatus||'Not Enrolled',p=String(r.
  return `<div class="rrail" role="complementary" aria-label="Learner summary"><div class="card"><div class="rpho" style="${ph?`background-image:url(${ph})`:''}">${ph?'':esc((a+b).toUpperCase())}</div>
  <h3 class="rnm">${esc(nm)}</h3><div class="rid">${r.StudentID?esc(sidShow(r)):'Not yet saved'}</div>
  <div class="rchips"><span class="chip ${stc(st)}">${esc(st)}</span>${holds.map(h=>`<span class="chip warn">Hold: ${esc(h)}</span>`).join('')}</div>
- ${row('Grade &amp; section',gsLabel(r))}${row('LRN',r.LRN)}${row('School year',r.SchoolYear)}${row('Classification',r.Classification)}${row('Category',r.Category)}${st==='Temporary'&&r.TempUntil?row('Temporary until',fmtD(r.TempUntil)):''}
+ ${row('Grade &amp; section',gsLabel(r))}${row('LRN',r.LRN)}${row('School year',r.SchoolYear)}${row('Classification',r.Classification)}${row('Category',catLabel(r))}${st==='Temporary'&&r.TempUntil?row('Temporary until',fmtD(r.TempUntil)):''}
  ${A()&&r.ProcessedBy?row('Last processed',r.ProcessedBy+(r.ProcessedDate?' \u00b7 '+fmtS(r.ProcessedDate):'')):''}
  <div class="rpg" id="rrp">${railProg(t)}</div></div></div>`}
 

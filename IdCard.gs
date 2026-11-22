@@ -1,10 +1,10 @@
 /*****************************************************************************
  MOREH ACADEMY PORTAL - STUDENT ID CARD (new file "IdCard")
- TLC scholars only (Category TLC or TLC-OVAP), Junior High and Senior High.
+ TLC scholars only (Category TLC SCHOLAR, any secondary category), Junior High and Senior High.
  The Student ID number is typed by staff and never changes for the learner.
 *****************************************************************************/
 const ID_SLOTS = ['front', 'back', 'STEM', 'ASSH', 'BE', 'ICT', 'HT'];
-const ID_RE = /^TLC\d{4}-\d{4}$/, ID_CATS = ['TLC', 'TLC-OVAP'];
+const ID_RE = /^TLC\d{4}-\d{4}$/, ID_CATS = ['TLC SCHOLAR'];
 
 /** Decodes a data URL and checks that it is a JPEG within the size limit. */
 function jpegBytes_(dataUrl, maxBytes) {

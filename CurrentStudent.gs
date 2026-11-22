@@ -4,7 +4,7 @@
 
  WHAT IT DOES
    - Public form asks: Surname, First Name, Middle Name, LRN, Grade Level, Section, Category
-     (+ TLC ID Number when the Category is TLC / TLC-OVAP), then username, email and password.
+     (+ TLC ID Number and Secondary Category when the Category is TLC SCHOLAR), then username, email and password.
    - The e-mail code check is the same as the enrollee sign-up (or no code while automatic mail is off).
    - If the LRN is ALREADY on the Students sheet (e.g. imported by the office) and has no login yet, and the surname and
      first name match, the new login is linked to that record: nothing the office keeps is overwritten, only blanks are filled.
@@ -15,8 +15,8 @@
  Requires Security, Protection, Hardening, MailSwitch, SignInGuard, Identifiers (same as registerAccount).
 *****************************************************************************/
 
-const CUR_CAT_LABELS_ = { 'TLC':'TLC Scholar', 'TLC-OVAP':'TLC-OVAP Scholar', 'REGULAR':'Regular (non-scholar)', 'PUB-QVR':'PUB-QVR', 'ESC':'ESC', 'QVA PASSER':'QVA Passer', 'IS':'IS' };
-const CUR_TLC_CATS_ = ['TLC', 'TLC-OVAP'];            // same categories that get a Student ID card (IdCard.gs)
+const CUR_CAT_LABELS_ = { 'REGULAR':'REGULAR', 'TLC SCHOLAR':'TLC SCHOLAR', 'ESC GRANTEE':'ESC GRANTEE', 'VP-QVR':'VP-QVR', 'VP-QVA':'VP-QVA', 'IS':'IS' };
+const CUR_TLC_CATS_ = ['TLC SCHOLAR'];            // same categories that get a Student ID card (IdCard.gs)
 const CUR_TLC_RE_ = /^TLC\d{4}-\d{4}$/;
 
 /** PUBLIC. What the form needs: grades, sections (Senior High sections carry their cluster code), categories, school year. */
@@ -30,7 +30,7 @@ function currentStudentOptions() {
       } else sections[g] = (SEC[g] || []).map(s => [s, '']);
     });
     return ok({ sy: activeSY_(), grades: GRADES, sections: sections, clusters: CL,
-      categories: CATS.map(c => ({ v: c, l: CUR_CAT_LABELS_[c] || c, tlc: CUR_TLC_CATS_.includes(c) })) });
+      categories: CATS.map(c => ({ v: c, l: CUR_CAT_LABELS_[c] || c, tlc: CUR_TLC_CATS_.includes(c) })), secondary: SEC_CAT_LIST });
   } catch (e) { return fail(e); }
 }
 
@@ -38,7 +38,7 @@ function currentStudentOptions() {
 function curClean_(f) {
   const up = v => String(v || '').trim().toUpperCase().replace(/\s+/g, ' ');
   const p = { sn: up(f.surname), fn: up(f.firstName), mn: up(f.middleName), lrn: String(f.lrn || '').trim(), grade: String(f.grade || '').trim(),
-    section: up(f.section), cat: String(f.category || '').trim(), tlc: up(f.tlcId), un: String(f.username || '').trim().toLowerCase(),
+    section: up(f.section), cat: String(f.category || '').trim(), sec: String(f.secondaryCategory || '').trim(), tlc: up(f.tlcId), un: String(f.username || '').trim().toLowerCase(),
     em0: String(f.email || '').trim(), pw: String(f.password || '') };
   p.em = p.em0.toLowerCase();
   if (!f.consent) throw new Error('You must accept the Data Privacy Notice to create an account.');
@@ -58,7 +58,8 @@ function curClean_(f) {
     if (!CUR_TLC_RE_.test(p.tlc)) throw new Error('Enter your TLC ID number exactly as issued, like TLC2026-0001.');
     const yr = parseInt(p.tlc.slice(3, 7), 10), top = parseInt(activeSY_().slice(0, 4), 10) + 1;
     if (yr < 2018 || yr > top) throw new Error('The year in the TLC ID number must be between 2018 and ' + top + '.');
-  } else p.tlc = '';
+    if (SEC_CAT_LIST.indexOf(p.sec) < 0) throw new Error('Select your Secondary Category (TLC-OVAP, TLC-ESC or Not Applicable).');
+  } else { p.tlc = ''; p.sec = ''; }
   if (!USER_RE.test(p.un)) throw new Error('Choose a username of 4 to 30 characters: letters, numbers, dot, underscore or hyphen (no spaces, no @).');
   if (rows_('U').some(u => u.Username === p.un)) throw new Error('That username is already taken. Please choose another one.');
   if (!EMAIL_RE.test(p.em0)) throw new Error('Enter a valid email address.');
@@ -156,7 +157,7 @@ function curCreate_(p, how) {
     claimed = true; row = Object.assign({}, claim);
     const fill = (k, v) => { if (!row[k] && v) row[k] = v; };
     fill('MiddleName', p.mn); fill('Email', p.em0); fill('GradeLevel', p.grade); fill('Section', p.section); fill('Cluster', p.cluster); fill('Category', p.cat);
-    if (CUR_TLC_CATS_.includes(row.Category)) fill('IDNumber', p.tlc);
+    if (CUR_TLC_CATS_.includes(row.Category)) { fill('IDNumber', p.tlc); fill('SecondaryCategory', p.sec); }
     fill('ConsentAt', now);
     row.FullName = [row.Surname + ',', row.FirstName, row.MiddleName ? row.MiddleName[0] + '.' : '', row.Suffix].filter(Boolean).join(' ');
     if (row.EnrollStatus === 'Enrolled') ensurePermId_(row);
@@ -165,7 +166,7 @@ function curCreate_(p, how) {
   } else {
     row = Object.assign({}, newKeys_(activeSY_()), { CreatedAt: now, Surname: p.sn, FirstName: p.fn, MiddleName: p.mn, LRN: p.lrn, Email: p.em0,
       Classification: 'Old', SchoolYear: activeSY_(), EnrollStatus: 'Enrolled', GradeLevel: p.grade, Section: p.section, Cluster: p.cluster, Category: p.cat,
-      IDNumber: p.tlc, ReqConsent: 'None', ConsentAt: now,
+      IDNumber: p.tlc, SecondaryCategory: p.sec, ReqConsent: 'None', ConsentAt: now,
       ProcessedBy: 'SELF-REGISTERED (UNVERIFIED)', ProcessedDate: Utilities.formatDate(d, tz, 'yyyy-MM-dd'), ProcessedTime: Utilities.formatDate(d, tz, 'hh:mm:ss a'), StatusChangedAt: now });
     row.FullName = [p.sn + ',', p.fn, p.mn ? p.mn[0] + '.' : ''].filter(Boolean).join(' ');
     ensurePermId_(row);

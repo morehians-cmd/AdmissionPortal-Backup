@@ -18,7 +18,7 @@
    3. Owner: Enrollment Settings > Re-enrollment > Preview > "Re-enroll all eligible (promote one grade)".
       (A backup copy of the spreadsheet is made first.)
    4. Students sign in with the same account, update their profile and bring the requirements; staff mark them Enrolled.
-   For learners entering Grade 11, the Cluster is cleared and the Category should be reviewed (e.g. ESC to voucher).
+   For learners entering Grade 11, the Cluster is cleared and the Category should be reviewed (e.g. ESC GRANTEE to VP-QVR).
 *****************************************************************************/
 
 const REENROLL_RESET = ['ReqSF9', 'ReqConsent', 'ReqRemarks', 'ReqEnvelope', 'ReqEnrollForm'];   // requirements that must be submitted again every year. Edit freely.
@@ -36,7 +36,7 @@ function histSh_() {
 function history_(id) {
   const sh = histSh_(); if (sh.getLastRow() < 2) return [];
   return sh.getRange(2, 1, sh.getLastRow() - 1, 8).getValues().filter(r => String(r[0]) === id)
-    .map(r => ({ SchoolYear:String(r[1]), Classification:String(r[2]), Category:String(r[3]), GradeLevel:String(r[4]), Cluster:String(r[5]), Section:String(r[6]), EnrollStatus:String(r[7]) }))
+    .map(r => ({ SchoolYear:String(r[1]), Classification:String(r[2]), Category:catNorm_(r[3]), GradeLevel:String(r[4]), Cluster:String(r[5]), Section:String(r[6]), EnrollStatus:String(r[7]) }))
     .sort((a, b) => a.SchoolYear.localeCompare(b.SchoolYear));
 }
 /** Adds the history and the "can be re-enrolled" flag to a record that is sent to the browser. */
@@ -85,7 +85,7 @@ function reenrollRun(token, o) {
       // previous school block = Moreh Academy, last year
       r.PrevSchool = SCHOOL; r.PrevSchoolID = SCHOOL_ID; r.PrevSY = old.SchoolYear; r.PrevGrade = old.GradeLevel; r.PrevSection = old.Section;
       r.PrevCluster = ['Grade 11', 'Grade 12'].includes(old.GradeLevel) ? old.Cluster : ''; r.PrevAdviser = ''; r.PrevAddress = '';
-      r.PrevScholarship = old.Category === 'ESC' ? (old.Department === 'Junior High School' ? 'ESC JHS' : 'ESC SHS') : (['PUB-QVR', 'TLC', 'QVA PASSER'].includes(old.Category) ? old.Category : '');
+      r.PrevScholarship = ['TLC SCHOLAR', 'ESC GRANTEE', 'VP-QVR', 'VP-QVA'].includes(catNorm_(old.Category)) ? catNorm_(old.Category) : '';
       // new year
       r.SchoolYear = SY; r.Classification = 'Old'; r.GradeLevel = ng; r.Department = deptOf_(ng);
       r.Cluster = (r.Department !== 'Senior High School' || old.GradeLevel === 'Grade 10') ? '' : old.Cluster;   // entering Grade 11: learner chooses a cluster again
