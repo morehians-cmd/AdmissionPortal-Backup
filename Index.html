@@ -3177,23 +3177,6 @@ act.clgo=()=>{const q=S.clq||{},n=Object.keys(q).length,out=$('clres');if(!out)r
   return `<div class="clr" style="border-left:4px solid ${clColor(c,i)}"><div><b>${esc(c.key)}</b><br><span class="sm">${esc(c.full)}</span></div><button class="btn alt" onclick="document.getElementById('cl${i}').scrollIntoView({behavior:'smooth',block:'start'})">See this cluster</button></div>`}).join('')+(top.length>1?'<span class="sm" style="color:var(--mut);font-size:13px">It was a tie. Read both clusters and see which feels closer to you.</span>':'')};
 
 /* Cluster page: replace the generic cards with cluster cards */
-const _cpR4=cpRender;
-cpRender=function(){_cpR4();const c=S.cp;if(!c||c.id!=='cluster')return;
- if(c.edit){const bar=document.querySelector('#view .sbar');if(bar&&!bar.querySelector('[data-act=cltpl]')){const b=document.createElement('button');b.className='btn alt';b.dataset.act='cltpl';b.onmousedown=e=>e.preventDefault();b.textContent='Insert cluster template';bar.insertBefore(b,bar.querySelector('.pvtip'))}return}
- const L=clParse(c.html||cpDefault('cluster')),F=FULL(),hero=document.querySelector('#view .shero'),gal=$('gal');
- if(!hero||!L.length)return;S.clL=L;
- [...document.getElementById('view').children].forEach(n=>{if(n!==hero&&n!==gal)n.remove()});
- const vis=F?L:L.filter(clHas),live=L.filter(clHas).length,chips=hero.querySelector('.shch');
- if(chips)chips.innerHTML=`<span class="shchip">${live} ${live===1?'cluster':'clusters'}</span>${F&&L.length>live?`<span class="shchip">${L.length-live} empty (hidden from students)</span>`:''}`;
- const body=vis.length?`<div class="clg">${vis.map(x=>clCard(x,L.indexOf(x),F)).join('')}</div>${clCompare(L)}${clPicker(L)}`:'<div class="card cpsoon"><b>Coming soon</b>This page is being prepared. Please check back later.</div>';
- const w=document.createElement('div');w.innerHTML=body;hero.after(w);clLogos()};
-
-/* Editor helper: add the structure for any cluster that is not on the page yet */
-act.cltpl=()=>{const b=$('cpbody');if(!b)return;const have=[...b.querySelectorAll('h4')].map(h=>h.textContent.trim().toUpperCase());let n=0;
- Object.keys(S.clusters).forEach(k=>{if(have.some(t=>t.indexOf(k.toUpperCase())===0))return;n++;
-  b.insertAdjacentHTML('beforeend',`<h4>${esc(k)} \u2013 ${esc(S.clusters[k])}</h4><p>One short line about this cluster.</p><p><b>What you will study:</b></p><ul><li></li></ul><p><b>Skills that fit:</b></p><ul><li></li></ul><p><b>Possible careers:</b></p><ul><li></li></ul><p><b>Possible college courses:</b></p><ul><li></li></ul>`)});
- toast(n?'Template added for '+n+' cluster'+(n===1?'':'s')+'. Fill in the bullets, then Save.':'All clusters are already on the page.',n?true:'warn')};
-
 /* ===== Student Handbook + Help Center upgrades =====
    Paste AFTER content-pages-v2.js, facilities-photo-first.js and cluster-cards.js, at the end of the main script.
    No backend changes. Everything is read from the existing page text.
@@ -3674,25 +3657,7 @@ function cgCard(c,i){const col=clColor(c,i),ini=esc(c.key.slice(0,5).toUpperCase
   +`</div></div>`}
 
 /* 4. Page: replace the earlier cluster layout (cards, compare table, quick picker) with the new cards */
-const _cpR7=cpRender;
-cpRender=function(){_cpR7();const c=S.cp;if(!c||c.id!=='cluster'||c.edit)return;
- const hero=document.querySelector('#view .shero');if(!hero)return;
- const L=cgParse(c.html||cpDefault('cluster')),F=FULL();S.clL=L;
- [...$('view').children].forEach(n=>{if(n!==hero&&n.id!=='cecta')n.remove()});
- const vis=F?L:L.filter(cgHas),live=L.filter(cgHas).length,chips=hero.querySelector('.shch');
- if(chips)chips.innerHTML=`<span class="shchip">${live} ${live===1?'cluster':'clusters'}</span>${F&&L.length>live?`<span class="shchip">${L.length-live} empty (hidden from students)</span>`:''}`;
- const w=document.createElement('div');
- w.innerHTML=vis.length?`<div class="clg">${vis.map(x=>cgCard(x,L.indexOf(x))).join('')}</div>`:'<div class="card cpsoon"><b>Coming soon</b>This page is being prepared. Please check back later.</div>';
- (document.getElementById('cecta')||hero).after(w);clLogos()};
-
-/* 5. Editor: the template button now inserts Definition + Future career paths */
-act.cltpl=()=>{const b=$('cpbody');if(!b)return;
- const have=[...b.querySelectorAll('h4')].map(h=>h.textContent.trim().toUpperCase());let n=0;
- Object.keys(S.clusters).forEach(k=>{if(have.some(t=>new RegExp('^'+k.toUpperCase()+'\\b').test(t)))return;n++;
-  b.insertAdjacentHTML('beforeend',`<h4>${esc(k)} – ${esc(S.clusters[k])}</h4><p><b>Definition:</b> Write the definition here.</p><p><b>Future career paths:</b></p><ul><li></li><li></li><li></li></ul>`)});
- toast(n?'Template added for '+n+' cluster'+(n===1?'':'s')+'. Fill it in, then Save.':'All clusters are already on the page.',n?true:'warn')};
-
- /* ===== System Manager: no System Administration pages ===== */
+/* ===== System Manager: no System Administration pages ===== */
 const _navSM=nav;
 nav=function(id){
  if(['um','set','ia'].includes(id)&&!SYS()){toast('This section is for the main administrator only.','warn');id='home'}
