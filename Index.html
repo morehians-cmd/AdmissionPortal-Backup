@@ -2710,7 +2710,7 @@ function renderNav(m){S.menu=m;
  $('nav').innerHTML=m.map((e,i)=>Array.isArray(e)
   ?(e[0]==='me'?'<div class="nlabel">Account</div>':'')+navBtn(e)
   :`<div class="ng" data-g="${i}"><button class="nav ngh" data-act="ngtoggle" data-v="${i}" aria-label="${esc(e.g)}" aria-haspopup="true" aria-expanded="false" aria-controls="ns${i}">${e.i}<span>${e.g}</span>${nbHTML(e.g)}<span class="chev">${CHEV}</span></button><div class="ns" id="ns${i}"><div class="nsh">${e.g}</div>${e.items.map(x=>navBtn(x,1)).join('')}</div></div>`).join('');
- sbInit()}
+ sbInit()}\n  navBadgeSync();loadBadges()
 
 /* flyout open / close */
 let FT=null;
