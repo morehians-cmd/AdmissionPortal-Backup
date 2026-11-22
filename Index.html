@@ -2515,7 +2515,7 @@ function wsRenderLegacy(){
 
   `<div class="card"><div class="ch"><h3>School identity</h3></div><div class="g">${wf('Tagline','masthead.tagline',d.masthead.tagline)}</div></div>`,
   wcard('ids','Schools in the top bar',(d.masthead.ids||[]).map((x,i)=>wrow('ids',i,WS_LISTS.ids.n,
-   wf('School name','masthead.ids.'+i+'.name',x.name)+wf('Short name (2–4 letters)','masthead.ids.'+i+'.short',x.short)+wf('Logo image URL','masthead.ids.'+i+'.logo',x.logo)+wf('Facebook page URL','masthead.ids.'+i+'.fb',x.fb))).join(''),'The logo is optional; the short name is shown when there is none.'),
+   wf('School name','masthead.ids.'+i+'.name',x.name)+wf('Short name (2–4 letters)','masthead.ids.'+i+'.short',x.short)+wf('Logo image reference','masthead.ids.'+i+'.logo',x.logo)+`<div style="margin-top:8px"><button class="btn alt" type="button" data-act="wsselectlogo" data-v="masthead.ids.${i}.logo">Select from Media Library</button></div>`+wf('Facebook page URL','masthead.ids.'+i+'.fb',x.fb))).join(''),'The logo is optional; the short name is shown when there is none.'),
   `<div class="card"><div class="ch"><h3>Hero (top of the homepage)</h3></div><div class="g">${wf('Small line above the name','hero.title',d.hero.title)}${wf('School name (large)','hero.name',d.hero.name)}${wf('Subtitle','hero.subtitle',d.hero.subtitle)}${wt('Description','hero.desc',d.hero.desc)}${wf('Main button label','hero.enroll.label',d.hero.enroll.label)}${wf('Main button link (#create, route:about, https://…)','hero.enroll.to',d.hero.enroll.to)}${wf('Second button label','hero.discover.label',d.hero.discover.label)}${wf('Second button link','hero.discover.to',d.hero.discover.to)}${wf('Slide interval (milliseconds)','hero.intervalMs',d.hero.intervalMs,'number')}</div></div>`,
   wcard('slides','Hero slides',(d.hero.slides||[]).map((x,i)=>wrow('slides',i,WS_LISTS.slides.n,
   wf('Image URL (empty = coloured background)','hero.slides.'+i,x)+
@@ -2674,6 +2674,7 @@ function wsMediaPicker(title,done){
 }
 act.wsselecthero=path=>wsMediaPicker('Select Hero Media',m=>wsHeroApply(path,m.ref));
 act.wsselectprogram=path=>wsMediaPicker('Select Program Media',m=>{wspSet(S.site,path,m.ref);wsRender()});
+act.wsselectlogo=path=>wsMediaPicker('Select School Logo',m=>{wspSet(S.site,path,m.ref);wsRender()});
 act.pgmedia=()=>wsMediaPicker('Insert Page Media',m=>{
  const ta=$('pgTxt');if(!ta||!S.pg)return;
  const route=S.pg.route,old=ta.value||'',alt=m.title||'Moreh Academy image',ins='!['+alt.replace(/\]/g,'')+']('+m.ref+')';
