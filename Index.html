@@ -1441,8 +1441,11 @@ function formHTML(t){S.t=t;t.step=t.step||1;const id=t.rec.StudentID,canc=t.rec.
 function loadGuide(){google.script.run.withSuccessHandler(r=>{const el=$('guidebox');if(el&&r&&r.success&&r.data)el.innerHTML=cleanHtml(r.data)}).withFailureHandler(()=>{}).getBlock(S.token,'guide')}
 function guidePage(){head('Enrollment Guide','Edit the guide students see on their dashboard');call('getBlock',[T(),'guide'],r=>{S.guideHtml=r.data||'';guideRender()})}
 function guideRender(){const t=(v,l)=>`<button class="btn alt" onmousedown="event.preventDefault()" data-act="pfmt" data-v="${v}">${l}</button>`;
- $('view').innerHTML=`<div class="sbar"><button class="btn" data-act="guidesave">Save guide</button><button class="btn alt" data-act="guidereset">Restore default text</button>${t('bold','Bold')}${t('insertOrderedList','Numbered list')}${t('insertUnorderedList','Bullets')}<span class="pvtip">Students see this on their Home page. Click inside the box to edit.</span></div><div class="card pv pve pvs" id="gbody" contenteditable="true">${cleanHtml(S.guideHtml||GUIDE0)}</div>`}
-act.guidesave=()=>call('saveBlock',[T(),'guide',$('gbody').innerHTML],r=>{S.guideHtml=r.data;toast(r.message)});
+ $('view').innerHTML=`<div class="sbar"><button class="btn" data-act="guidesave">Save guide</button><button class="btn alt" data-act="guidereset">Restore default text</button>${t('bold','Bold')}${t('insertOrderedList','Numbered list')}${t('insertUnorderedList','Bullets')}<span class="pvtip">Students see this on their Home page. Click inside the box to edit.</span></div><div class="card pv pve pvs" id="gbody" contenteditable="true">${cleanHtml(S.guideHtml||GUIDE0)}</div>`
+ const bar=document.querySelector('#view .sbar');
+ if(bar&&!bar.querySelector('[data-act=guidetabs]')){const b=document.createElement('button');b.className='btn alt';b.dataset.act='guidetabs';b.onmousedown=e=>e.preventDefault();b.textContent='Insert tabs layout';bar.insertBefore(b,bar.querySelector('.pvtip'))}
+ const tip=document.querySelector('#view .pvtip');if(tip)tip.textContent='Students see this on their Home page. Numbered steps tick themselves (keywords: profile, consent, requirements, dashboard). Headings become tabs.'
+}act.guidesave=()=>call('saveBlock',[T(),'guide',$('gbody').innerHTML],r=>{S.guideHtml=r.data;toast(r.message)});
 act.guidereset=()=>{if(confirm('Replace the text with the default guide? Click Save guide to keep it.'))$('gbody').innerHTML=GUIDE0};
 /* ===== Holds / Flags ===== */
 I.flag=ic('M4 22V4M4 4h13l-2 4 2 4H4');
@@ -2160,7 +2163,7 @@ function planCard(plan,items,i){const m=pmeta(plan),tot=items.find(isT),rows=ite
  return `<div class="card fpc" id="fp${i}"><div class="fpch" style="border-top-color:${m.c}"><span class="ao ${m.cl}">${m.ico}</span><div><h3>${esc(plan)}</h3><small>${plan==='Full Payment'?'Paid once, upon enrollment':rows.length+' payments'}</small></div></div><div class="fpb">${rows.map(r=>`<div class="fpr"><i style="background:${m.c}"></i><span>${esc(r.Item)}</span><b>${pm(r.Amount)}</b></div>`).join('')}${tot?`<div class="fpr fpt" style="background:${m.c}14"><span>${plan==='Full Payment'?'Total upon enrollment':'Total'}</span><b style="color:${m.c}">${pm(tot.Amount)}</b></div>`:''}</div></div>`}
 function tierFor(g,tiers){if(!g)return null;if(/^(Nursery|Kinder)/i.test(g))return tiers.find(t=>/pre|nursery|kinder/i.test(t))||null;const n=parseInt((g.match(/\d+/)||[])[0],10);if(!n)return null;
  return tiers.find(t=>{if(/pre|nursery|kinder/i.test(t))return false;const m=t.match(/(\d+)\s*(?:[\u2013\u2014\-]|to)\s*(\d+)/);if(m)return n>=+m[1]&&n<=+m[2];const s=t.match(/(\d+)/);return s&&+s[1]===n})||null}
-function tuitionPage(){head('Schedule of Fees','School Year '+S.cfg.sy.replace('-','\u2013'));call('getFees',[T()],r=>{S.fees=r.data;if(A())return feeRender();call('getStudent',[T()],q=>{S.fg=q.data.GradeLevel||'';feeRender()})})}
+function tuitionPage(){S.fplan='';head('Schedule of Fees','School Year '+S.cfg.sy.replace('-','\u2013'));call('getFees',[T()],r=>{S.fees=r.data;if(A())return feeRender();call('getStudent',[T()],q=>{S.fg=q.data.GradeLevel||'';feeRender()})})}
 function feeRender(){const F=S.fees,tiers=[...new Set(F.rows.map(x=>x.Tier))];S.tierList=tiers;
  if(!tiers.length)return $('view').innerHTML='<div class="card">The fee schedule has not been filled in yet.</div>';
  const stu=!A();let t;
@@ -3316,10 +3319,6 @@ loadGuide=function(){const box=$('guidebox');if(!box)return;let html=box.innerHT
  google.script.run.withSuccessHandler(r=>{if(r&&r.success)st=r.data;fin()}).withFailureHandler(fin).getStudent(S.token)};
 
 /* editor helper for the main administrator */
-const _gR=guideRender;
-guideRender=function(){_gR();const bar=document.querySelector('#view .sbar');
- if(bar&&!bar.querySelector('[data-act=guidetabs]')){const b=document.createElement('button');b.className='btn alt';b.dataset.act='guidetabs';b.onmousedown=e=>e.preventDefault();b.textContent='Insert tabs layout';bar.insertBefore(b,bar.querySelector('.pvtip'))}
- const tip=document.querySelector('#view .pvtip');if(tip)tip.textContent='Students see this on their Home page. Numbered steps tick themselves (keywords: profile, consent, requirements, dashboard). Headings become tabs.'};
 act.guidetabs=()=>{const b=$('gbody');if(!b)return;if(b.querySelector('h4'))return toast('This guide already has headings, so it will show as tabs.','warn');
  b.innerHTML='<h4>New students</h4>'+b.innerHTML+'<h4>Returning students</h4><p>Write the steps here.</p><h4>Account issues</h4><p>Write the steps here.</p>';
  toast('Tabs layout added. Fill in the empty tabs, then Save guide. Empty tabs stay hidden from students.')};
@@ -4585,9 +4584,6 @@ function segFocus(){const k=S.segKb;if(!k)return;S.segKb='';const o=document.que
 /* =====================================================================
    SCHEDULE OF FEES
    ===================================================================== */
-const _tpF=tuitionPage;
-tuitionPage=function(){S.fplan='';_tpF()};
-
 /** REPLACES feeRender(): grade-level and plan segmented controls, a compare table, then the plan cards. */
 feeRender=function(){const F=S.fees,tiers=[...new Set(F.rows.map(x=>x.Tier))];S.tierList=tiers;
  if(!tiers.length)return $('view').innerHTML='<div class="card">The fee schedule has not been filled in yet.</div>';
