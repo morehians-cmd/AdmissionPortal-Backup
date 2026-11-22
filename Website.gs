@@ -257,44 +257,18 @@ function getDraftHomepage() { return getPublishedHomepage(); }
  *                                                *italic*, [label](url) and "- " bullets work)
  */
 
-/* Mirrors Homepage.html's DEFAULT_HOME.nav: same labels, same order, same slugs (route ids).
- * noRoot groups have no page of their own (Contact, Terms and Privacy are reached from the footer). */
-const PAGE_MENU_ = [
-  { id: 'about', label: 'About Us', subs: [
-    ['vision-mission-and-core-values', 'Vision, Mission & Core Values'],
-    ['history', 'History'],
-    ['school-leadership', 'School Leadership']] },
-  { id: 'admissions', label: 'Admissions', subs: [
-    ['enrollment-procedure', 'Enrollment Procedure'],
-    ['admission-requirements', 'Admission Requirements'],
-    ['scholarships', 'Scholarships'],
-    ['frequently-asked-questions', 'Frequently Asked Questions']] },
-  { id: 'academics', label: 'Academics', subs: [
-    ['kindergarten', 'Kindergarten'],
-    ['elementary', 'Elementary'],
-    ['junior-high-school', 'Junior High School'],
-    ['senior-high-school', 'Senior High School'],
-    ['college-program', 'College Program']] },
-  { id: 'campus-life', label: 'Campus Life', subs: [
-    ['student-organizations', 'Student Organizations'],
-    ['school-activities-and-events', 'School Activities & Events'],
-    ['sports-and-athletics', 'Sports & Athletics'],
-    ['clubs-and-societies', 'Clubs & Societies'],
-    ['campus-facilities-and-tour', 'Campus Facilities & Tour']] },
-  { id: 'forms', label: 'Downloadable Forms', subs: [
-    ['downloadable-forms', 'Downloadable Forms']] },
-  { id: 'news', label: 'News & Updates', subs: [
-    ['school-announcements', 'School Announcements'],
-    ['latest-news', 'Latest News'],
-    ['upcoming-events', 'Upcoming Events'],
-    ['enrollment-announcements', 'Enrollment Announcements'],
-    ['school-achievements', 'School Achievements']] },
-  /* No 'privacy' here on purpose: the website's Privacy page shows the Data Privacy Policy the
-     portal already stores (getPublishedPolicy), so there is only ever one copy of it. */
-  { id: 'other', label: 'Other pages', noRoot: true, subs: [
-    ['contact', 'Contact Information'],
-    ['terms', 'Terms of Service']] }
-];
+/* Derive the page editor catalogue from the canonical server menu seed.
+ * This avoids a second set of menu labels and card titles drifting out of sync. */
+const PAGE_MENU_IDS_ = ['about', 'admissions', 'academics', 'campus-life', 'forms', 'news'];
+const pageSlug_ = value => String(value || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const PAGE_MENU_ = SITE_SEED_.sections.nav.menus.map((m, i) => ({
+  id: PAGE_MENU_IDS_[i],
+  label: m.label,
+  subs: m.subs.map(s => [pageSlug_(s[0]), s[0]])
+})).concat([{
+  id: 'other', label: 'Other pages', noRoot: true,
+  subs: [['contact', 'Contact Information'], ['terms', 'Terms of Service']]
+}]);
 const PAGES_KEY = 'pages_data', PAGES_CACHE_KEY = 'pages_v1', PAGE_TEXT_MAX = 6000, PAGES_MAX = 45000;
 /* A menu page's route is "<menu>/<slug>", exactly what Homepage.html's links and cur_route() use. */
 const pageRoute_ = (g, s) => g.noRoot ? s[0] : g.id + '/' + s[0];
