@@ -1306,8 +1306,8 @@ const act={out:()=>{clearInterval(CD);if($('idm'))$('idm').remove();try{google.s
  pedit:()=>{S.pe=true;profile()},
  psave:()=>{const p={email:$('em').value,newPassword:$('npw').value,photo:S.newPhoto};call('saveMyProfile',[T(),p],r=>{S.user=r.data;S.pe=false;S.newPhoto=null;setAv();profile();toast(r.message)})}};
 document.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(a)act[a.dataset.act](a.dataset.v)});
-function paint(){S.cur==='stu'||!A()?stuProfile(true):adm()}
-function collect(t){document.querySelectorAll('#view [data-k]').forEach(i=>{if(i.type==='radio'){if(i.checked)t.rec[i.dataset.k]=i.value;return}t.rec[i.dataset.k]=i.type==='checkbox'?(i.checked?'Yes':''):(i.type==='text'&&!/(Email|Facebook)$/.test(i.dataset.k)?i.value.toUpperCase():i.value)})}
+
+
 document.addEventListener('input',e=>{if(e.target.dataset.num){e.target.value=e.target.value.replace(/\D/g,'')}});
 document.addEventListener('change',e=>{const k=e.target.dataset.k,t=S.t;if(!k||!t)return;collect(t);const r=t.rec;
  if(k==='GradeLevel'){r.Department=deptOf(r.GradeLevel);r.Section='';if(r.Department!=='Senior High School')r.Cluster=''}
@@ -1652,7 +1652,7 @@ function wCheck(t){const r=t.rec,bad=x=>{toast(x,false);return false},ph=/^\d{11
  if(t.step===2&&r.Mobile&&!ph.test(r.Mobile))return bad('Contact number must be 11 digits.');
  if(t.step===3){for(const k of['FatherMobile','MotherMobile','EmMobile','GuardMobile'].concat(r.LivingWith==='Relatives / Legal Guardian'?['RelMobile']:[]))if(r[k]&&!ph.test(r[k]))return bad('Contact numbers must be exactly 11 digits.');for(const k of['FatherEmail','MotherEmail'])if(r[k]&&!em.test(r[k]))return bad('Enter a valid parent email address.')}
  return true}
-function wGo(n){const t=S.t;collect(t);if(t.edit&&n>t.step&&!wCheck(t))return;t.step=Math.max(1,Math.min(5,n));paint();window.scrollTo(0,0)}
+
 
 function adm(){head('Admission','Search, register and update enrollees');S.cur=S.cur||'search';
  const tabs=`<div class="tabs"><button class="tab ${S.cur==='search'?'on':''}" data-act="tab" data-v="search">${I.search} Search</button>${S.tabs.map(t=>`<button class="tab ${S.cur===t.key?'on':''}" data-act="tab" data-v="${t.key}">${esc(t.rec.FullName||'New enrollee')}<i data-act="close" data-v="${t.key}">${I.x}</i></button>`).join('')}</div>`;
@@ -1676,8 +1676,7 @@ function recHero(t){const r=t.rec,p=String(r.FullName||'').split(','),nm=r.FullN
  ini=((r.FullName?(p[0]||'').trim()[0]:(r.Surname||nm)[0])||'N')+(r.FullName?((p[1]||'').trim()[0]||''):(r.FirstName||'')[0]||''),gs=((r.GradeLevel||'')+' '+(r.Section||'')).trim();
  return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip ${r.StudentID?'':'sh-unsaved'}">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip ${(!r.EnrollStatus||r.EnrollStatus==='Not Enrolled')?'sh-pending':''}">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(tc(gs))}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`}
 
-function stuProfile(keep){head('Student Profile','Review and update your information');S.cur='stu';
- if(keep===true)return $('view').innerHTML=formHTML(S.st);call('getStudent',[T()],r=>{S.st={rec:r.data,edit:false};$('view').innerHTML=formHTML(S.st)})}
+
 function stuReq(){head('School Requirements','Requirements for your grade level');call('getStudent',[T()],r=>{const s=r.data,R=reqsFor(s);
  if(!R.level)return $('view').innerHTML='<div class="card">Choose your <b>Grade Level</b> in <b>Student Profile</b> to see the requirements for your level.</div>';
  const hint=S.cfg.reqHints[R.level]||{},docs=S.fields.filter(f=>f[0]==='req'&&R.show.includes(f[1])),notes=S.cfg.reqNotes.filter(n=>n.lv.includes(R.level)&&(!n.g||n.g.includes(s.GradeLevel)));
@@ -2183,7 +2182,7 @@ function feeRender(){const F=S.fees,tiers=[...new Set(F.rows.map(x=>x.Tier))];S.
 
 const FULL=()=>A()&&['Full','Manager'].includes(S.user.Clearance),SYS=()=>A()&&S.user.Clearance==='Full',ROLEN=c=>c==='Full'?'Administrator':c==='Manager'?'System Manager':c;;
 let IDLE=null,WARN=null,CD=null;
-function idleReset(){if(!S.token||$('idm'))return;clearTimeout(IDLE);clearTimeout(WARN);WARN=setTimeout(idleWarn,240000);IDLE=setTimeout(()=>act.out(),300000)}
+
 ['click','keydown','mousemove','touchstart','scroll'].forEach(e=>document.addEventListener(e,idleReset,{passive:true}));
 function idleWarn(){if(!S.token)return;const m=document.createElement('div');m.className='mod';m.id='idm';m.innerHTML='<div style="max-width:420px;padding:28px;text-align:center"><h3 style="color:var(--navy)">Are you still there?</h3><p style="color:var(--mut)">For your security you will be signed out in <b id="idc">60</b> seconds.</p><button class="btn" data-act="stay">Stay signed in</button></div>';document.body.appendChild(m);let n=60;clearInterval(CD);CD=setInterval(()=>{n--;if($('idc'))$('idc').textContent=n;if(n<=0)clearInterval(CD)},1000)}
 function settingsPage(){head('Enrollment Settings','Control the school year and who may register');call('getSettings',[T()],r=>{const d=r.data;$('view').innerHTML=`<div class="card"><h3>School year</h3><p>Active school year: <b>${esc(d.sy)}</b> &nbsp; <span class="chip ${d.mail?'ok':'warn'}">Automatic e-mails: ${d.mail?'ON':'OFF (reset and staff codes still work)'}</span></p><button class="btn" data-act="nextsy">Start enrollment for next school year</button></div>
@@ -3957,29 +3956,7 @@ function svRing(st,photo,ini,col){
  return `<div class="sv-av" style="--dc:${col}"><svg viewBox="0 0 120 120" width="120" height="120" aria-hidden="true"><circle cx="60" cy="60" r="58" fill="#1a62f0"/><circle cx="60" cy="60" r="52" fill="#fff"/></svg><div class="sv-ph" style="${photo?`background-image:url('${photo}')`:''}">${photo?'':esc(ini)}</div><i></i></div>`}
 
 /* ---------- the student Home page ---------- */
-function homeStudent(){head('Dashboard','Your enrollment at a glance');
- call('getStudent',[T()],r=>{const s=r.data,rq=reqsFor(s).req,done=rq.filter(k=>s[k]&&s[k]!=='None').length,rp=rq.length?Math.round(done/rq.length*100):0,
-  PK=['Surname','FirstName','LRN','Birthdate','GradeLevel','AddressLine1','City','Mobile','EmName','EmMobile'],
-  pp=Math.round((PK.filter(k=>s[k]).length+((s.FatherName||s.MotherName)?1:0))/(PK.length+1)*100),
-  cons=!!(s.ReqConsent&&s.ReqConsent!=='None'),st=s.EnrollStatus||'Not Enrolled',on=st==='Enrolled',
-  gs=((s.GradeLevel||'')+' '+(s.Section||'')).trim(),nm=tc([s.FirstName,s.Surname].filter(Boolean).join(' ')||S.user.FullName||'Student'),
-  col=on?'#22c55e':st==='Temporary'?'#f59e0b':'#94a3b8',sy=String(s.SchoolYear||S.cfg.sy).replace('-','\u2013'),
-  map=typeof GALMAP==='string'?GALMAP:'#',
-  k=(l,n,cap,a,v)=>{const t=a?'button':'div';return `<${t} class="sv-k"${a?` data-act="${a}"${v?` data-v="${v}"`:''}`:''}><b>${l}</b>${svStars(n)}<small>${cap}</small></${t}>`};
-  $('view').innerHTML=`<div class="sv hm-wrap" style="display:contents"><div class="sv-cv" style="--lg:url('${LOGO}')"><small>${greet()},</small><h2>${esc(tc(s.FirstName||nm))} &#128075;</h2><p>Welcome to your enrollment portal. Follow the guide below to finish your enrollment.</p>
-   <div class="sv-bar"><span>${I.cal}SY ${esc(sy)}</span><span>${EV_PIN}Taguig City, Philippines</span><span>${I.sch}Moreh Academy${s.Department?' \u00b7 '+esc(tc(s.Department)):''}</span><span class="sv-so"><a href="mailto:morehians@gmail.com" aria-label="Email the Admissions Office">${ic(CIC.mail)}</a><a href="tel:09618766886" aria-label="Call the Admissions Office">${ic(CIC.tel)}</a><a href="${map}" target="_blank" rel="noopener" aria-label="View the school on the map">${ic(CIC.pin)}</a></span></div></div></div>
-  <div class="sv hm"><div class="sv-l"><div class="sv-pc">${svRing(st,S.user.Photo,nm[0]||'S',col)}<h2>${esc(nm)}</h2><p>${esc(tc(gs)||'Grade level not set yet')}${s.Category?' \u00b7 '+esc(s.Category):''}<br>${esc(tc(s.Department||''))}</p>
-    <div class="sv-st"><div><b>${rq.length?done+'/'+rq.length:'\u2013'}</b><small>Requirements</small></div><i></i><div><b>${pp}%</b><small>Profile</small></div></div>
-    <div class="sv-bt"><button class="btn" data-act="nav" data-v="sp">Continue</button><a class="btn alt" href="mailto:morehians@gmail.com">Contact</a></div></div>
-   <div class="sv-jc"><h4>Enrollment Status</h4><div class="sv-job"><img src="${LOGO}" alt=""><div><b>${esc(st)}</b><small>School Year ${esc(sy)}</small></div>${on?SVSTAR(true):''}</div></div></div>
-  <div class="sv-r">${holdBanner(s)}
-   <div class="sv-r1"><div class="sv-or"><h3><span>${I.cal}</span>Office Hours</h3><p><b>Weekdays</b>Mon\u2013Fri 8:00 AM \u2013 5:00 PM<br>Sat 8:00 AM \u2013 3:00 PM</p><p><b>Contact</b>0961 876 6886<br>morehians@gmail.com</p><p><b>Visit us</b>Ground Floor, Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City</p>${I.sch}</div>${evSide()}</div>
-   <div class="card"><div class="ch"><h3>Enrollment Progress</h3></div><div class="sv-kg">${k('Profile',Math.round(pp/20),pp+'% complete','nav','sp')}${k('Requirements',Math.round(rp/20),rq.length?done+' of '+rq.length+' documents':'Choose your grade level','nav','rq')}${k('Parental consent',cons?5:0,cons?'Received by the office':'Print and submit the form','pconsent')}${k('Enrollment',on?5:st==='Temporary'?3:0,esc(st))}</div></div>
-   <div class="card"><h3>Enrollment guide</h3><div id="guidebox" class="pvs">${GUIDE0}</div></div>
-   <div class="row2"><div class="card"><div class="ch"><h3>Quick Actions</h3></div><div class="qas">${qa('c1',I.adm,'Student Profile','nav','sp')}${qa('c3',I.rep,'School Requirements','nav','rq')}${qa('c4',I.rep,'Print Consent Form','pconsent')}${qa('c2',I.rep,'Data Privacy Policy','nav','pp')}${qa('c5',I.sch,'Scholarships','nav','sch')}${qa('c1',I.tf,'Schedule of Fees','nav','tf')}</div></div>${actCard()}</div>
-   <div class="card"><h3>Important Reminders</h3><ul style="line-height:1.9;margin:0;padding-left:20px"><li><b>Enrollment Cancellation / Withdrawal:</b> &#8369;1,000.00 processing fee applies to cancellations/withdrawals on or before June 30. Requests made after June 30 will be recalculated by the Principal's and Accounting Offices based on elapsed class days and applied discounts/incentives.</li></ul></div>
-   ${polCard()}${helpbar()}</div></div>`;
-  renderAct();homeEvents()})}
+
 
 const _homeSv=home;
 home=function(){return A()?_homeSv():homeStudent()};
