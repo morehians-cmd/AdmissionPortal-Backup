@@ -362,6 +362,21 @@ function applyContent(c){
  if(s.footer)H.footer=Object.assign({},H.footer,s.footer);if(s.display)H.display=s.display}
 
 /* ===== Render ===== */
+function resolveHeroMedia(done){
+ var list=HOME.hero&&Array.isArray(HOME.hero.slides)?HOME.hero.slides.slice():[],pending=0;
+ function finish(){if(typeof done==='function')done();}
+ list.forEach(function(u,i){
+  var m=String(u||'').match(/^gallery:([^:]+):(.+)$/);
+  if(!m)return;
+  pending++;
+  call('getGalleryPhoto',[m[1],m[2],m[3]],function(r){
+   if(r&&r.success&&r.data)HOME.hero.slides[i]=r.data;
+   else HOME.hero.slides[i]='';
+   if(--pending===0)finish();
+  },function(){HOME.hero.slides[i]='';if(--pending===0)finish()});
+ });
+ if(!pending)finish();
+}
 function render(){
  var h=HOME;
  $('ids').innerHTML=h.ids.map(function(i){return '<a class="id" href="'+esc(safeUrl(i.fb))+'" target="_blank" rel="noopener">'+(i.logo?'<img class="logo" src="'+esc(i.logo)+'" alt="">':'<span class="logo">'+esc(i.short)+'</span>')+'<span>'+esc(i.name)+'</span></a>'}).join('');
@@ -539,7 +554,7 @@ PG.loading=(cur_route()!=='home')?cur_route():'';render();
 /* The website's Privacy page reads the policy the portal stores, not a copy of its own. */
 if(cur_route()==='privacy')loadPolicy();
 /* Sessions are held by the portal; the homepage only signs in and hands over. */
-call(APP_PREVIEW?API.getDraft:API.getHomepage,APP_PREVIEW?[APP_TICKET]:[],function(d){applyContent(d);render()},function(m){if(APP_PREVIEW)toast(m,true)});
+call(APP_PREVIEW?API.getDraft:API.getHomepage,APP_PREVIEW?[APP_TICKET]:[],function(d){applyContent(d);resolveHeroMedia(render)},function(m){if(APP_PREVIEW)toast(m,true)});
 </script>
 </body>
 </html>
