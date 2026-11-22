@@ -3467,10 +3467,6 @@ function homeAdmin(){head('Dashboard','Enrollment overview for School Year '+S.c
   google.script.run.withSuccessHandler(q=>{if(q&&q.success)X=q.data;fin()}).withFailureHandler(()=>fin()).dashboardExtra(S.token);
   google.script.run.withSuccessHandler(q=>{if(q&&q.success)H=q.data;fin()}).withFailureHandler(()=>fin()).holdsOverview(S.token)})}
 
-/* Route the admin Home to the new page; students (and everyone else) keep the original home() */
-const _homeDx=home;
-home=function(){return (A()&&!OFC())?homeAdmin():_homeDx()};
-
 /* ===== Career Evaluation (15 questions) + Grade 11-only access to the Cluster Guide =====
    Paste at the very end of the main script in Index.html (after the Admin dashboard v2 block).
    ALSO make this ONE edit inside the existing nav() function: find
@@ -3686,8 +3682,6 @@ menuFor = function () {
   if (ACD()) return [['home', 'Academics', I.book], ['ev', 'Campus Bulletin', I.cal], ['me', 'My Profile', I.me]];
   return _menuAc().map(e => Array.isArray(e) || e.g !== 'System Administration' ? e : Object.assign({}, e, { items: e.items.concat([['ac', 'Academics', I.book]]) }));
 };
-const _homeAc = home;
-home = function () { return ACD() ? acadPage() : _homeAc() };
 
 /* ---------- state helpers ---------- */
 const acF = () => S.ac.f || (S.ac.f = { g: S.ac.grades[0] || '', c: '', sub: '', sec: '', t: '', name: '' });
@@ -3924,8 +3918,16 @@ function svRing(st,photo,ini,col){
 /* ---------- the student Home page ---------- */
 
 
-const _homeSv=home;
-home=function(){return A()?_homeSv():homeStudent()};
+/* ===== Unified home router =====
+   Consolidates admin dashboard, Academic mode, student home, and
+   the original home fallback into one routing layer. */
+const _homeBase=home;
+home=function(){
+ if(!A())return homeStudent();
+ if(ACD())return acadPage();
+ if(!OFC())return homeAdmin();
+ return _homeBase();
+};
 
 /* ===== Admin dashboard restyle v2 (follows your layout mockup) =====
    FIRST delete the previous restyle block (it starts with "Admin dashboard restyle" and ends with the
