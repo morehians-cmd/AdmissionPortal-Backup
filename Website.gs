@@ -181,6 +181,7 @@ const SITE_SEED_ = {
 };
 
 /* ---------- storage ---------- */
+const SITE_KEY = 'homepage_data', SITE_CACHE_KEY = 'site_v1', SITE_MAX = 45000;
 const SITE_DRAFT_KEY_ = 'site_draft_data', PAGES_DRAFT_KEY_ = 'pages_draft_data';
 const SITE_PREVIOUS_KEY_ = 'site_previous_publish', PAGES_PREVIOUS_KEY_ = 'pages_previous_publish', WEBSITE_PUBLISH_META_KEY_ = 'website_previous_publish_meta';
 function websiteRaw_(key) {
