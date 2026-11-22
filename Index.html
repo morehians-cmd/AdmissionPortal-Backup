@@ -2521,7 +2521,14 @@ function wsRenderLegacy(){
   wcard('values','Our values strip',(d.values.items||[]).map((x,i)=>wrow('values',i,WS_LISTS.values.n,wf('Label','values.items.'+i+'.label',x.label)+wf('Icon (emoji)','values.items.'+i+'.icon',x.icon)+wc('Show','values.items.'+i+'.on',x.on))).join('')),
   `<div class="card"><div class="ch"><h3>Admission process</h3></div><div class="g">${wf('Section title','admission.title',d.admission.title)}${wf('Section subtitle','admission.sub',d.admission.sub)}</div></div>`,
   wcard('steps','Admission steps',(d.admission.steps||[]).map((x,i)=>wrow('steps',i,WS_LISTS.steps.n,wf('Step title','admission.steps.'+i+'.t',x.t)+wt('Description','admission.steps.'+i+'.d',x.d)+wf('Icon (emoji)','admission.steps.'+i+'.i',x.i))).join(''),'They are numbered automatically, in the order shown here.'),
-  `<div class="card"><div class="ch"><h3>About preview</h3></div><div class="g">${wf('Heading','about.heading',d.about.heading)}${wt('Paragraph','about.text',d.about.text)}${wf('Link label','about.linkLabel',d.about.linkLabel)}${wf('Photo URL','about.photo',d.about.photo)}</div></div>`,
+  `<div class="card"><div class="ch"><h3>About preview</h3><span class="chip ok">About Moreh Academy</span></div>
+   <div class="g">${wf('Homepage heading','about.heading',d.about.heading)}${wt('Homepage text','about.text',d.about.text)}</div>
+   <div style="margin-top:12px;padding:14px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)">
+    <b style="color:var(--navy)">Single source of truth</b>
+    <p style="margin:5px 0 10px;color:var(--mut)">The homepage About preview is now populated from the main About Moreh Academy page. Edit the institutional About page instead of maintaining a second copy here.</p>
+    <button class="btn alt" data-act="wsabout">Open About Moreh Academy</button>
+   </div>
+  </div>`,
   `<div class="card"><div class="ch"><h3>Academic programs</h3></div><div class="g">${wf('Section title','programs.title',d.programs.title)}</div></div>`,
   wcard('programs','Program cards',(d.programs.items||[]).map((x,i)=>wrow('programs',i,WS_LISTS.programs.n,wf('Program','programs.items.'+i+'.name',x.name)+wt('Description','programs.items.'+i+'.desc',x.desc)+wc('Show','programs.items.'+i+'.on',x.on))).join('')),
   `<div class="card"><div class="ch"><h3>News &amp; announcements</h3><span class="chip ok">Campus Bulletin</span></div>
@@ -2621,6 +2628,7 @@ act.wssave=()=>call('saveSiteAdmin',[T(),S.site],r=>{S.site=r.data.sections;S.si
 act.wsreload=()=>{if(confirm('Discard unsaved changes?'))websitePage()};
 act.wsview=()=>{if(S.siteMeta&&S.siteMeta.home)window.open(S.siteMeta.home,'_blank','noopener')};
 act.wsbulletin=()=>{try{document.querySelector('[data-act="nav"][data-v="ev"]')?.click()}catch(_){} };
+act.wsabout=()=>{try{document.querySelector('[data-act="nav"][data-v="cp"]')?.click()}catch(_){} };
 act.wsreset=()=>{if(!confirm('Return the homepage to its built-in content? The saved copy is removed and the built-in text is shown again.'))return;call('resetSiteAdmin',[T()],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()})};
 act.pgsave=()=>{if(!S.pg)return;call('savePagesAdmin',[T(),S.pg.text],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
 act.pgreload=()=>{if(confirm('Discard unsaved page changes?'))websitePage()};
