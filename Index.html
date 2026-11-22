@@ -1235,6 +1235,7 @@ const reqLevel=g=>{const i=S.grades.indexOf(g);return i<0?'':i<2?'PRE':i<9?'ELEM
 function reqsFor(r){const lv=reqLevel(r.GradeLevel),ru=S.cfg.reqRules[lv];if(!ru)return{level:'',req:[],show:[]};
  const tf=ru.opt.includes('ReqTransferee')&&S.cfg.reqTf.includes(r.Category);
  return{level:lv,req:ru.req,show:S.cfg.reqAll.filter(k=>ru.req.includes(k)||(tf&&k==='ReqTransferee')||(r[k]&&r[k]!=='None'))}}
+const idLabel=r=>r&&r.AdmissionID?'Admission ID':'Enrollment ID',idValue=r=>(r&&(r.AdmissionID||r.StudentID))||'';
 const abbr=c=>Object.keys(S.clusters).find(k=>S.clusters[k]===c);
 
 const enter=r=>{Object.assign(S,r.data);try{sessionStorage.setItem('mrh_t',S.token)}catch(e){}$('login').classList.add('hidden');$('app').classList.remove('hidden');boot()};
@@ -1763,7 +1764,7 @@ function enrollFormHTML(r,photo){
 
  ${bar('Learner Academic Information',49)}
  ${at(13.7,56.9,33.5,photo?`<img src="${esc(photo)}" alt="">`:'','ph" style="height:38mm;left:13.7mm;top:56.9mm;width:33.5mm')}
- ${at(48.5,56.9,150.1,col(4.4,0,rw(fd('Classification',r.Classification,{bw:20}),fd('Category',r.Category,{bw:20}),fd('Enrollment ID',r.StudentID))))}
+ ${at(48.5,56.9,150.1,col(4.4,0,rw(fd('Classification',r.Classification,{bw:20}),fd('Category',r.Category,{bw:20}),fd(idLabel(r),idValue(r)))))}
  ${at(48.5,62.9,150.1,'','dv')}
  ${at(48.5,65.6,150.1,col(4.3,1.05,
    rw(fd('Learner\u2019s Full Name',r.FullName,L)),rw(fd('Learner Reference Number',r.LRN,L)),rw(fd('Grade Level',r.GradeLevel,L)),
@@ -1816,7 +1817,7 @@ const efHead=title=>`<div class="ab hdr"><img src="${LOGO}" alt=""><div class="w
 
 const efLearner=(r,photo)=>{const L={lw:48};return efBar('Learner Academic Information',49)
  +efAt(13.7,56.9,33.5,photo?`<img src="${esc(photo)}" alt="">`:'','ph',38)
- +efAt(48.5,56.9,150.1,efColIndex3(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:20}),efFd('Enrollment ID',r.StudentID))))
+ +efAt(48.5,56.9,150.1,efColIndex3(4.4,0,efRw(efFd('Classification',r.Classification,{bw:20}),efFd('Category',r.Category,{bw:20}),efFd(idLabel(r),idValue(r)))))
  +efAt(48.5,62.9,150.1,'','dv')
  +efAt(48.5,65.6,150.1,efColIndex3(4.3,1.05,
    efRw(efFd('Learner\u2019s Full Name',r.FullName,L)),efRw(efFd('Learner Reference Number',r.LRN,L)),efRw(efFd('Grade Level',r.GradeLevel,L)),
@@ -1903,7 +1904,7 @@ function letterhead(){if(S.cfg.letterhead)return `<img class="lh" src="${esc(S.c
 function printConfirm(r){printHTML(confirmHTML(r),true,fileName(r))}
 function confirmHTML(r){const C=S.cfg,sch=schOf(r);
  const cat=(r.Category||'')+(certNeeded(r)&&r.CertNo?' (Cert. No. '+r.CertNo+')':'');
- const L=[['Learner\u2019s Name',r.FullName,'Enrollment ID',r.StudentID],['Grade Level',r.GradeLevel,'Learner Reference Number',r.LRN],['Grade Section',r.Section,'Birth Date',fmtD(r.Birthdate)],['Cluster',abbr(r.Cluster)||'','Age',r.Birthdate?ageOf(r.Birthdate):''],['Category',cat,'Sex & Gender',[r.SexualOrient,r.GenderOrient].filter(Boolean).join(' / ')],['Classification',r.Classification,'Religion',r.Religion==='Others, specify'?r.ReligionOther:r.Religion],['Address',addrOf(r),'Contact Number',r.Mobile]];
+ const L=[['Learner\u2019s Name',r.FullName,idLabel(r),idValue(r)],['Grade Level',r.GradeLevel,'Learner Reference Number',r.LRN],['Grade Section',r.Section,'Birth Date',fmtD(r.Birthdate)],['Cluster',abbr(r.Cluster)||'','Age',r.Birthdate?ageOf(r.Birthdate):''],['Category',cat,'Sex & Gender',[r.SexualOrient,r.GenderOrient].filter(Boolean).join(' / ')],['Classification',r.Classification,'Religion',r.Religion==='Others, specify'?r.ReligionOther:r.Religion],['Address',addrOf(r),'Contact Number',r.Mobile]];
  const prof=L.map((x,i)=>`<div class="rw${i===0?' f1':''}${i===L.length-1?' last':''}"><span>${esc(x[0])}</span><b${x[0]==='Address'?' class="sm"':''}>${esc(x[1])}</b><span>${esc(x[2])}</span><b>${esc(x[3])}</b></div>`).join('');
  const Q=S.fields.filter(f=>f[0]==='req'&&f[3]!=='date'&&(f[1]!=='ReqRemarks'||(r.ReqRemarks&&r.ReqRemarks!=='None'))).map(f=>[f[2],r[f[1]]||'None']),N=Math.max(Q.length,sch.length,7);
  let rq='',sc='';for(let i=0;i<N;i++){const lc=(i===0?' f1':'')+(i===N-1?' last':'');rq+=`<div class="rw2${lc}"><span>${Q[i]?esc(Q[i][0]):''}</span><b>${Q[i]?esc(Q[i][1]):''}</b></div>`;sc+=`<div class="rw2 sc${lc}"><b>${i===0?esc(r.Category||''):''}</b><span class="v" style="font-weight:500">${esc(sch[i]||'')}</span></div>`}
@@ -2031,7 +2032,7 @@ act.pedit2=()=>{S.privEdit=true;privRender();window.scrollTo(0,0)};
 act.pcancel2=()=>{S.privEdit=false;privRender()};
 act.psave2=()=>call('savePolicy',[T(),$('pbody').innerHTML],r=>{S.privHtml=r.data;S.privEdit=false;toast(r.message);privRender()});
 
-function printConsent(r){printHTML(`<div class="sl">${hd('PARENTAL CONSENT & DATA PRIVACY UNDERTAKING FORM')}<p style="margin-top:12px"><b>Learner:</b> ${esc(r.FullName)} &nbsp; <b>Enrollment ID:</b> ${esc(r.StudentID)} &nbsp; <b>LRN:</b> ${esc(r.LRN)} &nbsp; <b>Grade Level:</b> ${esc(r.GradeLevel)}</p><p><b>Applicant Declaration &amp; Explicit Consent</b><br>By signing below, I hereby declare and agree that:</p>${CONS}<p>I have read, understood, and accept the Data Privacy Notice and Consent Terms of the Moreh Academy and Moreh College Admission Portal.</p><p><i>This form must be submitted together with the hardcopy school requirements.</i></p>
+function printConsent(r){printHTML(`<div class="sl">${hd('PARENTAL CONSENT & DATA PRIVACY UNDERTAKING FORM')}<p style="margin-top:12px"><b>Learner:</b> ${esc(r.FullName)} &nbsp; <b>${idLabel(r)}:</b> ${esc(idValue(r))} &nbsp; <b>LRN:</b> ${esc(r.LRN)} &nbsp; <b>Grade Level:</b> ${esc(r.GradeLevel)}</p><p><b>Applicant Declaration &amp; Explicit Consent</b><br>By signing below, I hereby declare and agree that:</p>${CONS}<p>I have read, understood, and accept the Data Privacy Notice and Consent Terms of the Moreh Academy and Moreh College Admission Portal.</p><p><i>This form must be submitted together with the hardcopy school requirements.</i></p>
 <div style="display:grid;grid-template-columns:2fr 1fr;gap:30px;margin-top:50px"><div style="border-top:1px solid #000;padding-top:3px">Parent / Legal Guardian (Printed Name and Signature)</div><div style="border-top:1px solid #000;padding-top:3px">Date</div><div style="border-top:1px solid #000;padding-top:3px">Relationship to Learner</div><div style="border-top:1px solid #000;padding-top:3px">Contact Number</div><div style="border-top:1px solid #000;padding-top:3px">Received by: Admission Personnel (Printed Name and Signature)</div><div style="border-top:1px solid #000;padding-top:3px">Date Received</div></div></div>`)}
 function resetModal(step){
  const old=$('rm');if(old)old.remove();
@@ -2403,7 +2404,7 @@ function menuFor(){
   ['me','My Profile',I.me]];
  return[
   ['home','Home',I.home],
-  {g:'Enrollment & Academics',i:I.adm,items:[['sp','Student Profile & Account',I.adm],['rq','School Requirements',I.rep],['tf','Schedule of Fees',I.tf],['sch','Scholarships',I.sch]]},
+  {g:'Enrollment & Academics',i:I.adm,items:[['sp','Enrollment Form & Profile',I.adm],['rq','School Requirements',I.rep],['tf','Schedule of Fees',I.tf],['sch','Scholarships',I.sch]]},
   {g:'Campus & Student Life',i:I.book,items:guides},
   {g:'Support & Updates',i:I.help,items:[['ev','Campus Bulletin',I.cal],['faq','Help Center & FAQs',I.help]]},
   ['me','My Profile',I.me]];
@@ -3159,7 +3160,7 @@ cpRender=function(){_cpR5();const c=S.cp;if(!c)return;
 `;document.head.appendChild(s)})();
 
 const gEmpty=h=>!String(h).replace(/<[^>]*>/g,' ').replace(/write the steps here|to be added[^.]*\.?/ig,'').trim();
-function gStat(txt,s){if(!s)return null;const t=txt.toLowerCase();
+function gStat(txt,s){if(!s)return null;if(/^xf:/.test(txt))return xfStat(txt,s);const t=txt.toLowerCase();
  if(/consent/.test(t)){const ok=s.ReqConsent&&s.ReqConsent!=='None';return{done:!!ok,msg:ok?'Consent form received by the office':'Not yet received by the office',btn:ok?'':['Print consent form','pconsent','']}}
  if(/profile/.test(t)){const K=['Surname','FirstName','LRN','Birthdate','GradeLevel','AddressLine1','City','Mobile','EmName','EmMobile'],f=K.filter(k=>s[k]).length+((s.FatherName||s.MotherName)?1:0),n=K.length+1,ok=f===n;
   return{done:ok,msg:ok?'Profile complete':f+' of '+n+' key details filled in',btn:ok?'':['Open my profile','nav','sp']}}
@@ -4686,7 +4687,7 @@ homeStudent = function () {
   head('Dashboard', 'Your enrollment at a glance');
   call('getStudent', [T()], r => {
     const s = r.data,
-      steps = HS.map(x => Object.assign({ k: x[0], t: x[1], h: x[2], msg: '', done: false }, gStat(x[0], s) || {})),
+      steps = hsFor(s).map(x => Object.assign({ k: x[0], t: x[1], h: x[2], msg: '', done: false }, gStat(x[0], s) || {})),
       idx = steps.findIndex(x => !x.done), next = idx < 0 ? null : steps[idx],
       R = reqsFor(s).req, rd = R.filter(k => s[k] && s[k] !== 'None').length, rp = R.length ? Math.round(rd / R.length * 100) : 0,
       st = s.EnrollStatus || 'Not Enrolled', name = tc(s.FirstName || S.user.FullName || 'Student'),
@@ -4705,7 +4706,8 @@ homeStudent = function () {
     const hero = `<div class="bn-hero"><div><p class="bn-hi">${greet()}, ${esc(name)} &#128075;</p><h2 class="bn-hl">${esc(headline)}</h2><p class="bn-sub">${esc(sub)}</p>${act1}</div><div class="bn-dots" role="img" aria-label="${next ? 'Step ' + (idx + 1) + ' of ' + steps.length : 'All steps done'}">${dots}</div></div>`;
 
     /* gradient KPI tiles */
-    const status = bnG({ k: SK[st] || 'bn-k3', cls: 'bn-st', l: 'Status', ic: I.home, v: esc(st), d: 'School Year ' + esc(sy) + (st === 'Temporary' && s.TempUntil ? '<br>Until ' + esc(fmtD(s.TempUntil)) : '') });
+    const status = bnG({ k: SK[st] || 'bn-k3', cls: 'bn-st', l: xfOn(s) && st !== 'Enrolled' && st !== 'Temporary' ? 'Application' : 'Status', ic: I.home, v: esc(xfLabel(s, st)), d: 'School Year ' + esc(sy) + (s.AdmissionID ? '<br>Admission ID: <b>' + esc(s.AdmissionID) + '</b>' : '') + (st === 'Temporary' && s.TempUntil ? '<br>Until ' + esc(fmtD(s.TempUntil)) : '') });
+    if (xfOn(s) && st !== 'Enrolled') head('Enrollee Portal', 'Track your application and enrollment');
     const cls = bnG({ k: 'bn-k4', cls: 'bn-cl', l: 'Class', ic: I.sch, a: 'sp', v: esc(gs || 'Not set yet'), d: gs ? esc(tc(s.Department || '')) + (s.Category ? ' \u00b7 ' + esc(s.Category) : '') : 'Choose your grade level in your profile.' });
     const req = bnG({ k: 'bn-k1', cls: 'bn-rq', l: 'Requirements', ic: I.rep, a: 'rq', v: R.length ? rd + ' of ' + R.length + ' submitted' : 'Choose your grade level first', d: R.length ? rp + '% complete' : '', bar: R.length ? rp : null });
     const fee = bnG({ k: 'bn-k6', cls: 'bn-fee', l: 'Schedule of fees', ic: I.tf, a: 'tf', v: 'Compare payment plans', d: 'For reference only. The Cashier assesses your final fees.' });
@@ -4716,7 +4718,7 @@ homeStudent = function () {
 
     const cal = `<div class="bn-t bn-f bn-cal" style="--c:#7c3aed"><div class="ch"><h4>${I.cal}This week</h4><a href="javascript:void(0)" data-act="nav" data-v="ev">View bulletin</a></div><div class="bn-days" id="bn-days"><i class="galsk" style="grid-column:1/-1;height:54px;border-radius:10px"></i></div><div class="bn-evl" id="bn-evl"><div class="aemp">Loading&hellip;</div></div></div>`;
 
-    const Q = [['Student profile', 'nav', 'sp', I.adm, 'c1'], ['Consent form', 'pconsent', '', I.rep, 'c3'], ['Scholarships', 'nav', 'sch', I.sch, 'c5'], ['Privacy policy', 'nav', 'pp', I.rep, 'c2']];
+    const Q = [[xfOn(s) ? 'Online enrollment form' : 'Student profile', 'nav', 'sp', I.adm, 'c1']].concat(xfOn(s) ? [['Print enrollment form', 'penrform', '', I.rep, 'c3']] : [], [['Consent form', 'pconsent', '', I.rep, 'c3'], ['Scholarships', 'nav', 'sch', I.sch, 'c5'], ['Privacy policy', 'nav', 'pp', I.rep, 'c2']]);
     if (S.cl) Q.push(['Career evaluation', 'nav', 'ce', ABI.target, 'c4']);
     const qa = `<div class="bn-t bn-f bn-qa" style="--c:#e8780f"><h4>${SICO.list}Quick actions</h4><div class="bn-qg">${Q.map(x => `<button class="bn-qb" data-act="${x[1]}"${x[2] ? ` data-v="${x[2]}"` : ''}><span class="ao ${x[4]}">${x[3]}</span>${esc(x[0])}</button>`).join('')}</div></div>`;
 
@@ -4797,6 +4799,95 @@ dxDraw=function(X,H){_dxDrawTh(X,H);
  if(typeof WANT_REG!=='undefined'&&WANT_REG){rb.classList.remove('hidden');setTimeout(()=>{const f=$('rs');if(f)f.focus()},150)}
  sync()
 })();
+
+/* =====================================================================
+   ENROLLMENT PROCESS v3 — Enrollee Portal
+   Enrollee fills in + submits the Online Enrollment Form -> review -> approval (Admission ID)
+   -> prints the forms -> brings the INITIAL requirements to the Admission Office -> enrolled
+   -> COMPLETION requirements later. Server: AdmissionPipeline.gs. Legacy records (no ApplicationStatus)
+   and returning learners keep the old screens: every function below falls back to them.
+   ===================================================================== */
+(function(){const st=document.createElement('style');st.textContent=`
+.xfb{border:1px solid var(--line);border-left:5px solid var(--blue,#2563eb);border-radius:14px;padding:14px 16px;margin:0 0 16px;background:var(--card,#fff)}
+.xfb.ok{border-left-color:#16a34a}.xfb.warn{border-left-color:#d97706}.xfb.no{border-left-color:#dc2626}
+.xfb h4{margin:0 0 4px;color:var(--navy);font-size:15px}.xfb p{margin:0 0 8px;color:var(--mut);font-size:13.5px;line-height:1.5}
+.xfb .xfa{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}.xfb .xfi{font-weight:700;letter-spacing:.04em;color:var(--navy)}
+.xfs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}.xfs span{font-size:11.5px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--mut)}
+.xfs span.on{background:var(--navy);border-color:var(--navy);color:#fff}.xfs span.d{color:#16a34a;border-color:#16a34a}
+`;document.head.appendChild(st)})();
+
+const xfOn=s=>!!(s&&s.NewFlow==='1');
+const xfSt=s=>(s&&s.AppStatus)||'Submitted';
+const xfDone=(s,k)=>!!s[k]&&s[k]!=='None';
+const xfLeft=(s,stage)=>((s.ReqPlan||{})[stage]||[]).filter(k=>!xfDone(s,k));
+const xfCnt=(s,stage)=>{const L=(s.ReqPlan||{})[stage]||[];return{n:L.length,d:L.filter(k=>xfDone(s,k)).length}};
+const xfEnr=s=>s.EnrollStatus==='Enrolled'||s.EnrollStatus==='Temporary';
+const xfLabel=(s,st)=>!xfOn(s)||st==='Enrolled'||st==='Temporary'?st:({Draft:'Draft \u2013 not yet submitted',Submitted:'Submitted','Under Review':'Under review',Approved:'Approved \u2013 submit requirements',Declined:'Declined'})[xfSt(s)]||st;
+const HS_FLOW=[['xf:form','Online enrollment form','Fill in and submit your Online Enrollment Form'],
+ ['xf:review','Application review','Your application is being reviewed'],
+ ['xf:id','Admission ID','Your Admission ID will be issued once you are approved'],
+ ['xf:print','Print and sign your forms','Print the enrollment form and the parent consent form'],
+ ['xf:initial','Initial requirements','Bring your initial requirements to the Admission Office'],
+ ['xf:enrolled','Enrollment','The Admission Office is processing your enrollment'],
+ ['xf:further','Further requirements','Submit your remaining requirements when they are available']];
+const hsFor=s=>xfOn(s)?HS_FLOW:HS;
+function xfStat(k,s){const st=xfSt(s),appr=st==='Approved'||xfDone(s,'AdmissionID')||xfEnr(s);
+ if(k==='xf:form')return{done:st!=='Draft',msg:st==='Draft'?'Not yet submitted':'Submitted'+(s.AppSubmittedAt?' on '+fmtD(String(s.AppSubmittedAt).slice(0,10)):''),btn:st==='Draft'?['Open the form','nav','sp']:''};
+ if(k==='xf:review')return{done:appr,msg:appr?'Approved':st==='Declined'?'Your application was declined. Please visit the Admission Office.':st==='Under Review'?'Under review by the Admission Office':st==='Draft'?'Starts after you submit the form':'Waiting for the Admission Office to start the review',btn:''};
+ if(k==='xf:id')return{done:!!s.AdmissionID,msg:s.AdmissionID||'Issued once your application is approved',btn:''};
+ if(k==='xf:print'){const ok=xfDone(s,'ReqEnrollForm')&&xfDone(s,'ReqConsent');return{done:ok,msg:ok?'Signed forms received by the office':appr?'Print both forms, have them signed by your parent / guardian, and bring them':'Available after your application is approved',btn:ok||!appr?'':['Print enrollment form','penrform','']}}
+ if(k==='xf:initial'){const c=xfCnt(s,'initial'),ok=c.n>0&&c.d===c.n;return{done:ok,msg:appr?c.d+' of '+c.n+' initial documents received':'Applies after your application is approved',btn:ok||!appr?'':['See the list','nav','rq']}}
+ if(k==='xf:enrolled'){const ok=xfEnr(s);return{done:ok,msg:ok?(s.EnrollStatus==='Temporary'?'Enrolled temporarily':'You are enrolled'+(s.Section?' \u2013 section assigned':'; your section will be assigned soon')):appr?'The office confirms your enrollment once the initial requirements are verified':'Follows your approval and initial requirements',btn:''}}
+ if(k==='xf:further'){const c=xfCnt(s,'completion');return{done:xfEnr(s)&&c.d===c.n,msg:c.n?c.d+' of '+c.n+' documents received':'No further requirements for your level',btn:xfEnr(s)&&c.d<c.n?['See the list','nav','rq']:''}}
+ return null}
+
+/* ---- Online Enrollment Form page: status banner, Submit button, read-only once submitted ---- */
+function xfBanner(s){const st=xfSt(s),locked=st!=='Draft'&&!xfEnr(s);
+ const steps=['Draft','Submitted','Under Review','Approved'],ix=steps.indexOf(st<0?'Draft':st);
+ const bar=`<div class="xfs">${steps.map((x,i)=>`<span class="${x===st?'on':i<ix?'d':''}">${x==='Draft'?'Filling in':x==='Under Review'?'Under review':x}</span>`).join('')}</div>`;
+ let cls='',h='',p='',b='';
+ if(st==='Draft'){h='Online Enrollment Form';p='Complete every section, save, then submit your application. Once submitted the form is locked while the Admission Office reviews it.';
+  b='<button class="btn" data-act="xfsubmit">Submit application</button>'}
+ else if(st==='Submitted'||st==='Under Review'){cls='warn';h='Application '+(st==='Submitted'?'submitted':'under review');p='Your form is locked while it is being reviewed. We will email you when there is an update. Need a correction? Please contact the Admission Office.'}
+ else if(st==='Approved'){cls='ok';h='Application approved';p='Your Admission ID is <span class="xfi">'+esc(s.AdmissionID||'(being issued)')+'</span>. Print your enrollment form and the parent consent form, have them signed, and bring them with your initial requirements to the Admission Office.';
+  b='<button class="btn" data-act="penrform">Print enrollment form</button><button class="btn alt" data-act="pconsent">Print consent form</button><button class="btn alt" data-act="nav" data-v="rq">Initial requirements</button>'}
+ else if(st==='Declined'){cls='no';h='Application declined';p='Your application was not approved. Please visit the Admission Office if you have questions.'}
+ if(xfEnr(s)){cls='ok';h='You are enrolled';p='Your Admission ID: <span class="xfi">'+esc(s.AdmissionID||'\u2014')+'</span>. You can keep your profile up to date; some identity details are locked.';b=''}
+ return `<div class="xfb ${cls}">${xfEnr(s)?'':bar}<h4>${h}</h4><p>${p}</p>${b?`<div class="xfa">${b}</div>`:''}</div>${locked?'<style>#view [data-act="edit"]{display:none}</style>':''}`}
+const _formHTMLXf=formHTML;
+formHTML=function(t){const h=_formHTMLXf(t),r=t&&t.rec;
+ if(!r)return h;
+ if(!A()&&xfOn(r)){head('Online Enrollment Form','Complete every section, then submit it for review');return xfBanner(r)+h}
+ if(A()&&(xfOn(r)||r.AdmissionID)){const c=xfCnt(r,'initial');
+  return `<div class="xfb ${r.AdmissionID?'ok':''}"><h4>Application: ${esc(xfLabel(r,xfSt(r)))}${r.AdmissionID?' &middot; Admission ID <span class="xfi">'+esc(r.AdmissionID)+'</span>':''}</h4><p style="margin:0">${xfOn(r)?'Initial requirements recorded: '+c.d+' of '+c.n+'. ':''}Approve applications in <b>Application Pipeline</b>; a learner can be marked Enrolled only after approval and when every initial requirement is recorded.</p></div>`+h}
+ return h};
+act.xfsubmit=()=>{if(S.t&&S.t.edit){toast('Please save your changes first, then submit.','warn');return}
+ if(!confirm('Submit your Online Enrollment Form for review?\n\nYou will not be able to edit it while it is being reviewed.'))return;
+ call('enrolleeSubmitApplication',[T()],r=>{toast(r.message);stuProfile()})};
+const _editXf=act.edit;
+act.edit=()=>{const r=S.t&&S.t.rec;if(!A()&&r&&xfOn(r)&&xfSt(r)!=='Draft'&&!xfEnr(r)){toast('Your form is locked while the application is being processed.',false);return}_editXf()};
+
+/* ---- printing: the enrollment form needs the Admission ID, so it opens after approval ---- */
+function xfPrintOk(s){if(A()||!xfOn(s)||s.AdmissionID)return true;toast('You can print your forms once your application is approved and your Admission ID is issued.',false);return false}
+act.penrform=()=>call('getStudent',[T()],r=>{if(xfPrintOk(r.data))printEnrollForm(r.data)});
+act.pconsent=()=>call('getStudent',[T()],r=>{if(xfPrintOk(r.data))printConsent(r.data)});
+
+/* ---- School Requirements: initial vs further (completion) ---- */
+const _stuReqXf=stuReq;
+stuReq=function(){call('getStudent',[T()],r=>{const s=r.data;if(!xfOn(s))return _stuReqXf();
+ const R=reqsFor(s);if(!R.level)return $('view').innerHTML='<div class="card">Choose your <b>Grade Level</b> in <b>Online Enrollment Form</b> to see the requirements for your level.</div>';
+ head('School Requirements','Initial requirements first, the rest later');
+ const hint=Object.assign({ReqEnrollForm:'Printed from this portal and signed by your parent / guardian'},S.cfg.reqHints[R.level]||{}),notes=S.cfg.reqNotes.filter(n=>n.lv.includes(R.level)&&(!n.g||n.g.includes(s.GradeLevel))),P=s.ReqPlan||{initial:[],completion:[]},appr=xfSt(s)==='Approved'||!!s.AdmissionID||xfEnr(s);
+ const lab=k=>(S.fields.find(f=>f[1]===k)||[0,0,k])[2];
+ const row=(k,opt)=>{const v=s[k],d=s[k+'Date'];return `<tr><td><b>${esc(lab(k))}</b>${opt?' <span class="chip">if applicable</span>':''}${hint[k]?`<br><small style="color:var(--mut)">${esc(hint[k])}</small>`:''}</td><td><span class="chip ${v&&v!=='None'?'ok':'no'}">${esc(v&&v!=='None'?v:'Not yet received')}</span></td><td>${d?esc(fmtD(d)):'\u2014'}</td></tr>`};
+ const tbl=(keys,extra)=>`<div class="tw"><table><thead><tr><th>Document Name</th><th>Status</th><th>Date Received</th></tr></thead><tbody>${keys.map(k=>row(k,false)).join('')}${(extra||[]).map(k=>row(k,true)).join('')}</tbody></table></div>`;
+ const opt=R.show.filter(k=>!P.initial.includes(k)&&!P.completion.includes(k));
+ const ci=xfCnt(s,'initial'),cc=xfCnt(s,'completion');
+ const how=appr?`<p style="margin:0 0 10px">Bring the <b>printed and signed</b> enrollment form and consent form together with these documents <b>personally to the Admission Office</b>. The office checks them and updates this list; once processed you are enrolled and a section is assigned.</p><div class="xfa" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><button class="btn" data-act="penrform">Print enrollment form</button><button class="btn alt" data-act="pconsent">Print consent form</button></div>`:`<p style="margin:0 0 10px;color:var(--mut)">This list applies once your application is approved. You will be notified by email.</p>`;
+ $('view').innerHTML=`<div class="card"><h3>1. Initial requirements \u2013 ${ci.d} of ${ci.n} received</h3>${how}${tbl(P.initial,opt)}</div>
+ ${P.completion.length?`<div class="card"><h3>2. Further requirements (for completion) \u2013 ${cc.d} of ${cc.n} received</h3><p style="margin:0 0 10px;color:var(--mut)">Submit these to the Admission Office once they are available. Your enrollment does not wait for them.</p>${tbl(P.completion)}</div>`:''}
+ ${s.ReqRemarks&&s.ReqRemarks!=='None'?`<div class="card"><b>Remarks:</b> ${esc(s.ReqRemarks)}</div>`:''}
+ ${notes.length?`<div class="card"><h3>Important reminders</h3><ul style="line-height:1.8;margin:0;padding-left:20px">${notes.map(n=>`<li>${esc(n.t)}</li>`).join('')}</ul></div>`:''}`})};
 </script>
 <?!= include('PipelineView') ?>
 </body></html>

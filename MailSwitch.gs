@@ -64,7 +64,7 @@ function registerDirect_(p) {
     if (dup) throw new Error('We could not create an account with these details. If you already registered, please sign in; otherwise visit the Admission Office.');
     const SY = activeSY_(), g = p.g || {}, now = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd HH:mm:ss');
     row = { StudentID:nextIdV2_(all, SY), CreatedAt:now, Surname:p.sn, FirstName:p.fn, LRN:p.lrn, Email:p.em0, Birthdate:p.bd, Age:age_(p.bd),
-      Classification:'New', SchoolYear:SY, EnrollStatus:'Not Enrolled', ReqConsent:'None', GuardName:g.name || '', GuardRelation:g.rel || '', GuardEmail:g.email || '', GuardMobile:g.mobile || '' };
+      Classification:'New', SchoolYear:SY, EnrollStatus:'Not Enrolled', ReqConsent:'None', ApplicationStatus:'Draft', GuardName:g.name || '', GuardRelation:g.rel || '', GuardEmail:g.email || '', GuardMobile:g.mobile || '' };
     row.ConsentAt = now; row.FullName = p.sn + ', ' + p.fn;
     const sh = sh_('S'); put_(sh, sh.getLastRow() + 1, 1, [COLS.map(c => row[c] || '')]);
     addUser_(p.em, p.pw, 'student', row.FullName, row.StudentID, p.em0);

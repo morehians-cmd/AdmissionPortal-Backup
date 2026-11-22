@@ -156,7 +156,7 @@ function verifyOtp(challenge, code) {
 /** The data the browser needs after sign-in. Shared by login and resumeSession. */
 function sessionData_(token, u) {
   return { token:token, user:pub_(u), fields:FIELDS, grades:GRADES, sections:SEC, clusters:CL, cfg:{ head:HEAD_NAME, headTitle:HEAD_TITLE, fee:FEE, sch:SCHOLARSHIP, letterhead:LETTERHEAD_URL,
-      reqAll:REQ_ALL, reqRules:REQ_RULES, reqTf:REQ_TF_CATS, reqHints:REQ_HINTS, reqNotes:reqNotes_(), sy:activeSY_() } };
+      reqAll:REQ_ALL, reqInitial:REQ_INITIAL, reqRules:REQ_RULES, reqTf:REQ_TF_CATS, reqHints:REQ_HINTS, reqNotes:reqNotes_(), sy:activeSY_() } };
 }
 
 /** PUBLIC. Called when the page loads with a stored token. Re-validates it and returns the same data as sign-in, with the SAME token (no new session, no audit row). */

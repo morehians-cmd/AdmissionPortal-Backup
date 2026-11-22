@@ -87,7 +87,7 @@ function confirmRegistration(challenge, code) {
     if (all.some(s => s.LRN === p.lrn || (s.Email || '').toLowerCase() === p.em || (s.Surname + '|' + s.FirstName + '|' + s.Birthdate).toUpperCase() === me) || rows_('U').some(u => u.Username === p.em)) { cache.remove(ck); throw bad; }
     const g = p.g || {};
     row = { StudentID:nextIdV2_(all, SY), CreatedAt:Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss'),
-      Surname:p.sn, FirstName:p.fn, LRN:p.lrn, Email:p.em0, Birthdate:p.bd, Age:age_(p.bd), Classification:'New', SchoolYear:SY, EnrollStatus:'Not Enrolled', ReqConsent:'None',
+      Surname:p.sn, FirstName:p.fn, LRN:p.lrn, Email:p.em0, Birthdate:p.bd, Age:age_(p.bd), Classification:'New', SchoolYear:SY, EnrollStatus:'Not Enrolled', ReqConsent:'None', ApplicationStatus:'Draft',
       GuardName:g.name || '', GuardRelation:g.rel || '', GuardEmail:g.email || '', GuardMobile:g.mobile || '' };
     row.ConsentAt = row.CreatedAt; row.FullName = p.sn + ', ' + p.fn;
     const sh = sh_('S'); put_(sh, sh.getLastRow() + 1, 1, [COLS.map(c => row[c] || '')]);
@@ -96,7 +96,7 @@ function confirmRegistration(challenge, code) {
     audit_('self:' + p.em, 'student.register', row.StudentID, 'e-mail verified');
   } catch (e) { return fail(e); } finally { if (held) { try { lock.releaseLock(); } catch (_) {} } }
   // mails are sent AFTER the lock is released
-  notify_(row, 'Registration received', 'Your account is ready. Sign in with your email as the username to complete your student profile. Please print the Parental Consent & Data Privacy Undertaking Form from your dashboard and submit it with your hardcopy requirements.');
+  notify_(row, 'Registration received', 'Your Enrollee account is ready. Sign in with your email as the username, fill in your Online Enrollment Form and submit it for review. After your application is approved you will receive your Admission ID and the list of initial requirements to bring to the Admission Office.');
   return ok({ id:row.StudentID }, 'Email verified. Your account is ready. You can now sign in.');
 }
 
@@ -136,6 +136,7 @@ function setStatus(token, ids, status) {
       const row = all[i];
       if (row.EnrollStatus === 'Cancelled') { skipped++; return; }          // cancelled records are never revived in bulk
       if (held[id]) { blocked++; return; }                                  // an active hold blocks Enrolled
+      if (status === 'Enrolled' && row.EnrollStatus !== 'Enrolled') { try { enrollGate_(row); } catch (_) { blocked++; return; } }   // approved + initial requirements first
       if (row.EnrollStatus === status) return;
       const was = row.EnrollStatus; row.EnrollStatus = status; stampAudit_(row, u);
       n++; logs.push(logRow_(row, was, u)); notes.push(row);

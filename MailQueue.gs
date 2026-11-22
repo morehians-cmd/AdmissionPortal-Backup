@@ -29,7 +29,7 @@ function notify_(row, subject, body) {
   try {
     if (typeof mailOn_ === 'function' && !mailOn_()) return;     // MailSwitch, if applied
     if (!EMAIL_RE.test(row.Email || '')) return;
-    queueMail_(row.Email, SCHOOL + ' - ' + subject, 'Hello ' + (row.FirstName || '') + ',\n\n' + body + '\n\nEnrollment ID: ' + row.StudentID + '\n\n' + SCHOOL + ' Admissions Office');
+    queueMail_(row.Email, SCHOOL + ' - ' + subject, 'Hello ' + (row.FirstName || '') + ',\n\n' + body + '\n\n' + (row.AdmissionID ? 'Admission ID: ' + row.AdmissionID : 'Enrollment ID: ' + row.StudentID) + '\n\n' + SCHOOL + ' Admissions Office');
   } catch (e) { Logger.log(e.message); }
 }
 
@@ -67,7 +67,7 @@ function notifyMany_(list, subject, body) {
     const now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss'), out = [];
     list.forEach(row => {
       if (!EMAIL_RE.test(row.Email || '')) return;
-      out.push([now, String(row.Email), SCHOOL + ' - ' + subject, 'Hello ' + (row.FirstName || '') + ',\n\n' + body + '\n\nEnrollment ID: ' + row.StudentID + '\n\n' + SCHOOL + ' Admissions Office']);
+      out.push([now, String(row.Email), SCHOOL + ' - ' + subject, 'Hello ' + (row.FirstName || '') + ',\n\n' + body + '\n\n' + (row.AdmissionID ? 'Admission ID: ' + row.AdmissionID : 'Enrollment ID: ' + row.StudentID) + '\n\n' + SCHOOL + ' Admissions Office']);
     });
     if (out.length) { const sh = mqSh_(); put_(sh, sh.getLastRow() + 1, 1, out); }
   } catch (e) { Logger.log('notifyMany: ' + e.message); }

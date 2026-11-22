@@ -107,10 +107,20 @@ add('hidden','IDNumber','Student ID card number','auto');
 add('hidden','IDPhotoID','ID photo file','auto');
 // ---- MERGE v1: application lifecycle (appended LAST so existing sheet columns never shift) ----
 add('hidden','ApplicationStatus','Application status','auto');
+// ---- ENROLLMENT PROCESS v3: Admission ID + signed enrollment form (appended LAST so existing sheet columns never shift) ----
+add('hidden','AdmissionID','Admission ID','auto');
+add('hidden','AppSubmittedAt','Application submitted at','auto');
+add('hidden','ApprovedAt','Application approved at','auto');
+add('req','ReqEnrollForm','Signed Online Enrollment Form','sel',['None','Original']);
+add('req','ReqEnrollFormDate','Signed Online Enrollment Form \u2013 Date Submitted','date');
 
 const COLS = ['StudentID','CreatedAt'].concat(FIELDS.map(f => f[1]));
 /* ---------- Requirements by level ---------- */
-const REQ_ALL = ['ReqSF9','ReqF137','ReqBirth','ReqMoral','ReqJHS','ReqPhoto','ReqTransferee','ReqConsent','ReqEnvelope']; // same order as FIELDS
+const REQ_ALL = ['ReqSF9','ReqF137','ReqBirth','ReqMoral','ReqJHS','ReqPhoto','ReqTransferee','ReqConsent','ReqEnvelope','ReqEnrollForm']; // same order as FIELDS
+/* Enrollment process v3. INITIAL = submitted in person at the Admission Office after the application is approved
+   (together with the printed enrollment form + parent consent form). Everything else a level requires is a
+   COMPLETION requirement, submitted later. Edit REQ_INITIAL to move a document between the two stages. */
+const REQ_INITIAL = ['ReqSF9','ReqBirth','ReqPhoto','ReqEnvelope','ReqConsent'];   // ReqEnrollForm is always added in front
 const REQ_STD = ['ReqSF9','ReqF137','ReqMoral','ReqBirth','ReqPhoto','ReqEnvelope','ReqConsent'];
 const REQ_RULES = {
   PRE:  { req:['ReqBirth','ReqPhoto','ReqEnvelope','ReqConsent'], opt:[] },   // Nursery, Kinder 1
@@ -144,6 +154,11 @@ function reqsFor_(r) {
   const lv = reqLevel_(r.GradeLevel), ru = REQ_RULES[lv]; if (!ru) return { level:'', req:[], show:[] };
   const tf = ru.opt.includes('ReqTransferee') && REQ_TF_CATS.includes(r.Category);
   return { level:lv, req:ru.req, show:REQ_ALL.filter(k => ru.req.includes(k) || (tf && k==='ReqTransferee') || (r[k] && r[k]!=='None')) };
+}
+/** { initial:[keys], completion:[keys] } for this learner. Transferee certificates stay optional ("if applicable"). */
+function reqPlan_(r) {
+  const b = reqsFor_(r), ru = REQ_RULES[b.level]; if (!ru) return { initial:[], completion:[] };
+  return { initial:['ReqEnrollForm'].concat(ru.req.filter(k => REQ_INITIAL.includes(k))), completion:ru.req.filter(k => !REQ_INITIAL.includes(k)) };
 }
 const STU_SECS = ['prev','personal','family','living','rel','emergency','guard'];
 const stuCan_ = f => STU_SECS.includes(f[0]) || (f[0]==='academic' && !['Section','ReferredBy','Category','Classification'].includes(f[1]));
@@ -198,6 +213,7 @@ function getStudent(token, id) {
     if (u.Role === 'admin') { const ax = findRow_('U', 'StudentID', id), acc = ax && ax.o.Role === 'student' ? ax.o : null; s.Photo = acc ? photo_(acc.PhotoID) : ''; s.AcctLocked = acc && acc.Locked === '1' ? '1' : ''; }
     s.Age = age_(s.Birthdate); s.RelAge = age_(s.RelBirthdate);decorate_(s, u);
     if (!s.CertNo) s.CertNo = s.VoucherCertNo || s.EscCertNo || '';
+    s.AppStatus = appStatusOf_(s); s.NewFlow = isNewFlow_(s) ? '1' : ''; s.ReqPlan = reqPlan_(s);
     if (u.Role==='student') { s.ProcessedBy = ''; s.ProcessedDate = ''; s.ProcessedTime = ''; s.TempBy = ''; s.TempReason = ''; s.Holds = studentHolds_(s.StudentID); }
     else s.HoldOffices = holdsOf_(s.StudentID);
     return ok(s);
@@ -213,10 +229,12 @@ function saveStudent(token, rec) {
     const id = admin ? rec.StudentID : u.StudentID, hit = id ? findStudent_(id) : null, rowNo = hit ? hit.r : 0;
     old = hit ? hit.o : null;
     if (!old && !admin) throw new Error('Not allowed.');
+    if (!admin && old && appLocked_(old)) throw new Error('Your Online Enrollment Form is ' + (appStatusOf_(old) === 'Declined' ? 'closed (application declined)' : 'locked while it is ' + appStatusOf_(old).toLowerCase()) + '. Please contact the Admission Office if something needs to be corrected.');
     row = old ? Object.assign({}, old) : {}; oldStatus = old ? old.EnrollStatus : ''; isNew = !old;
     FIELDS.forEach(f => { if (f[3]==='auto'||(!admin&&!stuCan_(f))) return; row[f[1]] = String(rec[f[1]]==null?'':rec[f[1]]).trim(); if (f[3]==='txt' && !/(Email|Facebook)$/.test(f[1])) row[f[1]] = row[f[1]].toUpperCase(); });
     if (!admin && old && old.EnrollStatus === 'Enrolled') IDLOCK.forEach(k => row[k] = old[k]);   // identity lock (Hardening)
     if (!row.EnrollStatus) row.EnrollStatus = 'Not Enrolled';
+    if (isNew) row.ApplicationStatus = 'Submitted';   // staff-encoded walk-in: nothing for the enrollee to submit; goes straight to review
     if (row.Email && !EMAIL_RE.test(row.Email)) throw new Error('Enter a valid student email address.');
     if (row.GuardEmail && !EMAIL_RE.test(row.GuardEmail)) throw new Error('Enter a valid parent / guardian email address.');
     FIELDS.forEach(f => { const v = row[f[1]]; if (typeof v === 'string' && /^[=@\t\r]/.test(v)) throw new Error('"' + f[2] + '" cannot start with = or @.'); });
@@ -225,6 +243,8 @@ function saveStudent(token, rec) {
     { if (!row.Surname || !row.FirstName) throw new Error('Surname and first name are required.'); row.FullName = [row.Surname+',', row.FirstName, row.MiddleName ? row.MiddleName[0]+'.' : '', row.Suffix].filter(Boolean).join(' '); }
     if (row.EnrollStatus === 'Temporary' && oldStatus !== 'Temporary') throw new Error('Use "Allow temporary enrollment" in the Enrollment Holds panel to set Temporary.');
     if (row.EnrollStatus === 'Enrolled' && oldStatus !== 'Enrolled' && !isNew) { const h = holdsOf_(row.StudentID); if (h.length) throw new Error('Cannot mark as Enrolled: active hold from ' + h.join(', ') + '. Clear the hold, or use "Allow temporary enrollment".'); }
+    if (row.EnrollStatus === 'Enrolled' && oldStatus !== 'Enrolled') enrollGate_(row);   // enrollment process v3: approved + initial requirements first
+    if (admin && row.Section && row.Section !== (old ? old.Section : '') && row.EnrollStatus !== 'Enrolled' && row.EnrollStatus !== 'Temporary' && isNewFlow_(row)) throw new Error('A section can only be assigned once the enrollee is enrolled.');
     if (row.EnrollStatus !== 'Temporary') { row.TempUntil = ''; row.TempBy = ''; row.TempReason = ''; }
     statusChanged = isNew ? row.EnrollStatus!=='Not Enrolled' : oldStatus!==row.EnrollStatus;
     if (row.EnrollStatus==='Cancelled' || row.EnrollStatus==='Transferred Out') {

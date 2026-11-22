@@ -21,13 +21,14 @@
    Server: admissionPipelineData / admissionApplicationStatusSet in AdmissionPipeline.gs.
    Uses Old AP's existing components and the existing act.open path (flopen) to edit a learner. */
 var PIPE_LABEL = { 'Submitted': 'Submitted', 'Under Review': 'Under review', 'Approved': 'Approved', 'Declined': 'Declined' };
+var PIPE_VERB = { 'Under Review': 'Start review', 'Approved': 'Approve', 'Declined': 'Decline' };
 
 function pipeline() {
-  head('Application Pipeline', 'Review applications by stage. Open a card to edit the learner.');
+  head('Application Pipeline', 'Review submitted applications, approve to issue the Admission ID, then complete enrollment once the initial requirements are in.');
   S.pq = S.pq || '';
   $('view').innerHTML =
     '<div class="card"><div class="sb">' +
-      '<input id="pq" value="' + esc(S.pq) + '" placeholder="Search name, LRN or Enrollment ID" onkeydown="if(event.key===\'Enter\')act.pipesearch()">' +
+      '<input id="pq" value="' + esc(S.pq) + '" placeholder="Search name, LRN, Enrollment ID or Admission ID" onkeydown="if(event.key===\'Enter\')act.pipesearch()">' +
       '<button class="btn" data-act="pipesearch">' + I.search + ' Search</button>' +
       '<span id="pnote" style="color:var(--mut);font-size:13px;align-self:center">Loading…</span>' +
     '</div></div>' +
@@ -43,7 +44,7 @@ function pipeLoad(q) {
     if (!r || !r.success) { if (note) note.textContent = (r && r.error) || 'Could not load the pipeline.'; return; }
     var d = r.data || {}, stages = d.stages || [];
     S.pipe = d;
-    if (note) note.textContent = (d.total || 0) + (d.total === 1 ? ' learner' : ' learners') + ' \u00b7 ' + stages.length + ' stages';
+    if (note) note.textContent = (d.total || 0) + (d.total === 1 ? ' application' : ' applications') + (d.drafts ? ' \u00b7 ' + d.drafts + ' enrollee' + (d.drafts === 1 ? '' : 's') + ' still filling in the form' : '');
     $('pboard').innerHTML = stages.map(pipeColumn).join('');
   });
 }
@@ -58,14 +59,23 @@ function pipeColumn(col) {
 
 function pipeCard(c) {
   var where = [tc(c.GradeLevel), tc(c.Section)].filter(Boolean).join(' \u2013 ');
-  var others = ['Submitted', 'Under Review', 'Approved', 'Declined'].filter(function (s) { return s !== c.ApplicationStatus; });
+  var allowed = c.Allowed || [];
+  var btns = allowed.map(function (s) {
+    return '<button data-act="pipestat" data-v="' + esc(c.StudentID) + '|' + esc(s) + '">' + (s === 'Declined' ? '' : '\u2192 ') + esc(PIPE_VERB[s] || PIPE_LABEL[s] || s) + '</button>';
+  }).join('');
+  var enr = '';
+  if (c.Flow && c.ApplicationStatus === 'Approved' && c.EnrollStatus !== 'Enrolled' && c.CanEnroll) {
+    enr = '<button data-act="pipenroll" data-v="' + esc(c.StudentID) + '" style="border-color:#16a34a;color:#15803d">\u2713 Complete enrollment</button>';
+  }
+  var prog = c.Flow && c.ApplicationStatus === 'Approved' && c.EnrollStatus !== 'Enrolled'
+    ? '<div class="pmeta">Initial requirements: <b>' + Number(c.InitialDone || 0) + ' of ' + Number(c.InitialTotal || 0) + '</b>' + (c.CanEnroll ? ' \u00b7 ready to enroll' : ' \u00b7 record them in the learner file') + '</div>' : '';
   return '<div class="pcard">' +
     '<button class="pnm" data-act="flopen" data-v="' + esc(c.StudentID) + '">' + esc(tc(c.FullName) || 'Unnamed learner') + '</button>' +
     '<div class="pmeta">' + esc(c.LRN || '') + (c.Category ? ' \u00b7 ' + esc(c.Category) : '') + '</div>' +
+    (c.AdmissionID ? '<div class="pmeta">Admission ID <b>' + esc(c.AdmissionID) + '</b></div>' : '') +
     '<div class="pmeta">' + esc(where || 'No grade / section') + (c.EnrollStatus ? ' \u00b7 ' + esc(c.EnrollStatus) : '') + '</div>' +
-    '<div class="pacts">' + others.map(function (s) {
-      return '<button data-act="pipestat" data-v="' + esc(c.StudentID) + '|' + esc(s) + '">\u2192 ' + esc(PIPE_LABEL[s] || s) + '</button>';
-    }).join('') + '</div>' +
+    prog +
+    '<div class="pacts">' + btns + enr + '</div>' +
   '</div>';
 }
 
@@ -84,13 +94,14 @@ act.pipestat = function (v) {
   m.className = 'mod';
   m.id = 'pm';
   m.innerHTML = '<div style="max-width:470px"><div class="bd">' +
-    '<h3 style="color:var(--navy);margin:0 0 6px">Move to ' + esc(PIPE_LABEL[status] || status) + '</h3>' +
+    '<h3 style="color:var(--navy);margin:0 0 6px">' + (status === 'Approved' ? 'Approve application' : status === 'Declined' ? 'Decline application' : 'Move to ' + esc(PIPE_LABEL[status] || status)) + '</h3>' +
     '<p style="color:var(--mut);margin:0 0 14px">' + esc(rec ? tc(rec.FullName) + (rec.LRN ? ' \u00b7 ' + rec.LRN : '') : id) + '</p>' +
     '<div class="f"><label for="prs">Reason / note' + (status === 'Declined' ? ' (required)' : ' (optional)') + '</label>' +
     '<textarea id="prs" maxlength="300" style="text-transform:none" placeholder="Why is this application moving to ' + esc(PIPE_LABEL[status] || status) + '?"></textarea></div>' +
+    (status === 'Approved' ? '<p style="font-size:12.5px;margin:10px 0 0"><b>Approving issues the enrollee\u2019s Admission ID</b> (MA-year-10 characters) and emails the next steps: print the forms, bring the initial requirements to the Admission Office.</p>' : '') +
     '<p style="color:var(--mut);font-size:12.5px;margin:10px 0 0">The change is written to the Students sheet and the Application Status Log.</p>' +
     '</div><div class="ft"><button class="btn alt" data-act="pipex">Cancel</button>' +
-    '<button class="btn" data-act="pipsave" data-v="' + esc(id) + '|' + esc(status) + '">Save status</button></div></div>';
+    '<button class="btn" data-act="pipsave" data-v="' + esc(id) + '|' + esc(status) + '">' + (status === 'Approved' ? 'Approve and issue Admission ID' : 'Save status') + '</button></div></div>';
   document.body.appendChild(m);
 };
 
@@ -103,6 +114,16 @@ act.pipsave = function (v) {
   call('admissionApplicationStatusSet', [T(), id, status, why], function (r) {
     var m = $('pm'); if (m) m.remove();
     toast(r.message || 'Application status saved.');
+    pipeLoad(S.pq);
+  });
+};
+
+/* Initial requirements are in and verified: the learner becomes Enrolled and a section can be assigned. */
+act.pipenroll = function (id) {
+  if (!id) return;
+  if (!confirm('Mark this learner as Enrolled?\n\nUse this once the printed forms and initial requirements were received and verified. A section can be assigned afterwards.')) return;
+  call('admissionProcessEnrollment', [T(), id], function (r) {
+    toast(r.message || 'Enrolled.');
     pipeLoad(S.pq);
   });
 };

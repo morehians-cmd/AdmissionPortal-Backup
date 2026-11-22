@@ -21,7 +21,7 @@
    For learners entering Grade 11, the Cluster is cleared and the Category should be reviewed (e.g. ESC to voucher).
 *****************************************************************************/
 
-const REENROLL_RESET = ['ReqSF9', 'ReqConsent', 'ReqRemarks', 'ReqEnvelope'];   // requirements that must be submitted again every year. Edit freely.
+const REENROLL_RESET = ['ReqSF9', 'ReqConsent', 'ReqRemarks', 'ReqEnvelope', 'ReqEnrollForm'];   // requirements that must be submitted again every year. Edit freely.
 const HIST_COLS = ['StudentID', 'SchoolYear', 'Classification', 'Category', 'GradeLevel', 'Cluster', 'Section', 'EnrollStatus', 'ArchivedAt', 'ArchivedBy', 'Snapshot'];
 
 const inSY_ = s => (s.SchoolYear || activeSY_()) === activeSY_();          // blank (legacy) year counts as the active year
@@ -104,5 +104,3 @@ function reenrollRun(token, o) {
     return ok({ done:todo.length, skipped:skipped }, todo.length + ' learner(s) re-enrolled for ' + SY + (skipped ? ' (' + skipped + ' not carried over)' : ''));
   } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
 }
-
-
