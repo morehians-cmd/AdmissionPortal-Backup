@@ -1,13 +1,26 @@
 /**
- * Website.gs — "Website Management": edit the public homepage from the portal.
+ * Website.gs — EVERYTHING that belongs to the public homepage lives in this one file.
  *
- * Homepage.html already calls getPublishedHomepage() at boot and passes the result to
- * applyContent(), which reads a {sections:{...}} object. This file stores exactly that
- * object in the existing Content sheet (Key = 'homepage_data', beside 'about_data'),
- * so the homepage itself needs no change: when nothing is saved it keeps rendering its
- * built-in DEFAULT_HOME, and as soon as the administrator saves, the saved copy wins.
+ * "Website Management" (Index.html, sidebar group "Website") edits the public homepage and its
+ * inner pages. Homepage.html needs no change to show what is saved: when nothing is saved it
+ * keeps rendering its built-in DEFAULT_HOME, and as soon as the administrator saves, the saved
+ * copy wins.
  *
- * Shape (every key optional; applyContent() ignores what it does not use):
+ * HOW TO FIND THINGS (search for the section number)
+ *   1. CONFIGURATION          keys, limits, cache names, page catalogue      <- change limits here
+ *   2. DEFAULT CONTENT        SITE_SEED_ (what visitors see before any save) <- change default text here
+ *   3. SANITISING             wsS_ / wsLink_ / wsImg_ and siteClean_         <- add or rename a field here
+ *   4. STORAGE                read/write of the Content-sheet rows, caching
+ *   5. PUBLIC ENDPOINTS       no sign-in: homepage, inner pages, policy, home URL
+ *   6. VISITOR SIGN-IN        homepage* wrappers around the portal's account system
+ *   7. EDITOR ENDPOINTS       administrator-only: what Website Management calls
+ *
+ * WHERE THE DATA LIVES (existing Content sheet; Key in column A, JSON in column B)
+ *   homepage_data   the homepage sections       (SITE_KEY)
+ *   pages_data      the inner pages' text       (PAGES_KEY)
+ *   privacy         the Data Privacy Policy     (Content!A2, edited in the portal, shown on the Privacy page)
+ *
+ * homepage_data shape (every key optional; Homepage.html's applyContent() ignores what it does not use):
  *   sections.masthead  { tagline, ids:[{name,short,logo,fb}] }
  *   sections.hero      { title,name,subtitle,desc,intervalMs,enroll:{label,to},discover:{label,to},slides:[url] }
  *   sections.values    { items:[{label,icon,on}] }
@@ -19,106 +32,84 @@
  *   sections.nav       { menus:[{ label,lead, subs:[{label,lead,icon}] }] }   (structure is fixed)
  *   sections.display   { order:[key], hidden:[key] }
  *
- * SITE_SEED_ below mirrors the homepage's own defaults, so the admin form starts from the
- * same text a visitor sees before anything is saved.
+ * Inner pages (About, Admissions, Academics, Campus Life, Forms, News and the footer pages) are
+ * written as plain text and stored as the block list Homepage.html's blocksHtml() renders:
+ *   "## Heading"          -> { type:'h2' }
+ *   "![alt](https://…)"   -> { type:'img' }
+ *   any other lines       -> one { type:'p' }  (blank lines separate paragraphs; **bold**,
+ *                                                *italic*, [label](url) and "- " bullets work)
  *
- * The homepage's inner pages (About, Admissions, Academics, Campus Life, Forms, News and the
- * footer pages) live in the same sheet under Key = 'pages_data'; see the inner-pages section.
+ * ADDING A HOMEPAGE FIELD, in order:
+ *   a) SITE_SEED_ (section 2)  b) siteClean_ (section 3)  c) the form in Index.html's
+ *   "Website Management" block (wsRender)  d) Homepage.html's applyContent().
+ *
+ * Apps Script shares one global scope across files, so every function below keeps its original
+ * name and signature; Index.html, Homepage.html and Router.gs call them exactly as before.
+ * Router.gs (doGet) stays where it is: it serves the homepage AND the portal.
  */
+
+/*=============================================================================
+ * 1. CONFIGURATION
+ * Keys, limits and cache names. The two page-catalogue constants must be defined before PAGES_ROUTES_ is built.
+ *=============================================================================*/
 
 const SITE_KEY = 'homepage_data', SITE_CACHE_KEY = 'site_v1', SITE_MAX = 45000;
 const SITE_SECTIONS = ['admission', 'about', 'programs', 'news'];
 
-/* ---------- sanitising: never trust what the browser posts ---------- */
-const wsS_ = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ' ').trim().slice(0, n);
-const wsLink_ = v => /^(https?:\/\/|mailto:|#|route:)/i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
-const wsImg_ = v => /^https?:\/\//i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
-const wsArr_ = (a, n) => Array.isArray(a) ? a.slice(0, n) : [];
-/* An absent field keeps its built-in text, so content saved before a card existed still opens. */
-const wsPick_ = (v, d, n) => v == null ? d : wsS_(v, n);
+/* Public-site extras (legacy PublicHome endpoints in section 5). */
+const PUB_GALLERY_PAGE = 'facilities', PUB_GALLERY_MAX = 5, PUB_EVENTS_MAX = 3;
 
-function siteClean_(d) {
-  d = d || {};
-  const S = d.sections || d;
-  const mast = S.masthead || {}, hero = S.hero || {}, adm = S.admission || {}, ab = S.about || {},
-        pr = S.programs || {}, nw = S.news || {}, ft = S.footer || {}, dp = S.display || {},
-        navSeed = SITE_SEED_.sections.nav.menus, navIn = S.nav && Array.isArray(S.nav.menus) ? S.nav.menus : [];
+/* ---------- inner-page catalogue ---------- */
+/* Mirrors Homepage.html's DEFAULT_HOME.nav: same labels, same order, same slugs (route ids).
+ * noRoot groups have no page of their own (Contact, Terms and Privacy are reached from the footer). */
+const PAGE_MENU_ = [
+  { id: 'about', label: 'About Us', subs: [
+    ['vision-mission-and-core-values', 'Vision, Mission & Core Values'],
+    ['history', 'History'],
+    ['school-leadership', 'School Leadership']] },
+  { id: 'admissions', label: 'Admissions', subs: [
+    ['enrollment-procedure', 'Enrollment Procedure'],
+    ['admission-requirements', 'Admission Requirements'],
+    ['scholarships', 'Scholarships'],
+    ['frequently-asked-questions', 'Frequently Asked Questions']] },
+  { id: 'academics', label: 'Academics', subs: [
+    ['kindergarten', 'Kindergarten'],
+    ['elementary', 'Elementary'],
+    ['junior-high-school', 'Junior High School'],
+    ['senior-high-school', 'Senior High School'],
+    ['college-program', 'College Program']] },
+  { id: 'campus-life', label: 'Campus Life', subs: [
+    ['student-organizations', 'Student Organizations'],
+    ['school-activities-and-events', 'School Activities & Events'],
+    ['sports-and-athletics', 'Sports & Athletics'],
+    ['clubs-and-societies', 'Clubs & Societies'],
+    ['campus-facilities-and-tour', 'Campus Facilities & Tour']] },
+  { id: 'forms', label: 'Downloadable Forms', subs: [
+    ['downloadable-forms', 'Downloadable Forms']] },
+  { id: 'news', label: 'News & Updates', subs: [
+    ['school-announcements', 'School Announcements'],
+    ['latest-news', 'Latest News'],
+    ['upcoming-events', 'Upcoming Events'],
+    ['enrollment-announcements', 'Enrollment Announcements'],
+    ['school-achievements', 'School Achievements']] },
+  /* No 'privacy' here on purpose: the website's Privacy page shows the Data Privacy Policy the
+     portal already stores (getPublishedPolicy), so there is only ever one copy of it. */
+  { id: 'other', label: 'Other pages', noRoot: true, subs: [
+    ['contact', 'Contact Information'],
+    ['terms', 'Terms of Service']] }
+];
 
-  const slides = wsArr_(hero.slides, 8).map(wsImg_);   // an empty entry keeps the coloured background
-  const order = wsArr_(dp.order, 8).map(String).filter(k => SITE_SECTIONS.indexOf(k) >= 0);
-  SITE_SECTIONS.forEach(k => { if (order.indexOf(k) < 0) order.push(k); });
+const PAGES_KEY = 'pages_data', PAGES_CACHE_KEY = 'pages_v1', PAGE_TEXT_MAX = 6000, PAGES_MAX = 45000;
+/* A menu page's route is "<menu>/<slug>", exactly what Homepage.html's links and cur_route() use. */
+const pageRoute_ = (g, s) => g.noRoot ? s[0] : g.id + '/' + s[0];
+const PAGES_ROUTES_ = [];
+PAGE_MENU_.forEach(g => { if (!g.noRoot) PAGES_ROUTES_.push(g.id); g.subs.forEach(s => PAGES_ROUTES_.push(pageRoute_(g, s))); });
 
-  const sections = {
-    masthead: {
-      tagline: wsS_(mast.tagline, 120),
-      ids: wsArr_(mast.ids, 6).map(x => ({
-        name: wsS_(x && x.name, 80), short: wsS_(x && x.short, 4),
-        logo: wsImg_(x && x.logo), fb: wsLink_(x && x.fb)
-      })).filter(x => x.name)
-    },
-    hero: {
-      title: wsS_(hero.title, 80), name: wsS_(hero.name, 80),
-      subtitle: wsS_(hero.subtitle, 200), desc: wsS_(hero.desc, 400),
-      intervalMs: Math.min(30000, Math.max(2000, parseInt(hero.intervalMs, 10) || 6500)),
-      enroll: { label: wsS_(hero.enroll && hero.enroll.label, 40), to: wsLink_(hero.enroll && hero.enroll.to) },
-      discover: { label: wsS_(hero.discover && hero.discover.label, 40), to: wsLink_(hero.discover && hero.discover.to) },
-      slides: slides.length ? slides : ['']
-    },
-    values: {
-      items: wsArr_(S.values && S.values.items, 10).map(x => ({
-        label: wsS_(x && x.label, 60), icon: wsS_(x && x.icon, 8), on: !(x && x.on === false)
-      })).filter(x => x.label)
-    },
-    admission: {
-      title: wsS_(adm.title, 120), sub: wsS_(adm.sub, 300),
-      steps: wsArr_(adm.steps, 10).map(x => ({
-        t: wsS_(x && x.t, 80), d: wsS_(x && x.d, 300), i: wsS_(x && x.i, 8)
-      })).filter(x => x.t)
-    },
-    about: {
-      heading: wsS_(ab.heading, 140), text: wsS_(ab.text, 1200),
-      linkLabel: wsS_(ab.linkLabel, 40), photo: wsImg_(ab.photo)
-    },
-    programs: {
-      title: wsS_(pr.title, 120),
-      items: wsArr_(pr.items, 12).map(x => ({
-        name: wsS_(x && x.name, 80), desc: wsS_(x && x.desc, 300), on: !(x && x.on === false)
-      })).filter(x => x.name)
-    },
-    news: {
-      title: wsS_(nw.title, 120),
-      items: wsArr_(nw.items, 12).map(x => ({
-        title: wsS_(x && x.title, 120), date: wsS_(x && x.date, 40),
-        summary: wsS_(x && x.summary, 600), link: wsLink_(x && x.link)
-      })).filter(x => x.title)
-    },
-    footer: {
-      loc: wsS_(ft.loc, 200), phone: wsS_(ft.phone, 120),
-      email: wsS_(ft.email, 120), fb: wsLink_(ft.fb), yt: wsLink_(ft.yt)
-    },
-    display: {
-      order: order,
-      hidden: wsArr_(dp.hidden, 8).map(String).filter(k => SITE_SECTIONS.indexOf(k) >= 0 || k === 'values')
-    },
-    /* The six menus and the cards on each group page. Structure (which cards exist, and their
-       addresses) is fixed by the seed; only the visible words are editable. */
-    nav: {
-      menus: navSeed.map((sm, i) => {
-        const m = navIn[i] || {};
-        return {
-          label: wsPick_(m.label, sm.label, 60), lead: wsPick_(m.lead, sm.lead, 200),
-          subs: sm.subs.map((ss, j) => {
-            const e = (m.subs || [])[j] || {};
-            return { label: wsPick_(e.label, ss[0], 80), lead: wsPick_(e.lead, ss[1], 240), icon: wsPick_(e.icon, ss[2], 8) };
-          })
-        };
-      })
-    }
-  };
-  return sections;
-}
+/*=============================================================================
+ * 2. DEFAULT CONTENT
+ * The built-in content (mirrors Homepage.html's DEFAULT_HOME). The admin form starts from this same text.
+ *=============================================================================*/
 
-/* ---------- the built-in content (mirrors Homepage.html's DEFAULT_HOME) ---------- */
 const SITE_SEED_ = {
   sections: {
     masthead: {
@@ -219,7 +210,105 @@ const SITE_SEED_ = {
   }
 };
 
-/* ---------- storage ---------- */
+/*=============================================================================
+ * 3. SANITISING
+ * Never trust what the browser posts. Every saved field passes through here.
+ *=============================================================================*/
+
+const wsS_ = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ' ').trim().slice(0, n);
+const wsLink_ = v => /^(https?:\/\/|mailto:|#|route:)/i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
+const wsImg_ = v => /^https?:\/\//i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
+const wsArr_ = (a, n) => Array.isArray(a) ? a.slice(0, n) : [];
+/* An absent field keeps its built-in text, so content saved before a card existed still opens. */
+const wsPick_ = (v, d, n) => v == null ? d : wsS_(v, n);
+
+function siteClean_(d) {
+  d = d || {};
+  const S = d.sections || d;
+  const mast = S.masthead || {}, hero = S.hero || {}, adm = S.admission || {}, ab = S.about || {},
+        pr = S.programs || {}, nw = S.news || {}, ft = S.footer || {}, dp = S.display || {},
+        navSeed = SITE_SEED_.sections.nav.menus, navIn = S.nav && Array.isArray(S.nav.menus) ? S.nav.menus : [];
+
+  const slides = wsArr_(hero.slides, 8).map(wsImg_);   // an empty entry keeps the coloured background
+  const order = wsArr_(dp.order, 8).map(String).filter(k => SITE_SECTIONS.indexOf(k) >= 0);
+  SITE_SECTIONS.forEach(k => { if (order.indexOf(k) < 0) order.push(k); });
+
+  const sections = {
+    masthead: {
+      tagline: wsS_(mast.tagline, 120),
+      ids: wsArr_(mast.ids, 6).map(x => ({
+        name: wsS_(x && x.name, 80), short: wsS_(x && x.short, 4),
+        logo: wsImg_(x && x.logo), fb: wsLink_(x && x.fb)
+      })).filter(x => x.name)
+    },
+    hero: {
+      title: wsS_(hero.title, 80), name: wsS_(hero.name, 80),
+      subtitle: wsS_(hero.subtitle, 200), desc: wsS_(hero.desc, 400),
+      intervalMs: Math.min(30000, Math.max(2000, parseInt(hero.intervalMs, 10) || 6500)),
+      enroll: { label: wsS_(hero.enroll && hero.enroll.label, 40), to: wsLink_(hero.enroll && hero.enroll.to) },
+      discover: { label: wsS_(hero.discover && hero.discover.label, 40), to: wsLink_(hero.discover && hero.discover.to) },
+      slides: slides.length ? slides : ['']
+    },
+    values: {
+      items: wsArr_(S.values && S.values.items, 10).map(x => ({
+        label: wsS_(x && x.label, 60), icon: wsS_(x && x.icon, 8), on: !(x && x.on === false)
+      })).filter(x => x.label)
+    },
+    admission: {
+      title: wsS_(adm.title, 120), sub: wsS_(adm.sub, 300),
+      steps: wsArr_(adm.steps, 10).map(x => ({
+        t: wsS_(x && x.t, 80), d: wsS_(x && x.d, 300), i: wsS_(x && x.i, 8)
+      })).filter(x => x.t)
+    },
+    about: {
+      heading: wsS_(ab.heading, 140), text: wsS_(ab.text, 1200),
+      linkLabel: wsS_(ab.linkLabel, 40), photo: wsImg_(ab.photo)
+    },
+    programs: {
+      title: wsS_(pr.title, 120),
+      items: wsArr_(pr.items, 12).map(x => ({
+        name: wsS_(x && x.name, 80), desc: wsS_(x && x.desc, 300), on: !(x && x.on === false)
+      })).filter(x => x.name)
+    },
+    news: {
+      title: wsS_(nw.title, 120),
+      items: wsArr_(nw.items, 12).map(x => ({
+        title: wsS_(x && x.title, 120), date: wsS_(x && x.date, 40),
+        summary: wsS_(x && x.summary, 600), link: wsLink_(x && x.link)
+      })).filter(x => x.title)
+    },
+    footer: {
+      loc: wsS_(ft.loc, 200), phone: wsS_(ft.phone, 120),
+      email: wsS_(ft.email, 120), fb: wsLink_(ft.fb), yt: wsLink_(ft.yt)
+    },
+    display: {
+      order: order,
+      hidden: wsArr_(dp.hidden, 8).map(String).filter(k => SITE_SECTIONS.indexOf(k) >= 0 || k === 'values')
+    },
+    /* The six menus and the cards on each group page. Structure (which cards exist, and their
+       addresses) is fixed by the seed; only the visible words are editable. */
+    nav: {
+      menus: navSeed.map((sm, i) => {
+        const m = navIn[i] || {};
+        return {
+          label: wsPick_(m.label, sm.label, 60), lead: wsPick_(m.lead, sm.lead, 200),
+          subs: sm.subs.map((ss, j) => {
+            const e = (m.subs || [])[j] || {};
+            return { label: wsPick_(e.label, ss[0], 80), lead: wsPick_(e.lead, ss[1], 240), icon: wsPick_(e.icon, ss[2], 8) };
+          })
+        };
+      })
+    }
+  };
+  return sections;
+}
+
+/*=============================================================================
+ * 4. STORAGE
+ * Content-sheet rows and the 5-minute script cache.
+ *=============================================================================*/
+
+/* ---------- homepage sections ---------- */
 function siteRow_() { return blockRow_(SITE_KEY); }
 
 function siteRead_() {
@@ -234,66 +323,7 @@ function siteRead_() {
   return out;
 }
 
-/** PUBLIC. Homepage.html calls this at boot and passes the result straight to applyContent(),
- *  so it must return the content itself — not an ok() wrapper. null = use the built-in defaults. */
-function getPublishedHomepage() { try { return siteRead_(); } catch (e) { return null; } }
-
-/** PUBLIC. The homepage's draft preview reads the same saved copy. */
-function getDraftHomepage() { return getPublishedHomepage(); }
-
-/* ---------- inner pages (About, Admissions, Academics, Campus Life, Forms, News) ----------
- * Same Content-sheet pattern as the homepage, under Key = 'pages_data'. Each value is the block
- * list Homepage.html's blocksHtml() already renders, written here from plain text:
- *   "## Heading"          -> { type:'h2' }
- *   "![alt](https://…)"   -> { type:'img' }
- *   any other lines       -> one { type:'p' }  (blank lines separate paragraphs; **bold**,
- *                                                *italic*, [label](url) and "- " bullets work)
- */
-
-/* Mirrors Homepage.html's DEFAULT_HOME.nav: same labels, same order, same slugs (route ids).
- * noRoot groups have no page of their own (Contact, Terms and Privacy are reached from the footer). */
-const PAGE_MENU_ = [
-  { id: 'about', label: 'About Us', subs: [
-    ['vision-mission-and-core-values', 'Vision, Mission & Core Values'],
-    ['history', 'History'],
-    ['school-leadership', 'School Leadership']] },
-  { id: 'admissions', label: 'Admissions', subs: [
-    ['enrollment-procedure', 'Enrollment Procedure'],
-    ['admission-requirements', 'Admission Requirements'],
-    ['scholarships', 'Scholarships'],
-    ['frequently-asked-questions', 'Frequently Asked Questions']] },
-  { id: 'academics', label: 'Academics', subs: [
-    ['kindergarten', 'Kindergarten'],
-    ['elementary', 'Elementary'],
-    ['junior-high-school', 'Junior High School'],
-    ['senior-high-school', 'Senior High School'],
-    ['college-program', 'College Program']] },
-  { id: 'campus-life', label: 'Campus Life', subs: [
-    ['student-organizations', 'Student Organizations'],
-    ['school-activities-and-events', 'School Activities & Events'],
-    ['sports-and-athletics', 'Sports & Athletics'],
-    ['clubs-and-societies', 'Clubs & Societies'],
-    ['campus-facilities-and-tour', 'Campus Facilities & Tour']] },
-  { id: 'forms', label: 'Downloadable Forms', subs: [
-    ['downloadable-forms', 'Downloadable Forms']] },
-  { id: 'news', label: 'News & Updates', subs: [
-    ['school-announcements', 'School Announcements'],
-    ['latest-news', 'Latest News'],
-    ['upcoming-events', 'Upcoming Events'],
-    ['enrollment-announcements', 'Enrollment Announcements'],
-    ['school-achievements', 'School Achievements']] },
-  /* No 'privacy' here on purpose: the website's Privacy page shows the Data Privacy Policy the
-     portal already stores (getPublishedPolicy), so there is only ever one copy of it. */
-  { id: 'other', label: 'Other pages', noRoot: true, subs: [
-    ['contact', 'Contact Information'],
-    ['terms', 'Terms of Service']] }
-];
-const PAGES_KEY = 'pages_data', PAGES_CACHE_KEY = 'pages_v1', PAGE_TEXT_MAX = 6000, PAGES_MAX = 45000;
-/* A menu page's route is "<menu>/<slug>", exactly what Homepage.html's links and cur_route() use. */
-const pageRoute_ = (g, s) => g.noRoot ? s[0] : g.id + '/' + s[0];
-const PAGES_ROUTES_ = [];
-PAGE_MENU_.forEach(g => { if (!g.noRoot) PAGES_ROUTES_.push(g.id); g.subs.forEach(s => PAGES_ROUTES_.push(pageRoute_(g, s))); });
-
+/* ---------- inner pages ---------- */
 function pagesRow_() { return blockRow_(PAGES_KEY); }
 
 /** Plain text -> the block list Homepage.html's blocksHtml() renders. */
@@ -338,6 +368,19 @@ function pagesRead_() {
   return out;
 }
 
+/*=============================================================================
+ * 5. PUBLIC ENDPOINTS
+ * No sign-in. Return only what is safe for anyone on the internet.
+ *=============================================================================*/
+
+/* ---------- homepage and inner pages (called by Homepage.html) ---------- */
+/** PUBLIC. Homepage.html calls this at boot and passes the result straight to applyContent(),
+ *  so it must return the content itself — not an ok() wrapper. null = use the built-in defaults. */
+function getPublishedHomepage() { try { return siteRead_(); } catch (e) { return null; } }
+
+/** PUBLIC. The homepage's draft preview reads the same saved copy. */
+function getDraftHomepage() { return getPublishedHomepage(); }
+
 /** PUBLIC. Homepage.html stores the result at HOME.pages[route]; null = nothing saved for that page.
  *  Like getPublishedHomepage() this returns the content itself, not an ok() wrapper. */
 function getPublishedPage(route) {
@@ -352,7 +395,137 @@ function getPublishedPolicy() {
   try { return cleanPolicy_(String(contentSh_().getRange(2, 2).getValue() || '')); } catch (e) { return ''; }
 }
 
-/* ---------- administrator endpoints ---------- */
+/* ---------- homepage links, campus photos, vision / mission (legacy PublicHome endpoints) ---------- */
+/** PUBLIC. Everything the homepage needs in one call (cached 5 minutes). */
+function getPublicContent() {
+  try {
+    const cache = CacheService.getScriptCache(), tz = Session.getScriptTimeZone();
+    const today = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd'), ck = 'pubc_v1_' + today;
+    const hit = cache.get(ck); if (hit) return JSON.parse(hit);
+
+    const gb = blockRow_('guide');
+    const guide = gb.row ? cleanPolicy_(String(gb.sh.getRange(gb.row, 2).getValue() || '')) : '';
+
+    const events = evRows_()
+      .filter(e => e.Category !== 'Announcement' && e.EventDate >= today)
+      .sort((a, b) => (a.EventDate + a.EventTime).localeCompare(b.EventDate + b.EventTime))
+      .slice(0, PUB_EVENTS_MAX)
+      .map(e => ({ t: e.Title, d: e.EventDate, v: e.Venue }));
+
+    const gallery = galRead_(PUB_GALLERY_PAGE).list.slice(0, PUB_GALLERY_MAX).map(p => ({ id: p.id, cap: p.cap }));
+
+    const out = ok({ sy: activeSY_(), portal: ScriptApp.getService().getUrl() + '?page=portal', guide: guide, events: events, gallery: gallery });
+    try { cache.put(ck, JSON.stringify(out), 300); } catch (_) {}
+    return out;
+  } catch (e) { return fail(e); }
+}
+
+/** PUBLIC. One campus photo as a data URI. Serves ONLY photos shown on the homepage, so it cannot read other Drive files. */
+function getPublicPhoto(id) {
+  try {
+    id = String(id || '');
+    if (!galRead_(PUB_GALLERY_PAGE).list.slice(0, PUB_GALLERY_MAX).some(x => x.id === id)) throw new Error('Photo not found.');
+    const cache = CacheService.getScriptCache(), k = 'pubp_' + id, hit = cache.get(k);
+    if (hit) return ok(hit);
+    const uri = photo_(id);
+    if (uri && uri.length < 95000) { try { cache.put(k, uri, 21600); } catch (_) {} }   // cache entries are limited to 100 KB
+    return ok(uri);
+  } catch (e) { return fail(e); }
+}
+
+/** PUBLIC. Vision, mission, core values and history. Leaders (names, emails, phones, photos) are NOT returned. */
+function getPublicAbout() {
+  try {
+    const cache = CacheService.getScriptCache(), hit = cache.get('puba_v1');
+    if (hit) return JSON.parse(hit);
+    const a = aboutRead_();
+    const out = ok({ vision: a.vision, mission: a.mission, values: a.values, timeline: a.timeline });
+    try { cache.put('puba_v1', JSON.stringify(out), 600); } catch (_) {}
+    return out;
+  } catch (e) { return fail(e); }
+}
+
+/** PUBLIC. URL of the public homepage (used by the sign-in page's "Back to homepage" link). */
+function getHomeUrl() { return ScriptApp.getService().getUrl(); }
+
+/*=============================================================================
+ * 6. VISITOR SIGN-IN (homepage modals)
+ * Lets the homepage keep its sign-in / register / password modals while using the portal's credentials,
+ * sessions and sheets. There is exactly ONE account system: the Users sheet and login() / verifyOtp() /
+ * forgotPassword() / resetPassword() / registerAccount() / confirmRegistration(). These wrappers only trim
+ * the payload and keep the portal's session key ('mrh_t') as the single browser token.
+ *=============================================================================*/
+
+/** Step 1 of sign-in. Returns {token} on success, {otp,challenge,hint} for staff who need a code. */
+function homepageSignIn(username, password) {
+  const r = login(username, password);
+  if (r && r.success && r.data && r.data.otp) {
+    return { success: true, otp: true, challenge: r.data.challenge, hint: r.data.hint, message: 'Enter the 6-digit code sent to your email.' };
+  }
+  if (r && r.success && r.data && r.data.token) {
+    const u = r.data.user || {};
+    return { success: true, token: r.data.token, name: u.FullName || u.Username || '', role: u.Role || '' };
+  }
+  return { success: false, error: (r && r.error) || 'Invalid username or password.' };
+}
+
+/** Step 2 of staff sign-in. Returns the same session token the portal uses. */
+function homepageVerifyCode(challenge, code) {
+  const r = verifyOtp(challenge, code);
+  if (r && r.success && r.data && r.data.token) {
+    const u = r.data.user || {};
+    return { success: true, token: r.data.token, name: u.FullName || u.Username || '', role: u.Role || '' };
+  }
+  return { success: false, error: (r && r.error) || 'Invalid or expired code.' };
+}
+
+/** Public registration step 1: emails a 6-digit code (or registers directly when mail is off). */
+function homepageRegister(form) {
+  const f = form || {};
+  const r = registerAccount({
+    surname: f.surname, firstName: f.firstName, lrn: f.lrn, birthdate: f.birthdate,
+    email: f.email, password: f.password, password2: f.password2,
+    consent: f.consent === true, mobile: f.mobile,
+    guardName: f.guardName, guardRel: f.guardRel, guardEmail: f.guardEmail, guardMobile: f.guardMobile
+  });
+  if (r && r.success && r.data && r.data.pending) {
+    return { success: true, challenge: r.data.challenge, hint: r.data.hint, message: r.message || '' };
+  }
+  if (r && r.success) return { success: true, challenge: '', message: (r && r.message) || 'Account created. You can sign in now.' };
+  return { success: false, error: (r && r.error) || 'Could not create the account.' };
+}
+
+/** Public registration step 2. */
+function homepageConfirmRegistration(challenge, code) {
+  const r = confirmRegistration(challenge, code);
+  if (r && r.success) return { success: true, id: (r.data && r.data.id) || '', message: r.message || 'Email verified. You can sign in now.' };
+  return { success: false, error: (r && r.error) || 'Invalid or expired code.' };
+}
+
+/** Always reports the same message, whether or not the account exists (Old AP behaviour). */
+function homepageForgotPassword(identifier) {
+  const r = forgotPassword(identifier);
+  if (r && r.success) return { success: true, message: r.message || 'If the account exists, a 6-digit code has been sent.' };
+  return { success: false, error: (r && r.error) || 'Could not send the code.' };
+}
+
+function homepageResetPassword(identifier, code, newPassword) {
+  const r = resetPassword(identifier, code, newPassword);
+  if (r && r.success) return { success: true, message: r.message || 'Password changed. Please sign in.' };
+  return { success: false, error: (r && r.error) || 'Could not reset the password.' };
+}
+
+/** The homepage never holds a session after redirecting to the portal; this exists for parity. */
+function homepageSignOut(token) {
+  return logout(token);
+}
+
+/*=============================================================================
+ * 7. EDITOR ENDPOINTS
+ * ADMINISTRATOR / SYSTEM MANAGER only (owner_). These are what the Website Management page calls.
+ *=============================================================================*/
+
+/* ---------- homepage sections ---------- */
 /** ADMINISTRATOR / SYSTEM MANAGER. The current content (or the built-in defaults before the first save). */
 function getSiteAdmin(token) {
   try {
@@ -386,6 +559,20 @@ function saveSiteAdmin(token, sections) {
   } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
 }
 
+/** ADMINISTRATOR / SYSTEM MANAGER. Removes the saved copy so the homepage falls back to its built-in content. */
+function resetSiteAdmin(token) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(20000);
+    const ou = owner_(token), b = siteRow_();
+    if (b.row) put_(b.sh, b.row, 2, [['']]);
+    CacheService.getScriptCache().remove(SITE_CACHE_KEY);
+    audit_(ou, 'website.reset', SITE_KEY, '');
+    return ok({ saved: false, updatedAt: '', updatedBy: '', sections: siteClean_(SITE_SEED_) }, 'Website reset to the built-in content.');
+  } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
+}
+
+/* ---------- inner pages ---------- */
 /** ADMINISTRATOR / SYSTEM MANAGER. Every inner page's text, plus the page list for the picker. */
 function getPagesAdmin(token) {
   try {
@@ -444,18 +631,5 @@ function resetPagesAdmin(token) {
     CacheService.getScriptCache().remove(PAGES_CACHE_KEY);
     audit_(ou, 'website.pages.reset', PAGES_KEY, '');
     return ok({ saved: false, updatedAt: '', updatedBy: '', pages: pagesEmpty_() }, 'Inner pages reset to their built-in text.');
-  } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
-}
-
-/** ADMINISTRATOR / SYSTEM MANAGER. Removes the saved copy so the homepage falls back to its built-in content. */
-function resetSiteAdmin(token) {
-  const lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(20000);
-    const ou = owner_(token), b = siteRow_();
-    if (b.row) put_(b.sh, b.row, 2, [['']]);
-    CacheService.getScriptCache().remove(SITE_CACHE_KEY);
-    audit_(ou, 'website.reset', SITE_KEY, '');
-    return ok({ saved: false, updatedAt: '', updatedBy: '', sections: siteClean_(SITE_SEED_) }, 'Website reset to the built-in content.');
   } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
 }
