@@ -149,7 +149,7 @@ function verifyOtp(challenge, code) {
     return loginPayload_(u);
   } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
 }
- Re-validates it and returns the same data as sign-in, with the SAME token (no new session, no audit row). */
+/** Re-validates the session and returns the same data as sign-in, with the SAME token (no new session, no audit row). */
 function resumeSession(token) {
   try {
     const u = who_(String(token || ''), null, true);   // true: a user who must change their password may still resume
