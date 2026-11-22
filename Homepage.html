@@ -340,7 +340,7 @@ function renderHome(){
  items=(nw.items||[]).filter(function(x){return x.title});
  var S={
  admission:'<section class="sec" id="admission-process"><div class="wrap"><div class="bar"></div><h2>'+esc(h.sectionTitle)+'</h2><p class="lead">'+esc(h.sectionSub)+'</p><ol class="steps">'+h.steps.map(function(s,k){return '<li class="step"><div class="n">'+(k+1)+'</div><div class="si" aria-hidden="true">'+esc(s.i)+'</div><h3>'+esc(s.t)+'</h3><p>'+esc(s.d)+'</p></li>'}).join('')+'</ol><a class="btn blue" href="#create">Enroll Now!</a></div></section>',
- about:'<section class="sec" id="about-preview"><div class="wrap split"><div class="photo" style="'+(ab.photo?'background-image:url('+esc(ab.photo)+')':'')+'" role="img" aria-label="Moreh Academy students"></div><div><div class="bar"></div><h2>'+esc(ab.heading)+'</h2><p>'+esc(ab.text)+'</p><a class="btn blue" href="'+link('about')+'"'+T+'>'+esc(ab.linkLabel||'Learn More')+'</a></div></div></section>',
+ about:'<section class="sec" id="about-preview"><div class="wrap split"><div class="photo" style="'+(ab.photo&&!/^media:/.test(ab.photo)?'background-image:url('+esc(ab.photo)+')':'')+'" role="img" aria-label="Moreh Academy students" '+(ab.photo&&/^media:/.test(ab.photo)?'data-media-ref="'+esc(ab.photo.slice(6))+'"':'')+'></div><div><div class="bar"></div><h2>'+esc(ab.heading)+'</h2><p>'+esc(ab.text)+'</p><a class="btn blue" href="'+link('about')+'"'+T+'>'+esc(ab.linkLabel||'Learn More')+'</a></div></div></section>',
  programs:'<section class="sec" id="academics-preview"><div class="wrap"><div class="bar"></div><h2>'+esc((h.programs&&h.programs.title)||'Academic Programs')+'</h2><p class="lead">'+esc(ac.lead)+'</p><div class="grid five">'+prog.map(function(x){return '<article class="card"><h3>'+esc(x.name)+'</h3><p>'+esc(x.desc)+'</p><a class="more" href="'+link('academics/'+slug(x.name))+'"'+T+'>Learn more</a></article>'}).join('')+'</div></div></section>',
  news:'<section class="sec" id="news-preview"><div class="wrap"><div class="bar"></div><h2>'+esc(nw.title||'News & Announcements')+'</h2>'+(items.length?'<div class="grid">'+items.map(function(x){return '<article class="card"><h3>'+esc(x.title)+'</h3>'+(x.date?'<p style="font-size:13px;opacity:.7">'+esc(x.date)+'</p>':'')+'<p>'+esc(x.summary)+'</p>'+(x.link?'<a class="more" href="'+esc(routeHref(x.link))+'"'+T+'>Read more</a>':'')+'</article>'}).join('')+'</div><p style="margin-top:18px"><a class="btn blue" href="'+link('news/latest-news')+'"'+T+'>View all news</a></p>':'<div class="empty"><strong>No announcements yet.</strong><p style="margin:4px 0 12px">Follow Moreh Academy for future updates.</p><a class="btn" href="'+link('news/latest-news')+'"'+T+'>View all news</a></div>')+'</div></section>'};
  var order=(d.order||[]).filter(function(k){return S[k]});Object.keys(S).forEach(function(k){if(order.indexOf(k)<0)order.push(k)});
@@ -362,9 +362,18 @@ function applyContent(c){
  if(s.footer)H.footer=Object.assign({},H.footer,s.footer);if(s.display)H.display=s.display}
 
 /* ===== Render ===== */
+function resolvePublicMedia(){
+ var nodes=document.querySelectorAll('[data-media-ref]');
+ if(!nodes.length||!window.google||!google.script||!google.script.run)return;
+ nodes.forEach(function(el){var id=el.getAttribute('data-media-ref');if(!id||el.dataset.mediaLoading)return;el.dataset.mediaLoading='1';
+  google.script.run.withSuccessHandler(function(r){if(!r||!r.ok||!r.data)return;var v=r.data;
+   if(el.tagName==='IMG')el.src=v;else el.style.backgroundImage='url('+v+')';
+  }).withFailureHandler(function(){}).getPublishedWebsiteMediaPhoto(id);
+ });
+}
 function render(){
  var h=HOME;
- $('ids').innerHTML=h.ids.map(function(i){return '<a class="id" href="'+esc(safeUrl(i.fb))+'" target="_blank" rel="noopener">'+(i.logo?'<img class="logo" src="'+esc(i.logo)+'" alt="">':'<span class="logo">'+esc(i.short)+'</span>')+'<span>'+esc(i.name)+'</span></a>'}).join('');
+ $('ids').innerHTML=h.ids.map(function(i){return '<a class="id" href="'+esc(safeUrl(i.fb))+'" target="_blank" rel="noopener">'+(i.logo&&!/^media:/.test(i.logo)?'<img class="logo" src="'+esc(i.logo)+'" alt="">':i.logo&&/^media:/.test(i.logo)?'<img class="logo" data-media-ref="'+esc(i.logo.slice(6))+'" alt="">':'<span class="logo">'+esc(i.short)+'</span>')+'<span>'+esc(i.name)+'</span></a>'}).join('');
  $('tag').textContent=h.tagline;
  var soc='<a href="'+esc(safeUrl(h.footer.fb))+'" target="_blank" rel="noopener" aria-label="Facebook">f</a><a href="'+esc(safeUrl(h.footer.yt))+'" target="_blank" rel="noopener" aria-label="YouTube">▶</a><a href="mailto:'+esc(h.footer.email)+'" aria-label="Email">✉</a>';
  $('soc').innerHTML=soc;$('fSoc').innerHTML=soc;
@@ -376,13 +385,13 @@ function render(){
  $('hEnroll').textContent=h.hero.enroll.label;$('hEnroll').href=routeHref(h.hero.enroll.to);
  $('hDiscover').textContent=h.hero.discover.label;$('hDiscover').href=routeHref(h.hero.discover.to);if(APP_BASE)$('hDiscover').target='_top';
  var fall=['linear-gradient(135deg,#062E70,#0648AD)','linear-gradient(135deg,#0648AD,#062E70)','linear-gradient(135deg,#062E70,#FF941F)'];
- $('slides').innerHTML=h.hero.slides.map(function(u,i){return '<div class="slide" style="background-image:'+(u?'url('+esc(u)+')':fall[i%3])+'"></div>'}).join('');
+ $('slides').innerHTML=h.hero.slides.map(function(u,i){return '<div class="slide" '+(/^media:/.test(u)?'data-media-ref="'+esc(u.slice(6))+'"':'')+' style="background-image:'+(u&&!/^media:/.test(u)?'url('+esc(u)+')':fall[i%3])+'"></div>'}).join('');
  $('dots').innerHTML=h.hero.slides.map(function(_,i){return '<button aria-label="Go to slide '+(i+1)+'" data-i="'+i+'"></button>'}).join('');
  $('values').innerHTML=h.values.filter(function(v){return v.on}).map(function(v){return '<li><span class="ic" aria-hidden="true">'+esc(v.icon)+'</span>'+esc(v.label)+'</li>'}).join('');
  var r=cur_route(),home=(r==='home');$('hero').hidden=!home;$('homepage-values').hidden=!home||((HOME.display||{}).hidden||[]).indexOf('values')>-1;if(APP_PREVIEW&&!$('pvBar')){var pb=document.createElement('div');pb.id='pvBar';pb.textContent='Draft preview. Visitors do not see this version.';pb.style.cssText='background:#FF941F;color:#062E70;text-align:center;font:700 13px Poppins,sans-serif;padding:6px';document.body.insertBefore(pb,document.body.firstChild)}$('sections').innerHTML=home?renderHome():renderPage(r);document.title=(home?'Moreh Academy':pageInfo(r).title+' | Moreh Academy');if(!home)window.scrollTo(0,0);
  $('fLoc').textContent=h.footer.loc;$('fPhone').textContent=h.footer.phone;$('fMail').textContent=h.footer.email;$('fMail').href='mailto:'+h.footer.email;
  $('fCopy').textContent='© '+new Date().getFullYear()+' Moreh Academy. All rights reserved.'; $('lnkTerms').href=link('terms');$('lnkPriv').href=link('privacy');
- bindNav();if(home)initCarousel();else clearInterval(timer);
+ bindNav();resolvePublicMedia();if(home)initCarousel();else clearInterval(timer);
 }
 
 /* ===== Navigation ===== */

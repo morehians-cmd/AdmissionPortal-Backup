@@ -217,7 +217,12 @@ const SITE_SEED_ = {
 
 const wsS_ = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ' ').trim().slice(0, n);
 const wsLink_ = v => /^(https?:\/\/|mailto:|#|route:)/i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
-const wsImg_ = v => /^https?:\/\//i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
+// Preserve either a normal image URL or a validated Website Media Library reference.
+const wsImg_ = v => {
+  const value = String(v == null ? '' : v).trim();
+  if (/^media:[A-Za-z0-9_-]{10,80}$/.test(value)) return value;
+  return /^https?:\/\//i.test(value) ? value.slice(0, 500) : '';
+};
 const wsArr_ = (a, n) => Array.isArray(a) ? a.slice(0, n) : [];
 /* An absent field keeps its built-in text, so content saved before a card existed still opens. */
 const wsPick_ = (v, d, n) => v == null ? d : wsS_(v, n);
@@ -548,6 +553,8 @@ function saveSiteAdmin(token, sections) {
     lock.waitLock(20000);
     const ou = owner_(token);
     const clean = siteClean_(sections);
+    // Validate and sync Website Media Library references before publishing.
+    if (typeof syncWebsiteMediaUsage_ === 'function') syncWebsiteMediaUsage_(clean);
     const updatedAt = new Date().toISOString();
     const json = JSON.stringify({ updatedAt: updatedAt, updatedBy: ou.Username, sections: clean });
     if (json.length > SITE_MAX) throw new Error('The homepage content is too long to save. Shorten some text or remove a photo link.');
@@ -565,6 +572,7 @@ function resetSiteAdmin(token) {
   try {
     lock.waitLock(20000);
     const ou = owner_(token), b = siteRow_();
+    if (typeof syncWebsiteMediaUsage_ === 'function') syncWebsiteMediaUsage_(siteClean_(SITE_SEED_));
     if (b.row) put_(b.sh, b.row, 2, [['']]);
     CacheService.getScriptCache().remove(SITE_CACHE_KEY);
     audit_(ou, 'website.reset', SITE_KEY, '');
