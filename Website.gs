@@ -83,14 +83,14 @@ function siteClean_(d) {
     programs: {
       title: wsS_(pr.title, 120),
       items: wsArr_(pr.items, 12).map(x => ({
-        name: wsS_(x && x.name, 80), desc: wsS_(x && x.desc, 300), on: !(x && x.on === false)
+        name: wsS_(x && x.name, 80), desc: wsS_(x && x.desc, 300), photo: wsImg_(x && x.photo), on: !(x && x.on === false)
       })).filter(x => x.name)
     },
     news: {
       title: wsS_(nw.title, 120),
       items: wsArr_(nw.items, 12).map(x => ({
         title: wsS_(x && x.title, 120), date: wsS_(x && x.date, 40),
-        summary: wsS_(x && x.summary, 600), link: wsLink_(x && x.link)
+        summary: wsS_(x && x.summary, 600), link: wsLink_(x && x.link), photo: wsImg_(x && x.photo)
       })).filter(x => x.title)
     },
     footer: {
@@ -260,7 +260,7 @@ function siteNews_() {
         title: e.Title,
         date: e.EventDate,
         summary: e.Details || (e.Category === 'Announcement' ? 'School announcement from Moreh Academy.' : 'Upcoming Moreh Academy event.'),
-        link: e.Category === 'Announcement' ? 'route:news/school-announcements' : 'route:news/upcoming-events'
+        link: e.Category === 'Announcement' ? 'route:news/school-announcements' : 'route:news/upcoming-events', photo: wsMedia_(e.Image || e.image || e.Photo || e.photo || '')
       }));
   } catch (_) {
     return [];
@@ -274,7 +274,7 @@ function getPublishedHomepage() {
     const d = siteRead_();
     if (!d) return null;
     const liveAbout = siteAboutPreview_();
-    if (liveAbout) d.sections.about = Object.assign({}, d.sections.about || {}, liveAbout);
+    if (liveAbout) { liveAbout.photo = (d.sections.about && d.sections.about.photo) || ''; d.sections.about = Object.assign({}, d.sections.about || {}, liveAbout); }
     const liveNews = siteNews_();
     if (liveNews.length) d.sections.news = Object.assign({}, d.sections.news || {}, { items: liveNews });
     d.sections = siteResolveSectionMedia_(d.sections);
