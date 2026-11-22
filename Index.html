@@ -2509,7 +2509,7 @@ function websitePage(){
   },m=>{S.pg=null;wsRender();toast(m)});
  });
 }
-function wsRender(){
+function wsRenderLegacy(){
  const d=S.site,m=S.siteMeta||{},home=m.home||'';
  $('view').innerHTML=[
   `<div class="card"><div class="ch"><h3>Homepage content</h3><span class="chip ${m.saved?'ok':'warn'}">${m.saved?'Saved copy is live':'Built-in defaults'}</span></div>
@@ -2542,6 +2542,60 @@ function wsRender(){
  ].join('');
  wsBind();
 }
+
+/* ===== Website Management Center shell =====
+ * Keeps the existing field editor intact, but adds a clearer CMS-style control
+ * surface above it: status, quick actions, publishing metadata and management
+ * guidance. Existing save/reset/page actions remain unchanged.
+ */
+function wsRender(){
+  wsRenderLegacy();
+  const v=$('view');
+  if(!v || v.dataset.wsShell==='1') return;
+  v.dataset.wsShell='1';
+  const m=S.siteMeta||{}, d=S.site||{};
+  const counts={
+    schools:Array.isArray(d.masthead&&d.masthead.ids)?d.masthead.ids.length:0,
+    slides:Array.isArray(d.hero&&d.hero.slides)?d.hero.slides.filter(Boolean).length:0,
+    values:Array.isArray(d.values&&d.values.items)?d.values.items.filter(x=>x&&x.on!==false).length:0,
+    programs:Array.isArray(d.programs&&d.programs.items)?d.programs.items.filter(x=>x&&x.on!==false).length:0,
+    news:Array.isArray(d.news&&d.news.items)?d.news.items.length:0,
+    pages:S.pg&&S.pg.text?Object.values(S.pg.text).filter(x=>String(x||'').trim()).length:0
+  };
+  const stamp=m.updatedAt?new Date(m.updatedAt).toLocaleString():'Not published yet';
+  const status=m.saved
+    ? '<span class="chip ok">Published</span>'
+    : '<span class="chip warn">Using built-in defaults</span>';
+  const home=m.home||'';
+  const shell=document.createElement('div');
+  shell.className='card';
+  shell.style.cssText='margin-bottom:16px;border-top:4px solid var(--blue);padding:20px';
+  shell.innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">'+
+      '<div style="min-width:240px;flex:1">'+
+        '<div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:4px">Website Management Center</div>'+
+        '<h2 style="margin:0;color:var(--navy);font-size:26px">Public Website</h2>'+
+        '<p style="margin:6px 0 0;color:var(--mut)">Manage homepage content, navigation, inner pages and public-facing information from one place.</p>'+
+      '</div>'+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
+        status+
+        (home?'<button class="btn alt" data-act="wsview">Open website</button>':'')+
+        '<button class="btn" data-act="wssave">Save &amp; publish</button>'+
+      '</div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin-top:18px">'+
+      [['Homepage','Live'],['Schools',counts.schools],['Hero images',counts.slides],['Values',counts.values],['Programs',counts.programs],['News items',counts.news],['Inner pages',counts.pages]].map(x=>
+        '<div style="border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:var(--soft)">'+
+          '<div style="font-size:12px;color:var(--mut)">'+esc(x[0])+'</div><b style="display:block;margin-top:2px;color:var(--navy)">'+esc(String(x[1]))+'</b>'+
+        '</div>').join('')+
+    '</div>'+
+    '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut)">'+
+      '<span>Last published: <b style="color:var(--txt)">'+esc(stamp)+'</b>'+(m.updatedBy?' · '+esc(m.updatedBy):'')+'</span>'+
+      '<span>Changes are published immediately when saved.</span>'+
+    '</div>';
+  v.insertBefore(shell,v.firstChild);
+}
+
 function wsBind(){const v=$('view');v.querySelectorAll('[data-sp]').forEach(el=>{const h=()=>{wspSet(S.site,el.dataset.sp,el.type==='checkbox'?el.checked:el.value)};el.oninput=h;el.onchange=h});
  const sel=$('pgSel'),ta=$('pgTxt');
  if(sel&&S.pg)sel.onchange=()=>{S.pg.route=sel.value;wsRender()};
