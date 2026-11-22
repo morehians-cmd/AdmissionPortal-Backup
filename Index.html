@@ -4038,16 +4038,23 @@ body:not(.stu) .rbd.warn{background:#fbbf24;color:#3a2a00}
 DC.splice(0, DC.length, '#f59e0b', '#2563eb', '#16a34a', '#7c3aed', '#e11d48');
 
 /* ---------- top bar: date pill ---------- */
-const _topInitGk = topInit;
-topInit = function () {
-  _topInitGk();
-  const tr = document.querySelector('.top .tr');
-  if (tr && !$('tdate')) {
-    const d = document.createElement('span');
-    d.id = 'tdate'; d.className = 'tdate';
-    d.innerHTML = I.cal + new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    tr.insertBefore(d, tr.firstChild);
+const _topInitBase=topInit;
+topInit=function(){
+  _topInitBase();
+  const tr=document.querySelector('.top .tr');
+  if(tr&&!$('tdate')){
+    const d=document.createElement('span');
+    d.id='tdate';d.className='tdate';
+    d.innerHTML=I.cal+new Date().toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});
+    tr.insertBefore(d,tr.firstChild);
   }
+  if(tr&&!tr.querySelector('.theme-switch'))tr.insertBefore(thMake(),tr.firstChild);
+  const dd=$('dd');
+  if(dd&&!dd.querySelector('[data-act=thtoggle]')){
+    const l=dd.querySelector('.ddl');
+    if(l)l.insertAdjacentHTML('beforebegin','<button role="menuitem" data-act="thtoggle">'+I.star+'<span id="thl"></span></button>')
+  }
+  MRH_THEME.sync();thLabel()
 };
 
 /* ---------- KPI helpers ---------- */
@@ -4114,11 +4121,15 @@ function gkDemoDraw(D) {
 }
 
 /* after the shared panels draw: swap in the table and load the demographic charts */
-const _dxDrawGk = dxDraw;
-dxDraw = function (X, H) {
-  _dxDrawGk(X, H);
-  if (X) gkAttention();
+const _dxDrawBase=dxDraw;
+dxDraw=function(X,H){
+  _dxDrawBase(X,H);
+  if(X)gkAttention();
   gkDemoLoad();
+  const rec=$('dxrec');if(!rec||$('maov'))return;
+  rec.insertAdjacentHTML('beforebegin','<div id="maov"></div>');
+  if(S.dsh&&S.dsh.stats)maDraw(S.dsh.stats);
+  else google.script.run.withSuccessHandler(r=>{if(r&&r.success){S.dsh=r.data;maDraw(r.data.stats)}}).withFailureHandler(()=>{}).dashboard(S.token)
 };
 
 /* ---------- the admin Home page (REPLACES homeAdmin) ---------- */
@@ -4836,11 +4847,7 @@ function thMake(cls){const b=document.createElement('button');b.type='button';b.
 })();
 
 /* top bar (after sign-in) + a menu item for phones */
-const _topInitTh=topInit;
-topInit=function(){_topInitTh();
- const tr=document.querySelector('.top .tr');if(tr&&!tr.querySelector('.theme-switch'))tr.insertBefore(thMake(),tr.firstChild);
- const dd=$('dd');if(dd&&!dd.querySelector('[data-act=thtoggle]')){const l=dd.querySelector('.ddl');if(l)l.insertAdjacentHTML('beforebegin','<button role="menuitem" data-act="thtoggle">'+I.star+'<span id="thl"></span></button>')}
- MRH_THEME.sync();thLabel()};
+
 const thLabel=()=>{const e=$('thl');if(e)e.textContent=MRH_THEME.get()==='dark'?'Switch to day mode':'Switch to night mode'};
 act.thtoggle=()=>{MRH_THEME.toggle();thLabel()};
 new MutationObserver(thLabel).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
@@ -4858,12 +4865,7 @@ function maDraw(st){const X=S.dx&&S.dx.X,host=$('maov');if(!host||!X||!st)return
  if(full)R.push(maRing(pc(live-(c.consent||0),live),'#b78cff','Consent form',(live-(c.consent||0))+' of '+live+' received'));
  host.innerHTML=`<div class="card"><div class="ch"><h3>Enrollment Health</h3><span style="color:var(--mut);font-size:13px">Active learners, SY ${esc(String(S.cfg.sy).replace('-','\u2013'))}</span></div><div class="ma-rings">${R.join('')}</div></div>`}
 
-const _dxDrawTh=dxDraw;
-dxDraw=function(X,H){_dxDrawTh(X,H);
- const rec=$('dxrec');if(!rec||$('maov'))return;
- rec.insertAdjacentHTML('beforebegin','<div id="maov"></div>');
- if(S.dsh&&S.dsh.stats)maDraw(S.dsh.stats);
- else google.script.run.withSuccessHandler(r=>{if(r&&r.success){S.dsh=r.data;maDraw(r.data.stats)}}).withFailureHandler(()=>{}).dashboard(S.token)};
+
 
  /* ===== Sign-in panel: Sign in <-> Create an account (driven by whether #regbox is visible) ===== */
 (function(){
