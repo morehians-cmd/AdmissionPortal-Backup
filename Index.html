@@ -2472,7 +2472,7 @@ const WS_NAMES={admission:'Admission steps',about:'About Moreh Academy preview',
   slides:{p:'hero.slides',n:'Slide',make:()=>''},
   values:{p:'values.items',n:'Value',make:()=>({label:'',icon:'★',on:true})},
   steps:{p:'admission.steps',n:'Step',make:()=>({t:'',d:'',i:'•'})},
-  programs:{p:'programs.items',n:'Program',make:()=>({name:'',desc:'',on:true})},
+  programs:{p:'programs.items',n:'Program',make:()=>({name:'',desc:'',photo:'',on:true})},
   news:{p:'news.items',n:'Item',make:()=>({title:'',date:'',summary:'',link:''})}};
 S.site=null;S.siteMeta=null;
 const wspGet=(o,p)=>p.split('.').reduce((v,k)=>v==null?undefined:v[k],o);
@@ -2494,7 +2494,7 @@ function pgsCard(){
   <p style="color:var(--mut);margin-top:0">The pages in the homepage menu below the sections above. A page with nothing saved shows its built-in cards and “Content coming soon”.</p>
   <div class="f"><label for="pgSel">Page</label><select id="pgSel">${groups}</select></div>
   <div class="f"><label for="pgTxt">Content</label><textarea id="pgTxt" rows="14" maxlength="6000" placeholder="Write this page here.&#10;&#10;## A heading&#10;A paragraph with **bold**, *italic* and [a link](https://example.com).&#10;- a bullet&#10;&#10;![Photo caption](https://example.com/photo.jpg)">${esc(txt)}</textarea></div>
-  <p style="color:var(--mut);font-size:13px;margin-top:6px">Start a line with <b>##</b> for a heading, <b>-</b> for a bullet and <b>![alt](https://…)</b> for a photo. Blank lines separate paragraphs.</p>
+  <p style="color:var(--mut);font-size:13px;margin-top:6px">Start a line with <b>##</b> for a heading, <b>-</b> for a bullet and <b>![alt](https://…)</b> or a Media Library reference for a photo. Blank lines separate paragraphs.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="pgsave">Save pages</button><button class="btn alt" data-act="pgreload">Discard changes</button><button class="btn red" data-act="pgreset">Reset all pages</button></div>
   ${g.meta&&g.meta.updatedAt?`<p style="color:var(--mut);font-size:13px;margin-bottom:0">Last saved ${esc(new Date(g.meta.updatedAt).toLocaleString())} by ${esc(g.meta.updatedBy||'—')}.</p>`:''}</div>`;
 }
@@ -2537,7 +2537,7 @@ function wsRenderLegacy(){
    </div>
   </div>`,
   `<div class="card"><div class="ch"><h3>Academic programs</h3></div><div class="g">${wf('Section title','programs.title',d.programs.title)}</div></div>`,
-  wcard('programs','Program cards',(d.programs.items||[]).map((x,i)=>wrow('programs',i,WS_LISTS.programs.n,wf('Program','programs.items.'+i+'.name',x.name)+wt('Description','programs.items.'+i+'.desc',x.desc)+wc('Show','programs.items.'+i+'.on',x.on))).join('')),
+  wcard('programs','Program cards',(d.programs.items||[]).map((x,i)=>wrow('programs',i,WS_LISTS.programs.n,wf('Program','programs.items.'+i+'.name',x.name)+wt('Description','programs.items.'+i+'.desc',x.desc)+wf('Image reference','programs.items.'+i+'.photo',x.photo)+`<div style="margin-top:8px"><button class="btn alt" type="button" data-act="wsselectprogram" data-v="programs.items.${i}.photo">Select from Media Library</button></div>`+wc('Show','programs.items.'+i+'.on',x.on))).join('')),
   `<div class="card"><div class="ch"><h3>News &amp; announcements</h3><span class="chip ok">Campus Bulletin</span></div>
    <div class="g">${wf('Section title','news.title',d.news.title)}</div>
    <div style="margin-top:12px;padding:14px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)">
@@ -2650,29 +2650,37 @@ act.wsmedit=id=>{
 act.wsmmx=()=>{const m=$('wsmm');if(m)m.remove()};
 act.wsmmgo=()=>{const m=$('wsmm'),x=wsMediaFind(m&&m.dataset.id||'');if(!m||!x)return;call('saveMediaMetaAdmin',[T(),x.id,{title:$('wsmmt').value,alt:$('wsmma').value,caption:$('wsmmc').value}],r=>{m.remove();toast(r.message);wsMediaLoad()})};
 act.wsmediaadd=()=>{const f=document.createElement('input');f.type='file';f.accept='image/jpeg,image/png,image/webp';f.onchange=()=>{const file=f.files&&f.files[0];if(!file)return;const im=new Image();im.onerror=()=>toast('That file could not be read as an image.',false);im.onload=()=>{const k=Math.min(1,1000/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);const cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0,cv.width,cv.height);const url=cv.toDataURL('image/jpeg',.8);if(url.length>2100000)return toast('Photo is still too large after resizing. Try a smaller image.',false);const title=prompt('Media title:','Moreh Academy Facilities Photo');if(title===null)return;const alt=prompt('Alt text:',title);if(alt===null)return;const cap=prompt('Caption (optional):','');if(cap===null)return;call('addMediaLibraryPhoto',[T(),url,title,cap,alt],r=>{toast(r.message);wsMediaLoad()})};im.src=URL.createObjectURL(file)};f.click()};\nfunction wsHeroApply(path,url){wspSet(S.site,path,url||'');wsRender()}
-act.wsselecthero=path=>{
+function wsMediaPicker(title,done){
  const s=window.__WS_MEDIA__;if(!s||!s.items){toast('Media Library is still loading. Try again in a moment.',false);return}
  const imgs=s.items.filter(x=>x.type==='image');
  const m=document.createElement('div');m.className='mod';m.id='wshm';
  const rows=imgs.map(x=>{
-  const bg=x.url?'background-image:url(&quot;'+esc(x.url)+'&quot;)':'background:var(--soft)';
-  const ref=x.url?'':' · stored in Gallery';
+  const bg=x.url?'background-image:url(&quot;'+esc(x.url)+'&quot;)':'background:var(--soft)',ref=x.url?'':' · stored in Gallery';
   return '<button type="button" class="wshitem" data-mid="'+esc(x.id)+'"><span class="wshthumb" style="'+bg+'"></span><span><b>'+esc(x.title||'Untitled media')+'</b><small>'+esc(x.source||'Website media')+esc(ref)+'</small></span></button>';
  }).join('');
- m.innerHTML='<div style="max-width:680px;width:100%"><div class="bd"><h3 style="color:var(--navy);margin-bottom:5px">Select Hero Media</h3><p style="color:var(--mut);font-size:13px;margin-top:0">Choose an existing image from the centralized Media Library. Gallery photos remain in their protected Gallery storage and are referenced by ID.</p><div class="wshgrid">'+(rows||'<div class="aemp">No images are available yet.</div>')+'</div></div><div class="ft"><button class="btn alt" data-act="wshx">Cancel</button></div></div>';
+ m.innerHTML='<div style="max-width:680px;width:100%"><div class="bd"><h3 style="color:var(--navy);margin-bottom:5px">'+esc(title)+'</h3><p style="color:var(--mut);font-size:13px;margin-top:0">Choose an existing image from the centralized Media Library. Gallery photos remain in protected Gallery storage and are referenced by ID.</p><div class="wshgrid">'+(rows||'<div class="aemp">No images are available yet.</div>')+'</div></div><div class="ft"><button class="btn alt" data-act="wshx">Cancel</button></div></div>';
  document.body.appendChild(m);
  m.querySelectorAll('[data-mid]').forEach(b=>b.onclick=()=>{
   const x=wsMediaFind(b.dataset.mid);if(!x)return;
-  if(x.url){wsHeroApply(path,x.url);m.remove();return}
+  if(x.url){done({ref:x.url,title:x.title||'Moreh Academy image'});m.remove();return}
   if(x.page&&x.refId){
    b.disabled=true;b.innerHTML='<span class="wshthumb" style="background:var(--soft)"></span><span><b>Loading image…</b><small>Please wait</small></span>';
    call('getGalleryPhoto',[T(),x.page,x.refId],r=>{
-    if(r&&r.success&&r.data){wsHeroApply(path,'gallery:'+x.page+':'+x.refId);m.remove()}
+    if(r&&r.success&&r.data){done({ref:'gallery:'+x.page+':'+x.refId,title:x.title||'Moreh Academy image'});m.remove()}
     else {b.disabled=false;toast(r&&r.message||'Could not load that gallery photo.',false)}
    });
   }
  });
-};
+}
+act.wsselecthero=path=>wsMediaPicker('Select Hero Media',m=>wsHeroApply(path,m.ref));
+act.wsselectprogram=path=>wsMediaPicker('Select Program Media',m=>{wspSet(S.site,path,m.ref);wsRender()});
+act.pgmedia=()=>wsMediaPicker('Insert Page Media',m=>{
+ const ta=$('pgTxt');if(!ta||!S.pg)return;
+ const route=S.pg.route,old=ta.value||'',alt=m.title||'Moreh Academy image',ins='!['+alt.replace(/\]/g,'')+']('+m.ref+')';
+ const pos=ta.selectionStart==null?old.length:ta.selectionStart;
+ S.pg.text[route]=old.slice(0,pos)+ins+old.slice(pos);
+ ta.value=S.pg.text[route];ta.focus();ta.selectionStart=ta.selectionEnd=pos+ins.length;
+});
 act.wshx=()=>{const m=$('wshm');if(m)m.remove()};
 function wsBind(){const v=$('view');v.querySelectorAll('[data-sp]').forEach(el=>{const h=()=>{wspSet(S.site,el.dataset.sp,el.type==='checkbox'?el.checked:el.value)};el.oninput=h;el.onchange=h});
  const sel=$('pgSel'),ta=$('pgTxt');
