@@ -3,6 +3,9 @@
  *  MailSwitch (mail on/off, reset lock) | MailQueue (queued mail) | StaffControl (Encoder hours, deactivate) | ReEnroll (yearly carry-over)
  *  Speed (caches, lookups) | SignInGuard (trusted devices, mail buckets) | Housekeeping (script property cleanup) | Retention (disposal jobs)
  *  Add new columns only at the END of FIELDS / UCOLS. Deploy a NEW version after every change. */
+const SALT = 'M0r3#@cad3m4';
+// Optional: public image URL of the blank letterhead (A4 portrait). Leave '' to use the built-in drawn letterhead.
+const LETTERHEAD_URL = '';
 const PHOTO_FOLDER_ID = '18YcLeZCXpbO4-UIGov6PRlEV1CpZMHxb';
 const SCHOOL = 'MOREH ACADEMY', HEAD_NAME = 'JOSE JAY I. CABARDO', HEAD_TITLE = 'Head, Admissions Office', FEE = 1000;
 // Scholarship benefits printed on the confirmation slip, by Category. Edit freely.

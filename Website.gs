@@ -1,3 +1,26 @@
+/* ---------- value helpers used by siteClean_ and the media library ----------
+   RECONSTRUCTED: the original definitions were missing from the merged project. Behaviour is inferred from
+   how they are called (limits, link/image schemes used by the seed and the Homepage). Review before deploying. */
+const SITE_SECTIONS = ['admission', 'about', 'programs', 'news'];   // sections whose order can be changed
+function wsS_(v, max) {            // trimmed plain text, control characters removed, length-limited
+  return String(v == null ? '' : v).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, max || 200);
+}
+function wsArr_(v, max) { return Array.isArray(v) ? v.slice(0, max || 12) : []; }
+function wsPick_(v, fallback, max) { return wsS_(v, max) || wsS_(fallback, max); }   // edited text, else the seed text
+function wsImg_(v) {               // '' | gallery:<page>:<id> | https URL
+  const s = wsS_(v, 600);
+  if (!s) return '';
+  if (/^gallery:[A-Za-z0-9_-]+:[A-Za-z0-9_-]{1,80}$/.test(s)) return s;
+  return /^https:\/\/[^\s"'<>()]+$/i.test(s) ? s : '';
+}
+function wsLink_(v) {              // '' | #anchor | route:<page> | https URL
+  const s = wsS_(v, 300);
+  if (!s) return '';
+  if (/^#[A-Za-z0-9_-]{1,60}$/.test(s) || /^route:[A-Za-z0-9\/_-]{1,100}$/.test(s)) return s;
+  return /^https:\/\/[^\s"'<>()]+$/i.test(s) ? s : '';
+}
+function wsMedia_(ref) { return siteMediaPublic_(ref); }   // event/announcement image reference -> public URL ('' if none)
+
 function siteClean_(d) {
   d = d || {};
   const S = d.sections || d;
