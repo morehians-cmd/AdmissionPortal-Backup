@@ -2518,6 +2518,10 @@ function wsRenderLegacy(){
    wf('School name','masthead.ids.'+i+'.name',x.name)+wf('Short name (2–4 letters)','masthead.ids.'+i+'.short',x.short)+wf('Logo image URL','masthead.ids.'+i+'.logo',x.logo)+wf('Facebook page URL','masthead.ids.'+i+'.fb',x.fb))).join(''),'The logo is optional; the short name is shown when there is none.'),
   `<div class="card"><div class="ch"><h3>Hero (top of the homepage)</h3></div><div class="g">${wf('Small line above the name','hero.title',d.hero.title)}${wf('School name (large)','hero.name',d.hero.name)}${wf('Subtitle','hero.subtitle',d.hero.subtitle)}${wt('Description','hero.desc',d.hero.desc)}${wf('Main button label','hero.enroll.label',d.hero.enroll.label)}${wf('Main button link (#create, route:about, https://…)','hero.enroll.to',d.hero.enroll.to)}${wf('Second button label','hero.discover.label',d.hero.discover.label)}${wf('Second button link','hero.discover.to',d.hero.discover.to)}${wf('Slide interval (milliseconds)','hero.intervalMs',d.hero.intervalMs,'number')}</div></div>`,
   wcard('slides','Hero slides',(d.hero.slides||[]).map((x,i)=>wrow('slides',i,WS_LISTS.slides.n,wf('Image URL (empty = coloured background)','hero.slides.'+i,x))).join(''),'An empty slide keeps the built-in blue and orange background.'),
+  `<div class="card" id="ws-media-library"><div class="ch"><h3>Media Library</h3><span class="chip ok">Existing assets</span></div>
+   <p style="color:var(--mut);margin-top:0">A central view of the images already used by the public website. This first version reuses the existing Gallery and homepage hero records, so nothing is duplicated or moved.</p>
+   <div id="wsMediaBody" style="min-height:70px"><p style="color:var(--mut);margin-bottom:0">Loading media inventory…</p></div>
+  </div>`,
   wcard('values','Our values strip',(d.values.items||[]).map((x,i)=>wrow('values',i,WS_LISTS.values.n,wf('Label','values.items.'+i+'.label',x.label)+wf('Icon (emoji)','values.items.'+i+'.icon',x.icon)+wc('Show','values.items.'+i+'.on',x.on))).join('')),
   `<div class="card"><div class="ch"><h3>Admission process</h3></div><div class="g">${wf('Section title','admission.title',d.admission.title)}${wf('Section subtitle','admission.sub',d.admission.sub)}</div></div>`,
   wcard('steps','Admission steps',(d.admission.steps||[]).map((x,i)=>wrow('steps',i,WS_LISTS.steps.n,wf('Step title','admission.steps.'+i+'.t',x.t)+wt('Description','admission.steps.'+i+'.d',x.d)+wf('Icon (emoji)','admission.steps.'+i+'.i',x.i))).join(''),'They are numbered automatically, in the order shown here.'),
@@ -2600,7 +2604,7 @@ function wsRender(){
         '</div>').join('')+
     '</div>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">'+
-      [['School identity','School identity'],['Hero & media','Hero (top of the homepage)'],['Admissions','Admission process'],['Programs','Academic programs'],['Navigation','Menu & page cards'],['Inner pages','Inner pages']].map(x=>
+      [['School identity','School identity'],['Hero & media','Hero (top of the homepage)'],['Media Library','Media Library'],['Admissions','Admission process'],['Programs','Academic programs'],['Navigation','Menu & page cards'],['Inner pages','Inner pages']].map(x=>
         '<button class="btn alt" style="font-size:12px;padding:7px 11px" data-act="wsjump" data-v="'+esc(x[1])+'">'+esc(x[0])+'</button>').join('')+
     '</div>'+
     '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut)">'+
@@ -2608,6 +2612,7 @@ function wsRender(){
       '<span>Changes are published immediately when saved.</span>'+
     '</div>';
   v.insertBefore(shell,v.firstChild);
+  wsMediaLoad();
 }
 
 act.wsjump=label=>{
@@ -2615,6 +2620,22 @@ act.wsjump=label=>{
   const hit=cards.find(card=>String(card.querySelector('h3')&&card.querySelector('h3').textContent||'').trim()===String(label).trim());
   if(hit){hit.scrollIntoView({behavior:'smooth',block:'start'});const h=hit.querySelector('h3');if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}}
 };
+function wsMediaLoad(){
+ const el=$('wsMediaBody'); if(!el)return;
+ call('getMediaLibraryAdmin',[T()],r=>{
+  const d=r.data||{}, hero=Array.isArray(d.hero)?d.hero:[], gal=Array.isArray(d.gallery)?d.gallery:[];
+  const cards=hero.concat(gal).map(x=>'<div style="display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;background:#fff">'+
+    '<div style="width:58px;height:46px;border-radius:8px;background:var(--soft) center/cover no-repeat;flex:none;'+(x.url?'background-image:url('+esc(x.url)+')':'')+'"></div>'+
+    '<div style="min-width:0;flex:1"><b style="display:block;color:var(--navy);font-size:13px">'+esc(x.title||x.caption||'Untitled media')+'</b><span style="font-size:12px;color:var(--mut)">'+esc(x.source||'Website media')+(x.page?' · '+esc(x.page):'')+'</span></div></div>').join('');
+  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-bottom:10px">'+
+    '<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)"><small style="color:var(--mut)">Total assets</small><b style="display:block;font-size:22px;color:var(--navy)">'+esc(String(d.total||0))+'</b></div>'+
+    '<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)"><small style="color:var(--mut)">Hero images</small><b style="display:block;font-size:22px;color:var(--navy)">'+esc(String(hero.length))+'</b></div>'+
+    '<div style="padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--soft)"><small style="color:var(--mut)">Gallery photos</small><b style="display:block;font-size:22px;color:var(--navy)">'+esc(String(gal.length))+'</b></div></div>'+
+    (cards||'<p style="color:var(--mut);margin-bottom:0">No website media has been registered yet.</p>')+
+    '<p style="font-size:12px;color:var(--mut);margin:10px 0 0">'+esc(d.note||'')+'</p>';
+ },m=>{el.innerHTML='<p style="color:#b3261e;margin-bottom:0">'+esc(m||'Could not load media inventory.')+'</p>';});
+}
+
 function wsBind(){const v=$('view');v.querySelectorAll('[data-sp]').forEach(el=>{const h=()=>{wspSet(S.site,el.dataset.sp,el.type==='checkbox'?el.checked:el.value)};el.oninput=h;el.onchange=h});
  const sel=$('pgSel'),ta=$('pgTxt');
  if(sel&&S.pg)sel.onchange=()=>{S.pg.route=sel.value;wsRender()};
