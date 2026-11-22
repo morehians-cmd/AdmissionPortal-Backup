@@ -4494,9 +4494,7 @@ function homeStudent(){head('Dashboard','Your enrollment at a glance');
   <div class="dside"><div class="card"><div class="ch"><h3>Quick Actions</h3></div><div class="qas">${qa('c1',I.adm,'Student Profile','nav','sp')}${qa('c3',I.rep,'School Requirements','nav','rq')}${qa('c4',I.rep,'Print Consent Form','pconsent')}${qa('c2',I.rep,'Data Privacy Policy','nav','pp')}${qa('c5',I.sch,'Scholarships','nav','sch')}${qa('c1',I.tf,'Schedule of Fees','nav','tf')}</div></div>${evSide()}${actCard()}</div></div>`;
   renderAct();homeEvents()})}
 
-/* learners get the new Home; admin, office and teacher accounts keep theirs */
-const _homeS2=home;
-home=function(){return A()?_homeS2():homeStudent()};
+/* home routing is already handled by the consolidated home wrapper above */
 
 /* =====================================================================
    REPORTS: search, recently viewed, sticky first column on wide tables
