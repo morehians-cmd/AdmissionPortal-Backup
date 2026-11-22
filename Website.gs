@@ -397,32 +397,36 @@ function getPublishedPolicy() {
 /* ---------- administrator endpoints ---------- */
 /** ADMINISTRATOR / SYSTEM MANAGER. The current content (or the built-in defaults before the first save). */
 /** ADMINISTRATOR / SYSTEM MANAGER. Inventory existing website image assets without creating a second media store. */
-function getMediaLibraryAdmin(token) {
-  try {
-    owner_(token);
-    const site = siteRead_();
-    const sections = site ? site.sections : siteClean_(SITE_SEED_);
-    const hero = Array.isArray(sections.hero && sections.hero.slides) ? sections.hero.slides.filter(Boolean).map((url, i) => ({
-      id: 'hero-' + (i + 1), title: 'Homepage Hero ' + (i + 1), url: String(url), source: 'Homepage Hero'
-    })) : [];
-    const gallery = [];
-    GAL_PAGES.forEach(page => {
-      try {
-        galRead_(page).list.forEach(p => gallery.push({
-          id: p.id, title: p.cap || 'Untitled photo', caption: p.cap || '', page: page,
-          source: page === 'facilities' ? 'Facilities' : 'Cluster Guide'
-        }));
-      } catch (_) {}
-    });
-    return ok({
-      total: hero.length + gallery.length,
-      hero: hero,
-      gallery: gallery,
-      note: 'This inventory reuses the existing Gallery and homepage hero records. No second media database has been created.'
-    });
-  } catch (e) { return fail(e); }
+function mediaMetaRow_(){return blockRow_('media_library')}
+
+function mediaMetaRead_(){
+  const b=mediaMetaRow_(); if(!b.row) return {};
+  try{const raw=JSON.parse(String(b.sh.getRange(b.row,2).getValue()||'{}'));return raw&&raw.items&&typeof raw.items==='object'?raw.items:{}}catch(_){return {}}
 }
 
+function mediaMetaWrite_(items, ou){
+  const b=mediaMetaRow_(), json=JSON.stringify({updatedAt:new Date().toISOString(),updatedBy:ou.Username,items:items||{}});
+  if(json.length>30000) throw new Error('Media metadata is too large to save.');
+  put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[['media_library',json]]);
+}
+
+function mediaInventory_(){
+  const site=siteRead_(), sections=site?site.sections:siteClean_(SITE_SEED_), meta=mediaMetaRead_(), out=[];
+  const hero=Array.isArray(sections.hero&&sections.hero.slides)?sections.hero.slides.filter(Boolean):[];
+  hero.forEach((url,i)=>{const id='hero-'+(i+1),m=meta[id]||{};out.push({id:id,type:'image',title:m.title||'Homepage Hero '+(i+1),alt:m.alt||'Moreh Academy homepage hero image '+(i+1),caption:m.caption||'',url:String(url),source:'Homepage Hero',page:'homepage',editable:true})});
+  GAL_PAGES.forEach(page=>{try{galRead_(page).list.forEach(p=>{const id='gallery-'+page+'-'+p.id,m=meta[id]||{};out.push({id:id,type:'image',title:m.title||p.cap||'Untitled photo',alt:m.alt||p.cap||'Moreh Academy '+page+' photo',caption:m.caption||p.cap||'',url:'',source:page==='facilities'?'Facilities':'Cluster Guide',page:page,refId:p.id,editable:true})})}catch(_){} });
+  return {items:out};
+}
+
+function getMediaLibraryAdmin(token){try{owner_(token);return ok(mediaInventory_(),'Media library loaded.')}catch(e){return fail(e)}}
+
+function saveMediaMetaAdmin(token,id,data){
+  try{const ou=owner_(token);id=wsS_(id,160);if(!id)throw new Error('Media ID is required.');const items=mediaMetaRead_();items[id]={title:wsS_(data&&data.title,120),caption:wsS_(data&&data.caption,240),alt:wsS_(data&&data.alt,180)};mediaMetaWrite_(items,ou);audit_(ou,'website.media_meta',id,'');return ok({id:id,meta:items[id]},'Media details saved.')}catch(e){return fail(e)}
+}
+
+function addMediaLibraryPhoto(token,b64,title,caption,alt){
+  try{owner_(token);const r=addGalleryPhoto(token,'facilities',b64,caption||title||'');if(!r||!r.success)return r||fail('Could not add the photo.');const id='gallery-facilities-'+r.data.id,items=mediaMetaRead_();items[id]={title:wsS_(title,120)||wsS_(caption,240)||'Untitled photo',caption:wsS_(caption,240),alt:wsS_(alt,180)||wsS_(caption,240)||'Moreh Academy facilities photo'};const ou=owner_(token);mediaMetaWrite_(items,ou);audit_(ou,'website.media_upload',id,'');return ok({id:id,photo:r.data.id,meta:items[id],list:r.data.list},'Photo added to the Facilities gallery.')}catch(e){return fail(e)}
+}
 function getSiteAdmin(token) {
   try {
     owner_(token);
