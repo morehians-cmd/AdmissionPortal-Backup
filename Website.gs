@@ -396,6 +396,33 @@ function getPublishedPolicy() {
 
 /* ---------- administrator endpoints ---------- */
 /** ADMINISTRATOR / SYSTEM MANAGER. The current content (or the built-in defaults before the first save). */
+/** ADMINISTRATOR / SYSTEM MANAGER. Inventory existing website image assets without creating a second media store. */
+function getMediaLibraryAdmin(token) {
+  try {
+    owner_(token);
+    const site = siteRead_();
+    const sections = site ? site.sections : siteClean_(SITE_SEED_);
+    const hero = Array.isArray(sections.hero && sections.hero.slides) ? sections.hero.slides.filter(Boolean).map((url, i) => ({
+      id: 'hero-' + (i + 1), title: 'Homepage Hero ' + (i + 1), url: String(url), source: 'Homepage Hero'
+    })) : [];
+    const gallery = [];
+    GAL_PAGES.forEach(page => {
+      try {
+        galRead_(page).list.forEach(p => gallery.push({
+          id: p.id, title: p.cap || 'Untitled photo', caption: p.cap || '', page: page,
+          source: page === 'facilities' ? 'Facilities' : 'Cluster Guide'
+        }));
+      } catch (_) {}
+    });
+    return ok({
+      total: hero.length + gallery.length,
+      hero: hero,
+      gallery: gallery,
+      note: 'This inventory reuses the existing Gallery and homepage hero records. No second media database has been created.'
+    });
+  } catch (e) { return fail(e); }
+}
+
 function getSiteAdmin(token) {
   try {
     owner_(token);
