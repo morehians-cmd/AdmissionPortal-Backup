@@ -3090,14 +3090,14 @@ act.galcap=id=>{const c=S.cp,p=c.gal.find(x=>x.id===id);if(!p)return;
  call('setGalleryCaption',[T(),c.id,id,v],r=>{c.gal=r.data;toast(r.message);galDraw();galFill()})};
 
 /* Facilities: photos first, then the text cards, plus a Get directions button */
-const _cpR3=cpRender;
-cpRender=function(){_cpR3();const c=S.cp;if(!c||c.id!=='facilities'||c.edit)return;
+function cpR3Apply(){const c=S.cp;if(!c||c.id!=='facilities'||c.edit)return false;
  const hero=document.querySelector('#view .shero'),gal=$('gal');
  if(hero&&gal)hero.after(gal);
  const row=hero&&hero.querySelector('.sht');
  if(row&&!row.querySelector('.fdir')){const old=row.querySelector('[data-act=cpedit]'),w=document.createElement('div');w.className='fdir';
   w.innerHTML=`<a class="shbtn" href="${GALMAP}" target="_blank" rel="noopener">${I.bldg} Get directions</a>`;
-  if(old)w.appendChild(old);row.appendChild(w)}};
+  if(old)w.appendChild(old);row.appendChild(w)}
+ return false;}
 
 /* ===== Senior High Cluster Guide: cluster cards, compare table, "Which cluster fits me?" =====
    Paste AFTER content-pages-v2.js and facilities-photo-first.js, at the very end of the main script.
@@ -3248,13 +3248,13 @@ function fqPost(){const dm=dmEl();if(!dm)return;
  const side=document.querySelector('#view .sidenav');(side||dm).appendChild(h)}
 act.qf=v=>{if(v==='pwd'){nav('me');act.pedit()}else nav(v)};
 
-const _cpR5=cpRender;
-cpRender=function(){_cpR5();const c=S.cp;if(!c)return;
+function cpR5Apply(){const c=S.cp;if(!c)return false;
  if(c.edit){const tip=document.querySelector('#view .pvtip');
   if(tip&&c.id==='handbook')tip.textContent='Tips: add a line "Last updated: October 2026" above the first heading. The first 5 bullets under a "Rules" heading become icon cards. Grading lines like "Outstanding: 90-100" become a colored scale.';
   if(tip&&c.id==='faq')tip.textContent='Tips: put payment options as bullets under a "Payment" heading, one per line, like "GCash: 0917 000 0000". Each becomes a card.';
-  return}
- if(c.id==='handbook')hbPost();else if(c.id==='faq')fqPost()};
+  return true}
+ if(c.id==='handbook')hbPost();else if(c.id==='faq')fqPost();
+ return false;}
 
 /* ===== Student dashboard: live Enrollment Guide checklist + tabs =====
    Paste AFTER the other four files, at the very end of the main script in Index.html.
@@ -3352,11 +3352,11 @@ GAL_PAGES.push('handbook');
 `;document.head.appendChild(s)})();
 
 /* put the photos inside the Dress Code card when that card is showing; otherwise they stay at the bottom of the page */
-const _cpR6=cpRender;
-cpRender=function(){_cpR6();const c=S.cp;if(!c||c.id!=='handbook'||c.edit)return;
+function cpR6Apply(){const c=S.cp;if(!c||c.id!=='handbook'||c.edit)return false;
  const g=$('gal'),dc=secCard(/dress|uniform/i);
  if(g&&dc&&!dc.classList.contains('cpe')){const b=dc.querySelector('.scb');if(b)b.appendChild(g)}
- const ch=document.querySelector('#view .shero .shch');if(ch&&c.gal&&c.gal.length&&!ch.querySelector('.hbph'))ch.insertAdjacentHTML('beforeend','<span class="shchip hbph">'+c.gal.length+' photo'+(c.gal.length===1?'':'s')+'</span>')};
+ const ch=document.querySelector('#view .shero .shch');if(ch&&c.gal&&c.gal.length&&!ch.querySelector('.hbph'))ch.insertAdjacentHTML('beforeend','<span class="shchip hbph">'+c.gal.length+' photo'+(c.gal.length===1?'':'s')+'</span>');
+ return false;}
 
 /* ===== Admin dashboard v2 =====
    REPLACES the previous dashboard-extra.js block in Index.html. Delete that whole block first
@@ -3590,14 +3590,22 @@ act.ceshow=()=>{const pv=S.ce.prev;if(!pv||!pv.scores)return;S.ce.a={};S.ce.i=CE
 act.cegu=k=>{S.clFocus=k;nav('cluster')};
 
 /* ---------- Cluster Guide: shortcut to the assessment, and jump to the recommended cluster ---------- */
-const _cpCE=cpRender;
-cpRender=function(){_cpCE();const c=S.cp;if(!c||c.id!=='cluster'||c.edit)return;
+const _cpBase=cpRender;
+cpRender=function(){_cpBase();
+ const c=S.cp;
+ if(cpR3Apply())return;
+ if(cpR5Apply())return;
+ if(cpR6Apply())return;
+ cpCEApply();
+};
+function cpCEApply(){const c=S.cp;if(!c||c.id!=='cluster'||c.edit)return false;
  const hero=document.querySelector('#view .shero');
  if(hero&&S.cl&&!document.getElementById('cecta')){const d=document.createElement('div');d.className='card';d.id='cecta';
   d.innerHTML=`<div class="ch"><h3>Not sure which cluster to choose?</h3></div><p style="margin:0 0 12px;color:#475569">Take the 15-question Career Evaluation and get a recommendation based on your habits, interests and goals.</p><button class="btn" data-act="nav" data-v="ce">Take the Career Evaluation</button>`;
   hero.after(d)}
  if(S.clFocus){const k=S.clFocus;S.clFocus='';const i=(S.clL||[]).findIndex(x=>x.key.toUpperCase()===k);
-  if(i>=0)requestAnimationFrame(()=>{const el=document.getElementById('cl'+i);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})})}};
+  if(i>=0)requestAnimationFrame(()=>{const el=document.getElementById('cl'+i);if(el)el.scrollIntoView({behavior:'smooth',block:'start'})})}
+ return false;}
 
 /* ===== Senior High Cluster Guide v3: Definition + Career Paths cards, photo gallery removed =====
    Paste at the very end of the main script in Index.html (after career-evaluation.js).
