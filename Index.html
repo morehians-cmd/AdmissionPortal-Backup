@@ -1371,8 +1371,7 @@ function rep(){head('Reports','Choose a report to generate');S.rt='';S.rep=null;
  card.querySelector('.ch').insertAdjacentHTML('afterend',
   '<div class="rsrch"><input id="rsq" type="search" placeholder="Search reports" aria-label="Search reports" oninput="repFilter(this.value)"></div>'
   +(rc.length?`<div class="rrec"><span>Recently viewed</span>${rc.map(k=>`<button class="pill" data-act="rp" data-v="${k}">${esc(R[k][1])}</button>`).join('')}</div>`:'')
-  +'<div id="rsn" class="aemp hidden">No matching reports.</div>')};
-
+  +'<div id="rsn" class="aemp hidden">No matching reports.</div>');
 }
 const PDEF=['LRN','Classification','Category','GradeLevel','Section','Birthdate','Age','SexualOrient','Religion','Mobile','FatherName','FatherOccupation','FatherEducation','FatherMobile','FatherReligion','MotherName','MotherOccupation','MotherEducation','MotherMobile','MotherReligion','EmName','EmRelation','EmMobile'];
 const flab=f=>{let l=String(f[2]).replace(/\s*\([^)]*\)\s*$/,'');if(f[0]==='family'){const pp=f[1].indexOf('Father')===0?'Father':'Mother';if(l.indexOf(pp)!==0)l=pp+' '+l}return l};
@@ -3264,9 +3263,7 @@ function fqPost(){const dm=dmEl();if(!dm)return;
  const maps=typeof GALMAP==='string'?GALMAP:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City');
  const h=document.createElement('div');h.className='card';
  h.innerHTML=`<div class="ch"><h3>Still need help?</h3></div><div class="nhl"><div>${I.cal}<span>Mon\u2013Fri 8:00 AM \u2013 5:00 PM<br>Sat 8:00 AM \u2013 3:00 PM</span></div><div>${ic(CIC.tel)}<a href="tel:09618766886">0961 876 6886</a></div><div>${ic(CIC.mail)}<a href="mailto:morehians@gmail.com">morehians@gmail.com</a></div><div>${ic(CIC.pin)}<a href="${maps}" target="_blank" rel="noopener">Admissions Office, Reyes St., Central Bicutan \u2013 view map</a></div></div>`;
- const side=document.querySelector('#view .sidenav');(side||dm).appendChild(h)const nh=[...document.querySelectorAll('#view .nhl')].pop();
- if(nh&&!nh.parentElement.querySelector('[data-act=cfopen]'))nh.parentElement.insertAdjacentHTML('beforeend','<button class="btn" data-act="cfopen" style="margin-top:14px;width:100%;justify-content:center">Send us a message</button>')};
-
+ const side=document.querySelector('#view .sidenav');(side||dm).appendChild(h);if(!A()){const nh=[...document.querySelectorAll('#view .nhl')].pop();if(nh&&!nh.parentElement.querySelector('[data-act=cfopen]'))nh.parentElement.insertAdjacentHTML('beforeend','<button class="btn" data-act="cfopen" style="margin-top:14px;width:100%;justify-content:center">Send us a message</button>')}
 }
 act.qf=v=>{if(v==='pwd'){nav('me');act.pedit()}else nav(v)};
 
