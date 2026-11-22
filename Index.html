@@ -1667,11 +1667,6 @@ function admStats(){const put=d=>[['ks0',d.stats.total],['ks1',d.stats.enrolled]
  if(S.dsh)put(S.dsh);google.script.run.withSuccessHandler(r=>{if(r&&r.success){S.dsh=r.data;put(r.data)}}).dashboard(S.token)}
 const updSel=()=>{const e=$('selc');if(e)e.textContent=document.querySelectorAll('.sel:checked').length};
 document.addEventListener('change',e=>{if(e.target.classList&&(e.target.classList.contains('sel')||e.target.dataset.act==='selall'))updSel()});
-act.selall=()=>{const c=document.querySelector('[data-act=selall]').checked;document.querySelectorAll('.sel').forEach(x=>x.checked=c);updSel()};
-act.search=()=>call('searchStudents',[T(),$('q').value,S.flt||'All'],r=>{const L=r.data;$('admn').textContent=L.length+(L.length===1?' learner':' learners');
- $('bulk').innerHTML=`<div class="bkb"><span>Selected: <b id="selc">0</b></span><button class="btn alt" data-act="bulk" data-v="Enrolled">Mark Enrolled</button><button class="btn alt" data-act="bulk" data-v="Not Enrolled">Mark Not Enrolled</button><button class="btn alt" data-act="bulk" data-v="Transferred Out">Mark Transferred Out</button></div>`;
- $('hits').innerHTML=L.length?`<table class="at"><thead><tr><th><input type="checkbox" data-act="selall"></th><th>Learner</th><th>LRN</th><th>Grade &amp; Section</th><th>Enrollment</th><th></th></tr></thead><tbody>${L.map(s=>{const st=s.EnrollStatus||'Not Enrolled',o=st==='Cancelled'?['Cancelled']:['Not Enrolled','Enrolled','Transferred Out'],p=String(s.FullName||'').split(','),ini=((p[0]||'?').trim()[0]||'?')+(((p[1]||'').trim()[0])||'');
-  return `<tr><td><input type="checkbox" class="sel" value="${esc(s.StudentID)}"></td><td><div class="lrn"><span class="av2">${esc(ini)}</span><div><b>${esc(tc(s.FullName))}</b><small>${esc(s.StudentID)}${s.SchoolYear?' \u00b7 SY '+esc(s.SchoolYear):''}</small></div></div></td><td>${esc(s.LRN)}</td><td>${esc(tc(s.GradeLevel))} ${esc(tc(s.Section))}</td><td><select class="stsel ${stc(st)}" data-act="rowst" data-id="${esc(s.StudentID)}" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select></td><td><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')}</tbody></table>`:'<div class="aemp">No matching learners.</div>'});
 function recHero(t){const r=t.rec,p=String(r.FullName||'').split(','),nm=r.FullName?tc(r.FullName):(r.Surname||r.FirstName?tc([r.Surname,r.FirstName].filter(Boolean).join(', ')):'New enrollee'),
  ini=((r.FullName?(p[0]||'').trim()[0]:(r.Surname||nm)[0])||'N')+(r.FullName?((p[1]||'').trim()[0]||''):(r.FirstName||'')[0]||''),gs=((r.GradeLevel||'')+' '+(r.Section||'')).trim();
  return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip ${r.StudentID?'':'sh-unsaved'}">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip ${(!r.EnrollStatus||r.EnrollStatus==='Not Enrolled')?'sh-pending':''}">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(tc(gs))}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`}
@@ -2191,7 +2186,6 @@ try{google.script.run.withSuccessHandler(r=>{if(r&&r.success&&r.data)S.privHtml=
 function otpModal(d){const old=$('om');if(old)old.remove();S.otpc=d.challenge;const m=document.createElement('div');m.className='mod';m.id='om';
  m.innerHTML=`<div style="max-width:420px"><div class="bd"><h3 style="color:var(--navy);margin-bottom:6px">Verify it's you</h3><p style="color:var(--mut);margin:0 0 14px">We sent a 6-digit code to <b>${esc(d.hint)}</b>. It expires in 10 minutes.</p><div class="f"><label>6-digit code</label><input id="otc" type="text" maxlength="6" inputmode="numeric" autocomplete="one-time-code" data-num="1" style="text-transform:none;letter-spacing:6px;font-size:20px" onkeydown="if(event.key==='Enter')act.otpgo()"></div></div><div class="ft"><button class="btn alt" data-act="otpx">Cancel</button><button class="btn" data-act="otpgo">Verify &amp; sign in</button></div></div>`;
  document.body.appendChild(m);$('otc').focus()}
-act.otpgo=()=>call('verifyOtp',[S.otpc,$('otc').value],r=>{$('om').remove();enter(r)});
 act.otpx=()=>{const m=$('om');if(m)m.remove()};
 /* ===== Fix bundle: Enrollment Form PDF button ===== */
 act.eformpdf=()=>{const r=S.t.rec;savePdf(enrollFormHTML(r,A()?(r.Photo||''):S.user.Photo),fileName(r,'Enrollment-Form'))};
@@ -2353,7 +2347,6 @@ const devId=()=>{try{let d=localStorage.getItem('mrh_dev');if(!d||!/^[A-Za-z0-9]
 const devTok=u=>{try{return localStorage.getItem('mrh_dt_'+u)||''}catch(e){return ''}};
 const devSave=r=>{try{if(r&&r.data&&r.data.dev&&r.data.user)localStorage.setItem('mrh_dt_'+String(r.data.user.Username).toLowerCase(),r.data.dev)}catch(e){}};
 $('go').onclick=()=>{const k=$('u').value.trim().toLowerCase();call('login',[$('u').value,$('p').value,{id:devId(),tok:devTok(k)}],r=>{if(r.data&&r.data.otp)return otpModal(r.data);devSave(r);enter(r)})};
-act.otpgo=()=>call('verifyOtp',[S.otpc,$('otc').value,devId()],r=>{$('om').remove();devSave(r);enter(r)});
 
 /* ===== #16: logo from Drive (imgur stays as fallback) ===== */
 google.script.run.withSuccessHandler(r=>{if(r&&r.success&&r.data){LOGO=r.data;document.querySelectorAll('img[src*="imgur.com"]').forEach(i=>{i.src=r.data})}}).withFailureHandler(()=>{}).getLogo();
@@ -2454,8 +2447,6 @@ function galDraw(){const el=$('gal'),c=S.cp;if(!el||!c||!c.gal)return;const F=FU
 act.galadd=()=>{const f=$('galf');if(f)f.click()};
 act.galview=id=>{const src=S.gp[id];if(!src)return;const m=document.createElement('div');m.className='mod';m.style.cursor='zoom-out';m.onclick=()=>m.remove();
  const im=document.createElement('img');im.src=src;im.style.cssText='max-width:96vw;max-height:92vh;border-radius:12px;background:#fff';m.appendChild(im);document.body.appendChild(m)};
-act.galcap=id=>{const c=S.cp,p=c.gal.find(x=>x.id===id);if(!p)return;const v=prompt('Caption for this photo (optional, max 120 characters):',p.cap||'');if(v===null)return;
- call('setGalleryCaption',[T(),c.id,id,v],r=>{c.gal=r.data;toast(r.message);galDraw()})};
 act.galdel=id=>{if(!confirm('Remove this photo from the page? It is moved to the Drive trash.'))return;const c=S.cp;
  call('removeGalleryPhoto',[T(),c.id,id],r=>{c.gal=r.data;delete S.gp[id];toast(r.message);galDraw()})};
 /** Resize to max 1000 px and re-encode as JPEG (about 100-200 KB) in the browser before upload. */
