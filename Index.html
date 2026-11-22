@@ -2524,8 +2524,14 @@ function wsRenderLegacy(){
   `<div class="card"><div class="ch"><h3>About preview</h3></div><div class="g">${wf('Heading','about.heading',d.about.heading)}${wt('Paragraph','about.text',d.about.text)}${wf('Link label','about.linkLabel',d.about.linkLabel)}${wf('Photo URL','about.photo',d.about.photo)}</div></div>`,
   `<div class="card"><div class="ch"><h3>Academic programs</h3></div><div class="g">${wf('Section title','programs.title',d.programs.title)}</div></div>`,
   wcard('programs','Program cards',(d.programs.items||[]).map((x,i)=>wrow('programs',i,WS_LISTS.programs.n,wf('Program','programs.items.'+i+'.name',x.name)+wt('Description','programs.items.'+i+'.desc',x.desc)+wc('Show','programs.items.'+i+'.on',x.on))).join('')),
-  `<div class="card"><div class="ch"><h3>News &amp; announcements</h3></div><div class="g">${wf('Section title','news.title',d.news.title)}</div></div>`,
-  wcard('news','Announcements',(d.news.items||[]).map((x,i)=>wrow('news',i,WS_LISTS.news.n,wf('Title','news.items.'+i+'.title',x.title)+wf('Date (e.g. 12 Aug 2026)','news.items.'+i+'.date',x.date)+wt('Summary','news.items.'+i+'.summary',x.summary)+wf('Read-more link','news.items.'+i+'.link',x.link))).join(''),'With no announcements the homepage shows a short “No announcements yet” card.'),
+  `<div class="card"><div class="ch"><h3>News &amp; announcements</h3><span class="chip ok">Campus Bulletin</span></div>
+   <div class="g">${wf('Section title','news.title',d.news.title)}</div>
+   <div style="margin-top:12px;padding:14px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)">
+    <b style="color:var(--navy)">Single source of truth</b>
+    <p style="margin:5px 0 10px;color:var(--mut)">Homepage news is now supplied from Campus Bulletin. Create and edit announcements and events there instead of entering the same post twice.</p>
+    <button class="btn alt" data-act="wsbulletin">Open Campus Bulletin</button>
+   </div>
+  </div>`,
   `<div class="card"><div class="ch"><h3>Footer &amp; contact</h3></div><div class="g">${wf('Address','footer.loc',d.footer.loc)}${wf('Phone','footer.phone',d.footer.phone)}${wf('Email','footer.email',d.footer.email)}${wf('Facebook URL','footer.fb',d.footer.fb)}${wf('YouTube URL','footer.yt',d.footer.yt)}</div></div>`,
   `<div class="card"><div class="ch"><h3>Section order &amp; visibility</h3></div><div class="g" style="grid-template-columns:1fr">${(d.display.order||[]).map((k,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)"><b style="flex:1">${esc(WS_NAMES[k]||k)}</b><button class="btn alt" data-act="wsmove" data-v="order:${i}:-1" aria-label="Move up">↑</button><button class="btn alt" data-act="wsmove" data-v="order:${i}:1" aria-label="Move down">↓</button><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-act="wstoggle" data-v="${k}" ${((d.display.hidden||[]).indexOf(k)<0)?'checked':''}> Show</label></div>`).join('')}<label style="display:flex;gap:8px;align-items:center;padding:10px 0"><input type="checkbox" data-act="wstoggle" data-v="values" ${((d.display.hidden||[]).indexOf('values')<0)?'checked':''}> Show the “Our values” strip above the sections</label></div></div>`,
   `<div class="card"><div class="ch"><h3>Menu &amp; page cards</h3></div>
@@ -2614,6 +2620,7 @@ act.wstoggle=k=>{const dp=S.site.display,h=dp.hidden||(dp.hidden=[]),i=h.indexOf
 act.wssave=()=>call('saveSiteAdmin',[T(),S.site],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()});
 act.wsreload=()=>{if(confirm('Discard unsaved changes?'))websitePage()};
 act.wsview=()=>{if(S.siteMeta&&S.siteMeta.home)window.open(S.siteMeta.home,'_blank','noopener')};
+act.wsbulletin=()=>{try{document.querySelector('[data-act="nav"][data-v="ev"]')?.click()}catch(_){} };
 act.wsreset=()=>{if(!confirm('Return the homepage to its built-in content? The saved copy is removed and the built-in text is shown again.'))return;call('resetSiteAdmin',[T()],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()})};
 act.pgsave=()=>{if(!S.pg)return;call('savePagesAdmin',[T(),S.pg.text],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
 act.pgreload=()=>{if(confirm('Discard unsaved page changes?'))websitePage()};
