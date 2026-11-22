@@ -410,11 +410,21 @@ function mediaMetaWrite_(items, ou){
   put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[['media_library',json]]);
 }
 
-function mediaInventory_(){
-  const site=siteRead_(), sections=site?site.sections:siteClean_(SITE_SEED_), meta=mediaMetaRead_(), out=[];
+function siteMediaUsage_(){
+  const use={};
+  const add=(id,label)=>{if(!id||!label)return;(use[id]||(use[id]=[])).indexOf(label)<0&&use[id].push(label)};
+  const site=siteRead_(), sections=site?site.sections:siteClean_(SITE_SEED_);
   const hero=Array.isArray(sections.hero&&sections.hero.slides)?sections.hero.slides.filter(Boolean):[];
-  hero.forEach((url,i)=>{const id='hero-'+(i+1),m=meta[id]||{};out.push({id:id,type:'image',title:m.title||'Homepage Hero '+(i+1),alt:m.alt||'Moreh Academy homepage hero image '+(i+1),caption:m.caption||'',url:String(url),source:'Homepage Hero',page:'homepage',editable:true})});
-  GAL_PAGES.forEach(page=>{try{galRead_(page).list.forEach(p=>{const id='gallery-'+page+'-'+p.id,m=meta[id]||{};out.push({id:id,type:'image',title:m.title||p.cap||'Untitled photo',alt:m.alt||p.cap||'Moreh Academy '+page+' photo',caption:m.caption||p.cap||'',url:'',source:page==='facilities'?'Facilities':'Cluster Guide',page:page,refId:p.id,editable:true})})}catch(_){} });
+  hero.forEach((url,i)=>add('hero-'+(i+1),'Homepage Hero'+(i+1?' · Slide '+(i+1):'')));
+  try{GAL_PAGES.forEach(page=>{galRead_(page).list.forEach(p=>add('gallery-'+page+'-'+p.id,page==='facilities'?'Facilities Gallery':'Cluster Guide Gallery'));});}catch(_){}
+  return use;
+}
+
+function mediaInventory_(){
+  const site=siteRead_(), sections=site?site.sections:siteClean_(SITE_SEED_), meta=mediaMetaRead_(), usage=siteMediaUsage_(), out=[];
+  const hero=Array.isArray(sections.hero&&sections.hero.slides)?sections.hero.slides.filter(Boolean):[];
+  hero.forEach((url,i)=>{const id='hero-'+(i+1),m=meta[id]||{};out.push({id:id,type:'image',title:m.title||'Homepage Hero '+(i+1),alt:m.alt||'Moreh Academy homepage hero image '+(i+1),caption:m.caption||'',url:String(url),source:'Homepage Hero',page:'homepage',usedOn:usage[id]||[],editable:true})});
+  GAL_PAGES.forEach(page=>{try{galRead_(page).list.forEach(p=>{const id='gallery-'+page+'-'+p.id,m=meta[id]||{};out.push({id:id,type:'image',title:m.title||p.cap||'Untitled photo',alt:m.alt||p.cap||'Moreh Academy '+page+' photo',caption:m.caption||p.cap||'',url:'',source:page==='facilities'?'Facilities':'Cluster Guide',page:page,refId:p.id,usedOn:usage[id]||[],editable:true})}catch(_){} });
   return {items:out};
 }
 
