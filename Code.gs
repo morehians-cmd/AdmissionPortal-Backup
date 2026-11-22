@@ -108,11 +108,14 @@ add('hidden','IDPhotoID','ID photo file','auto');
 // ---- MERGE v1: application lifecycle (appended LAST so existing sheet columns never shift) ----
 add('hidden','ApplicationStatus','Application status','auto');
 // ---- ENROLLMENT PROCESS v3: Admission ID + signed enrollment form (appended LAST so existing sheet columns never shift) ----
-add('hidden','AdmissionID','Admission ID','auto');
+add('hidden','AdmissionID','Admission ID (legacy, replaced by Enrollee Reference)','auto');
 add('hidden','AppSubmittedAt','Application submitted at','auto');
 add('hidden','ApprovedAt','Application approved at','auto');
 add('req','ReqEnrollForm','Signed Online Enrollment Form','sel',['None','Original']);
 add('req','ReqEnrollFormDate','Signed Online Enrollment Form \u2013 Date Submitted','date');
+// ---- IDENTIFIERS (Identifiers.gs): appended LAST so existing sheet columns never shift ----
+add('hidden','AppRef','Application / Enrollment Reference','auto');
+add('hidden','PermanentID','Permanent Student ID','auto');
 
 const COLS = ['StudentID','CreatedAt'].concat(FIELDS.map(f => f[1]));
 /* ---------- Requirements by level ---------- */
@@ -191,13 +194,13 @@ function searchStudents(token, q, status, limit, grade, sy) {
     limit = Math.max(25, Math.min(parseInt(limit, 10) || 25, 5000));
     grade = GRADES.indexOf(grade) >= 0 ? grade : '';
     sy = /^\d{4}-\d{4}$/.test(sy || '') ? sy : '';
-    const hits = studentsLite_().filter(s => (s.FullName + s.LRN + s.StudentID).toLowerCase().includes(q))
+    const hits = studentsLite_().filter(s => (s.FullName + s.LRN + s.StudentID + (s.PermanentID || '') + (s.AppRef || '')).toLowerCase().includes(q))
       .filter(s => !status || status === 'All' || (s.EnrollStatus || 'Not Enrolled') === status)
       .filter(s => !grade || s.GradeLevel === grade)
       .filter(s => !sy || s.SchoolYear === sy).reverse();
     return ok({
       total: hits.length,
-      rows: hits.slice(0, limit).map(s => ({ StudentID:s.StudentID, FullName:s.FullName, LRN:s.LRN, GradeLevel:s.GradeLevel, Section:s.Section, EnrollStatus:s.EnrollStatus, SchoolYear:s.SchoolYear })),
+      rows: hits.slice(0, limit).map(s => ({ StudentID:s.StudentID, PermanentID:s.PermanentID || '', AppRef:s.AppRef || '', FullName:s.FullName, LRN:s.LRN, GradeLevel:s.GradeLevel, Section:s.Section, EnrollStatus:s.EnrollStatus, SchoolYear:s.SchoolYear })),
       ids: hits.filter(s => s.EnrollStatus !== 'Cancelled').slice(0, 500).map(s => s.StudentID)
     });
   } catch (e) { return fail(e); }
@@ -244,6 +247,7 @@ function saveStudent(token, rec) {
     if (row.EnrollStatus === 'Temporary' && oldStatus !== 'Temporary') throw new Error('Use "Allow temporary enrollment" in the Enrollment Holds panel to set Temporary.');
     if (row.EnrollStatus === 'Enrolled' && oldStatus !== 'Enrolled' && !isNew) { const h = holdsOf_(row.StudentID); if (h.length) throw new Error('Cannot mark as Enrolled: active hold from ' + h.join(', ') + '. Clear the hold, or use "Allow temporary enrollment".'); }
     if (row.EnrollStatus === 'Enrolled' && oldStatus !== 'Enrolled') enrollGate_(row);   // enrollment process v3: approved + initial requirements first
+    if (row.EnrollStatus === 'Enrolled' && oldStatus !== 'Enrolled') ensurePermId_(row);  // officially enrolled now: issue the permanent Student ID (once)
     if (admin && row.Section && row.Section !== (old ? old.Section : '') && row.EnrollStatus !== 'Enrolled' && row.EnrollStatus !== 'Temporary' && isNewFlow_(row)) throw new Error('A section can only be assigned once the enrollee is enrolled.');
     if (row.EnrollStatus !== 'Temporary') { row.TempUntil = ''; row.TempBy = ''; row.TempReason = ''; }
     statusChanged = isNew ? row.EnrollStatus!=='Not Enrolled' : oldStatus!==row.EnrollStatus;
@@ -269,7 +273,7 @@ function saveStudent(token, rec) {
     let r;
     if (isNew) {
       if (!/^\d{4}-\d{4}$/.test(row.SchoolYear||'')) throw new Error('Select a School Year.');
-      row.StudentID = nextIdFast_(sh, row.SchoolYear);
+      Object.assign(row, newKeys_(row.SchoolYear));                 // StudentID (record key) = AppRef = ENR-<year>-<4 digits>
       row.CreatedAt = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
       r = sh.getLastRow()+1;
     } else r = rowNo;
@@ -615,11 +619,8 @@ let SY_MEMO_ = null;   // lives for ONE execution only, so it can never go stale
 const activeSY_ = () => SY_MEMO_ || (SY_MEMO_ = props_().getProperty('SY_ACTIVE') || '2026-2027');
 const enrollOpen_ = () => props_().getProperty('ENROLL_OPEN') !== '0';
 const allowed_ = () => String(props_().getProperty('ALLOWED')||'').toLowerCase().split(/[\s,;]+/).filter(Boolean);
-function nextIdV2_(all, sy) {
-  const p = SCHOOL_ID+'-'+String(sy).slice(0,4);
-  const max = all.filter(s=>s.StudentID.startsWith(p+'-')).reduce((m,s)=>Math.max(m,parseInt(s.StudentID.split('-')[2],10)||0),0);
-  return p+'-'+String(max+1).padStart(4,'0');
-}
+/** Retired: record keys are now Enrollee References (Identifiers.gs). Kept so any stray caller still works. */
+function nextIdV2_(all, sy) { return nextAppRef_(sy); }
 function getSettings(token) { try { sysOwner_(token); return ok({ sy:activeSY_(), mail:mailOn_(), open:enrollOpen_(), allowed:props_().getProperty('ALLOWED')||'' }); } catch(e) { return fail(e); } }
 function saveSettings(token, s) {
   try { const ou = sysOwner_(token); props_().setProperty('ENROLL_OPEN', s.open?'1':'0'); props_().setProperty('ALLOWED', String(s.allowed||'').slice(0,4000)); audit_(ou, 'settings.save', 'enrollment', s.open ? 'open' : 'closed'); alert_('settings', 'Enrollment settings changed', ou.Username + ' set registration to ' + (s.open ? 'OPEN' : 'CLOSED')); return ok(null,'Settings saved'); } catch(e) { return fail(e); }

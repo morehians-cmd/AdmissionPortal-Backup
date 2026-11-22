@@ -18,6 +18,7 @@
  versions are no longer in Code.gs. After any change, deploy a new version.
 *****************************************************************************/
 
+const USER_RE = /^[a-z0-9][a-z0-9._-]{3,29}$/;      // portal username: 4-30 characters, letters / digits / . _ - (no @, so it can never be mistaken for an email)
 const NAME_RE = /^[A-Z\u00C0-\u00DD][A-Z\u00C0-\u00DD .'\-]{0,59}$/;     // used after upper-casing
 const IDLOCK  = ['LRN','Surname','FirstName','MiddleName','Suffix','Birthdate','SchoolYear','GradeLevel','Cluster'];
 const POLICY_TAGS = ['h3','h4','p','ul','ol','li','b','i','u','br','strong','em','div','span'];
@@ -29,12 +30,15 @@ const POLICY_TAGS = ['h3','h4','p','ul','ol','li','b','i','u','br','strong','em'
 function registerAccount(f) {
   try {
     const SY = activeSY_(), up = v => String(v || '').trim().toUpperCase();
+    const un = String(f.username || '').trim().toLowerCase();
     const em0 = String(f.email || '').trim(), em = em0.toLowerCase(), pw = String(f.password || ''), lrn = String(f.lrn || '').trim(), bd = String(f.birthdate || '').trim();
     const sn = up(f.surname), fn = up(f.firstName);
     if (!enrollOpen_() && !allowed_().includes(em)) throw new Error('Enrollment is currently closed. Please contact the Admissions Office.');
     if (!f.consent) throw new Error('You must accept the Data Privacy Notice to create an account.');
     if (!sn || !fn) throw new Error('Surname and first name are required.');
     if (!NAME_RE.test(sn) || !NAME_RE.test(fn)) throw new Error('Names may contain letters, spaces, periods, apostrophes and hyphens only.');
+    if (!USER_RE.test(un)) throw new Error('Choose a username of 4 to 30 characters: letters, numbers, dot, underscore or hyphen (no spaces, no @).');
+    if (rows_('U').some(u => u.Username === un)) throw new Error('That username is already taken. Please choose another one.');
     if (!EMAIL_RE.test(em0)) throw new Error('Enter a valid email address.');
     if (!/^[1-5]\d{11}$/.test(lrn)) throw new Error('LRN must be 12 digits and start with 1, 2, 3, 4 or 5.');
     if (!/^\d{4}-\d{2}-\d{2}$/.test(bd)) throw new Error('Enter your birth date.');
@@ -48,17 +52,17 @@ function registerAccount(f) {
       if (g.email.toLowerCase() === em) throw new Error('The parent / guardian email must be different from the student email.');
       if (!/^\d{11}$/.test(g.mobile)) throw new Error('Parent / guardian mobile number must be 11 digits.');
     }
-    if (!mailOn_()) return registerDirect_({ sn:sn, fn:fn, lrn:lrn, bd:bd, em:em, em0:em0, pw:pw, g:g });   // no e-mail code while automatic mail is off
+    if (!mailOn_()) return registerDirect_({ sn:sn, fn:fn, lrn:lrn, bd:bd, un:un, em:em, em0:em0, pw:pw, g:g });   // no e-mail code while automatic mail is off
     const cache = CacheService.getScriptCache();
     if (cache.get('rg_' + em)) throw new Error('A code was sent recently. Please wait a minute, or enter the code you already received.');
     cache.put('rg_' + em, '1', 60);
     if (!pubMailOk_('reg')) throw new Error('Registration is busy right now. Please try again later.');
 
     const ch = Utilities.getUuid(), all = rows_('S'), me = (sn + '|' + fn + '|' + bd).toUpperCase();
-    const dup = all.some(s => s.LRN === lrn || (s.Email || '').toLowerCase() === em || (s.Surname + '|' + s.FirstName + '|' + s.Birthdate).toUpperCase() === me) || rows_('U').some(u => u.Username === em || (u.Email || '').toLowerCase() === em);
+    const dup = all.some(s => s.LRN === lrn || (s.Email || '').toLowerCase() === em || (s.Surname + '|' + s.FirstName + '|' + s.Birthdate).toUpperCase() === me) || rows_('U').some(u => (u.Email || '').toLowerCase() === em);
     if (!dup) {
       const code = String(parseInt(Utilities.getUuid().replace(/-/g, '').slice(0, 8), 16) % 1000000).padStart(6, '0');
-      cache.put('rp_' + ch, JSON.stringify({ sn:sn, fn:fn, lrn:lrn, bd:bd, em:em, em0:em0, hash:hash_(pw), g:g, h:otHash_(ch, code), n:0, exp:Date.now() + 900000 }), 900);
+      cache.put('rp_' + ch, JSON.stringify({ sn:sn, fn:fn, lrn:lrn, bd:bd, un:un, em:em, em0:em0, hash:hash_(pw), g:g, h:otHash_(ch, code), n:0, exp:Date.now() + 900000 }), 900);
       try {
         MailApp.sendEmail({ to:em0, name:'Moreh Academy Admissions', subject:'Moreh Academy portal: verify your email',
           body:'Your verification code is: ' + code + '\n\nEnter it on the registration screen within 15 minutes to finish creating your account. If you did not start a registration, ignore this email.' });
@@ -84,20 +88,20 @@ function confirmRegistration(challenge, code) {
     const SY = activeSY_();
     if (!enrollOpen_() && !allowed_().includes(p.em)) throw new Error('Enrollment is currently closed. Please contact the Admissions Office.');
     const all = rows_('S'), me = (p.sn + '|' + p.fn + '|' + p.bd).toUpperCase();
-    if (all.some(s => s.LRN === p.lrn || (s.Email || '').toLowerCase() === p.em || (s.Surname + '|' + s.FirstName + '|' + s.Birthdate).toUpperCase() === me) || rows_('U').some(u => u.Username === p.em)) { cache.remove(ck); throw bad; }
+    if (all.some(s => s.LRN === p.lrn || (s.Email || '').toLowerCase() === p.em || (s.Surname + '|' + s.FirstName + '|' + s.Birthdate).toUpperCase() === me) || rows_('U').some(u => u.Username === p.un)) { cache.remove(ck); throw bad; }
     const g = p.g || {};
-    row = { StudentID:nextIdV2_(all, SY), CreatedAt:Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss'),
+    row = { ...newKeys_(SY), CreatedAt:Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss'),
       Surname:p.sn, FirstName:p.fn, LRN:p.lrn, Email:p.em0, Birthdate:p.bd, Age:age_(p.bd), Classification:'New', SchoolYear:SY, EnrollStatus:'Not Enrolled', ReqConsent:'None', ApplicationStatus:'Draft',
       GuardName:g.name || '', GuardRelation:g.rel || '', GuardEmail:g.email || '', GuardMobile:g.mobile || '' };
     row.ConsentAt = row.CreatedAt; row.FullName = p.sn + ', ' + p.fn;
     const sh = sh_('S'); put_(sh, sh.getLastRow() + 1, 1, [COLS.map(c => row[c] || '')]);
-    addUser_(p.em, { hash:p.hash }, 'student', row.FullName, row.StudentID, p.em0);
+    addUser_(p.un, { hash:p.hash }, 'student', row.FullName, row.StudentID, p.em0);
     cache.remove(ck);
-    audit_('self:' + p.em, 'student.register', row.StudentID, 'e-mail verified');
+    audit_('self:' + p.un, 'student.register', row.StudentID, 'e-mail verified');
   } catch (e) { return fail(e); } finally { if (held) { try { lock.releaseLock(); } catch (_) {} } }
   // mails are sent AFTER the lock is released
-  notify_(row, 'Registration received', 'Your Enrollee account is ready. Sign in with your email as the username, fill in your Online Enrollment Form and submit it for review. After your application is approved you will receive your Admission ID and the list of initial requirements to bring to the Admission Office.');
-  return ok({ id:row.StudentID }, 'Email verified. Your account is ready. You can now sign in.');
+  notify_(row, 'Registration received', 'Your Enrollee account is ready.\nUsername: ' + p.un + '\nEnrollee Reference: ' + row.AppRef + '\n\nSign in with your username, fill in your Online Enrollment Form and submit it for review. After your application is approved you will receive the list of initial requirements to bring to the Admission Office. Your permanent Student ID is issued once you are officially enrolled.');
+  return ok({ id:row.AppRef, ref:row.AppRef, username:p.un }, 'Email verified. Your account is ready. You can now sign in.');
 }
 
 
@@ -129,7 +133,7 @@ function setStatus(token, ids, status) {
     if (!['Not Enrolled', 'Enrolled'].includes(status))
       throw new Error(status === 'Transferred Out' ? 'Transferred Out needs a reason and a date. Open the learner and set it in Step 5.' : 'Invalid status.');
     ids = Array.isArray(ids) ? ids.slice(0, 500) : [];
-    const sh = sh_('S'), all = rows_('S'), logs = [], pos = {}, held = status === 'Enrolled' ? activeFlags_() : {};
+    const sh = sh_('S'), all = rows_('S'), logs = [], pos = {}, held = status === 'Enrolled' ? activeFlags_() : {}, mkPerm = status === 'Enrolled' ? permIdMaker_(all.map(s => s.PermanentID)) : null;
     all.forEach((s, i) => { pos[s.StudentID] = i; });
     ids.forEach(id => {
       const i = pos[id]; if (i == null) return;
@@ -138,11 +142,12 @@ function setStatus(token, ids, status) {
       if (held[id]) { blocked++; return; }                                  // an active hold blocks Enrolled
       if (status === 'Enrolled' && row.EnrollStatus !== 'Enrolled') { try { enrollGate_(row); } catch (_) { blocked++; return; } }   // approved + initial requirements first
       if (row.EnrollStatus === status) return;
+      if (mkPerm && !row.PermanentID) { row.PermanentID = mkPerm(row); }   // officially enrolled: permanent Student ID
       const was = row.EnrollStatus; row.EnrollStatus = status; stampAudit_(row, u);
       n++; logs.push(logRow_(row, was, u)); notes.push(row);
     });
     if (n) {   // one write per changed column instead of one write per learner
-      ['EnrollStatus', 'ProcessedBy', 'ProcessedDate', 'ProcessedTime', 'StatusChangedAt']
+      ['EnrollStatus', 'ProcessedBy', 'ProcessedDate', 'ProcessedTime', 'StatusChangedAt', 'PermanentID']
         .forEach(k => put_(sh, 2, COLS.indexOf(k) + 1, all.map(r => [r[k] || ''])));
       audit_(u, 'status.set', n + ' record(s)', status);
     }
@@ -150,7 +155,7 @@ function setStatus(token, ids, status) {
     if (logs.length) logStatus_(logs);
   } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
   notifyMany_(notes, 'Enrollment status update', 'Your enrollment status is now: ' + status.toUpperCase() + '.');   // after the lock; silent while AUTO_MAIL is off
-  return ok(n, n + ' record(s) updated' + (skipped ? ' (' + skipped + ' cancelled skipped)' : '') + (blocked ? ' (' + blocked + ' not enrolled: active hold)' : ''));
+  return ok(n, n + ' record(s) updated' + (skipped ? ' (' + skipped + ' cancelled skipped)' : '') + (blocked ? ' (' + blocked + ' not enrolled: active hold or missing requirements)' : ''));
 }
 /** Copies the full record to "Deleted Students" before removing it (restore = copy the row back). */
 function archiveStudent_(rec, u) {

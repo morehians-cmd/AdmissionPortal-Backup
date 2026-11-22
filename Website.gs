@@ -484,7 +484,7 @@ function homepageRegister(form) {
   const f = form || {};
   const r = registerAccount({
     surname: f.surname, firstName: f.firstName, lrn: f.lrn, birthdate: f.birthdate,
-    email: f.email, password: f.password, password2: f.password2,
+    username: f.username, email: f.email, password: f.password, password2: f.password2,
     consent: f.consent === true, mobile: f.mobile,
     guardName: f.guardName, guardRel: f.guardRel, guardEmail: f.guardEmail, guardMobile: f.guardMobile
   });

@@ -60,7 +60,7 @@ function propsUsage() {
 }
 
 /* ---------- compact learner cache (search, dashboard, notification bell) ---------- */
-const LITE_F = ['StudentID','FullName','LRN','GradeLevel','Section','EnrollStatus','SchoolYear','CreatedAt','Cluster','ReqConsent','TempUntil'], LITE_CHUNK = 60000, LITE_TTL = 600;
+const LITE_F = ['StudentID','FullName','LRN','GradeLevel','Section','EnrollStatus','SchoolYear','CreatedAt','Cluster','ReqConsent','TempUntil','PermanentID','AppRef'], LITE_CHUNK = 60000, LITE_TTL = 600;
 const stGet_ = () => { const c = CacheService.getScriptCache(); let v = c.get('stv'); if (!v) { v = Utilities.getUuid(); c.put('stv', v, 21600); } return v; };
 const stBump_ = () => { try { CacheService.getScriptCache().put('stv', Utilities.getUuid(), 21600); } catch (_) {} };
 
@@ -101,14 +101,8 @@ function colVals_(field) {
   return n < 1 ? [] : sh.getRange(2, COLS.indexOf(field) + 1, n, 1).getValues().flat().map(String);
 }
 
-/** Next Enrollment ID for a school year. Reads ONE column (same format as nextIdV2_). */
-function nextIdFast_(sh, sy) {
-  const p = SCHOOL_ID + '-' + String(sy).slice(0, 4) + '-', n = sh.getLastRow() - 1; let max = 0;
-  if (n >= 1) sh.getRange(2, 1, n, 1).getValues().forEach(r => {
-    const s = String(r[0]); if (s.indexOf(p) === 0) max = Math.max(max, parseInt(s.slice(p.length), 10) || 0);
-  });
-  return p + String(max + 1).padStart(4, '0');
-}
+/** Retired: new records get an Enrollee Reference (Identifiers.gs). Kept so any stray caller still works. */
+function nextIdFast_(sh, sy) { return nextAppRef_(sy); }
 
 /** OWNER ONLY. Measures the cache. */
 function speedTest3() {
@@ -150,5 +144,3 @@ function saveProfile() {
   t = Date.now(); who_(tok); lap('who_', t);
   Logger.log(T.join('\n'));
 }
-
-

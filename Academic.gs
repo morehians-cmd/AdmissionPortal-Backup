@@ -292,7 +292,7 @@ function getClassRoster(token, grade, cluster, section) {
 /* ---------- adviser learner view (everything except holds, cancellation / transfer data, audit trail) ---------- */
 const AC_HIDE_SEC = ['cancel', 'dest', 'audit'];
 const AC_HIDE_KEY = ['ReferredBy', 'ConsentAt', 'StatusChangedAt', 'TempUntil', 'TempBy', 'TempReason', 'IDPhotoID', 'EscCertNo', 'VoucherCertNo', 'EscSchoolNo'];
-const AC_HIDDEN_OK = ['FullName', 'Province', 'IDNumber'];
+const AC_HIDDEN_OK = ['FullName', 'Province', 'IDNumber', 'PermanentID'];
 /** Strips a record for the adviser. Built from FIELDS so new fields in the hidden/cancel/dest/audit areas never leak. */
 function adviseeView_(s) {
   const out = { StudentID: s.StudentID };

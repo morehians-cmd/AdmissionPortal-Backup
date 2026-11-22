@@ -113,6 +113,8 @@ function who_(token, role, allowMustChange) {
   if (!s || !s.u || Date.now() - s.i > SESS_ABS_MS) throw expired;
   if (s.v !== svGet_(s.u)) { cache.remove('s_' + token); throw expired; }
   const u = userCached_(s.u);
+  if (!u) { cache.remove('s_' + token); throw expired; }            // account was deleted
+  if (role === 'admin' && u.Role !== 'admin') throw new Error('Not allowed.');   // students can never reach staff functions
   if (role === 'admin' && (OFFICE_CL.indexOf(u.Clearance) >= 0 || ACAD_ROLES.indexOf(u.Clearance) >= 0)) throw new Error('Not allowed.');   // office accounts reach only the Holds functions
   if (u.MustChange === '1' && !allowMustChange) throw new Error('Please set a new password under My Profile to continue.');
   putSession_(token, u, s.i);          // sliding expiry
@@ -226,10 +228,10 @@ function resetPassword(identifier, code, newPassword) {
   try {
     if (!lock.tryLock(5000)) throw new Error('The service is busy. Please try again.');
     const key = String(identifier||'').trim().toLowerCase(), c = String(code||'').trim(), pw = String(newPassword||'');
-    if (!key || !c) throw new Error('Enter your username or email and the 6-digit code.');
+    if (!key || !c) throw new Error('Enter your username and the 6-digit code.');
     if (pw.length < 8 || pw === DEFAULT_PW) throw new Error('Password must be at least 8 characters.');
     const bad = new Error('Invalid or expired code. Please request a new one.');
-    const users = rows_('U'), i = users.findIndex(x => x.Username===key || (x.Email||'').toLowerCase()===key);
+    const users = rows_('U'), i = users.findIndex(x => x.Username===key);   // username only
     if (i < 0) throw bad;
     const cache = CacheService.getScriptCache(), ck = 'rc_'+users[i].Username, raw = cache.get(ck);
     if (!raw) throw bad;

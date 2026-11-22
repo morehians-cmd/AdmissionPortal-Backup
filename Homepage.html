@@ -156,7 +156,7 @@ img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflo
 
 <div class="modal" id="mSignin" role="dialog" aria-modal="true" aria-labelledby="siT"><div class="box">
   <button class="x" data-close aria-label="Close">×</button><h2 id="siT">Sign in</h2>
-  <div class="f"><label for="siUser">Username or email</label><input id="siUser" autocomplete="username"></div>
+  <div class="f"><label for="siUser">Username</label><input id="siUser" autocomplete="username"></div>
   <div class="f"><label for="siPass">Password</label><input id="siPass" type="password" autocomplete="current-password"></div>
   <p class="err" id="siErr" role="alert"></p>
   <button class="btn blue" id="siGo" style="width:100%">Sign in</button>
@@ -169,7 +169,9 @@ img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflo
   <div class="f"><label for="caFirst">First name</label><input id="caFirst" autocomplete="given-name"></div>
   <div class="f"><label for="caLrn">LRN (12 digits)</label><input id="caLrn" inputmode="numeric" maxlength="12" placeholder="123456789012"></div>
   <div class="f"><label for="caBirth">Birth date</label><input id="caBirth" type="date" autocomplete="bday" onchange="caGuard()"></div>
-  <div class="f"><label for="caMail">Email (your username)</label><input id="caMail" type="email" autocomplete="email"></div>
+  <div class="f"><label for="caUser">Username (you will sign in with this)</label><input id="caUser" autocomplete="username" maxlength="30" autocapitalize="none" spellcheck="false"></div>
+  <p class="note">4 to 30 characters: letters, numbers, dot, underscore or hyphen. No spaces and no @.</p>
+  <div class="f"><label for="caMail">Email (for notices and password reset codes)</label><input id="caMail" type="email" autocomplete="email"></div>
   <div class="f"><label for="caMobile">Mobile number</label><input id="caMobile" type="tel" inputmode="tel" autocomplete="tel" placeholder="09171234567"></div>
   <div class="f"><label for="caPass">Password</label><input id="caPass" type="password" autocomplete="new-password"></div>
   <p class="note">8 or more characters, with at least one letter and one number.</p>
@@ -199,7 +201,7 @@ img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflo
 <div class="modal" id="mForgot" role="dialog" aria-modal="true" aria-labelledby="fT"><div class="box">
   <button class="x" data-close aria-label="Close">×</button><h2 id="fT">Forgot password</h2>
   <p class="note">Enter your account email. We will send a 6-digit code.</p>
-  <div class="f"><label for="fgMail">Username or email</label><input id="fgMail" autocomplete="username"></div>
+  <div class="f"><label for="fgMail">Username</label><input id="fgMail" autocomplete="username"></div>
   <p class="err" id="fErr" role="alert"></p>
   <button class="btn blue" id="fGo" style="width:100%">Send code</button>
   <button class="swap" data-swap="mSignin">Back to sign in</button>
@@ -475,23 +477,23 @@ function caGuard(){var box=$('caGuardBox'),a=ageFrom($('caBirth').value);if(box)
 function startVerify(msg){$('vMsg').textContent=msg||('Enter the 6-digit code we sent to '+PEND.email+'.');$('vCode').value='';$('vErr').textContent='';openM('mVerify');cool(60);
  $('vResend').style.visibility=(PEND.mode==='reg')?'visible':'hidden'}
 $('caGo').onclick=function(){
- var sn=$('caSurname').value.trim(),fn=$('caFirst').value.trim(),lrn=$('caLrn').value.trim(),bd=$('caBirth').value,m=$('caMail').value.trim(),mo=$('caMobile').value.trim(),p=$('caPass').value,p2=$('caPass2').value,bad=[],msg='',age=ageFrom(bd);
+ var sn=$('caSurname').value.trim(),fn=$('caFirst').value.trim(),lrn=$('caLrn').value.trim(),bd=$('caBirth').value,un=$('caUser').value.trim().toLowerCase(),m=$('caMail').value.trim(),mo=$('caMobile').value.trim(),p=$('caPass').value,p2=$('caPass2').value,bad=[],msg='',age=ageFrom(bd);
  if(sn.length<1)bad.push('caSurname');if(fn.length<1)bad.push('caFirst');if(!/^[1-5]\d{11}$/.test(lrn))bad.push('caLrn');if(age==='')bad.push('caBirth');
- if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))bad.push('caMail');if(!mobileOk(mo))bad.push('caMobile');
+ if(!/^[a-z0-9][a-z0-9._-]{3,29}$/.test(un))bad.push('caUser');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))bad.push('caMail');if(!mobileOk(mo))bad.push('caMobile');
  if(pwBad(p))bad.push('caPass');if(p2!==p)bad.push('caPass2');
  var g={};
  if(age!==''&&age<18){g={guardName:$('caGuardName').value.trim(),guardRel:$('caGuardRel').value.trim(),guardEmail:$('caGuardEmail').value.trim(),guardMobile:$('caGuardMobile').value.trim()};
   if(!g.guardName)bad.push('caGuardName');if(!g.guardRel)bad.push('caGuardRel');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g.guardEmail))bad.push('caGuardEmail');if(!/^\d{11}$/.test(g.guardMobile))bad.push('caGuardMobile')}
- if(bad.length)msg=(bad.length===1&&bad[0]==='caPass2')?'Passwords do not match.':bad.indexOf('caPass')>-1?PWRULE:'Complete all fields. LRN must be 12 digits and start with 1-5; guardian details are required below 18.';
+ if(bad.length)msg=(bad.length===1&&bad[0]==='caPass2')?'Passwords do not match.':bad.indexOf('caPass')>-1?PWRULE:bad.indexOf('caUser')>-1?'Choose a username of 4 to 30 characters: letters, numbers, dot, underscore or hyphen.':'Complete all fields. LRN must be 12 digits and start with 1-5; guardian details are required below 18.';
  else if(!$('caTerms').checked)msg='Please accept the Terms of Service and Privacy Policy.';
- mark(['caSurname','caFirst','caLrn','caBirth','caMail','caMobile','caPass','caPass2','caGuardName','caGuardRel','caGuardEmail','caGuardMobile'],bad);$('caErr').textContent=msg;if(msg)return;
+ mark(['caSurname','caFirst','caLrn','caBirth','caUser','caMail','caMobile','caPass','caPass2','caGuardName','caGuardRel','caGuardEmail','caGuardMobile'],bad);$('caErr').textContent=msg;if(msg)return;
  var b=this;busyBtn(b,true,'Creating…');
- PEND.form={surname:sn,firstName:fn,lrn:lrn,birthdate:bd,email:m,mobile:mo,password:p,password2:p2,consent:true,guardName:g.guardName||'',guardRel:g.guardRel||'',guardEmail:g.guardEmail||'',guardMobile:g.guardMobile||''};
+ PEND.form={surname:sn,firstName:fn,lrn:lrn,birthdate:bd,username:un,email:m,mobile:mo,password:p,password2:p2,consent:true,guardName:g.guardName||'',guardRel:g.guardRel||'',guardEmail:g.guardEmail||'',guardMobile:g.guardMobile||''};
  call(API.register,[PEND.form],function(r){busyBtn(b,false);
   if(!r||r.success!==true){$('caErr').textContent=(r&&r.error)||'Could not create the account.';return}
   $('caPass').value=$('caPass2').value='';
-  if(!r.challenge){closeM();$('siUser').value=m;toast(r.message||'Account created. Please sign in.');openM('mSignin');return}
-  PEND.mode='reg';PEND.email=m;PEND.challenge=r.challenge;startVerify(r.message||('Enter the 6-digit code we sent to '+m+'.'))},
+  if(!r.challenge){closeM();$('siUser').value=un;toast(r.message||'Account created. Please sign in.');openM('mSignin');return}
+  PEND.mode='reg';PEND.email=m;PEND.user=un;PEND.challenge=r.challenge;startVerify(r.message||('Enter the 6-digit code we sent to '+m+'.'))},
   function(e){busyBtn(b,false);$('caErr').textContent=e})};
 $('vGo').onclick=function(){var c=$('vCode').value.replace(/\D/g,'');if(c.length!==6){$('vErr').textContent='Enter the 6-digit code.';return}
  var b=this;busyBtn(b,true,'Verifying…');
@@ -500,7 +502,7 @@ $('vGo').onclick=function(){var c=$('vCode').value.replace(/\D/g,'');if(c.length
   if(!r||r.success!==true){$('vErr').textContent=(r&&r.error)||'Verification failed.';return}
   if(PEND.mode==='otp'&&r.token){saveToken(r.token);closeM();goPortal();return}
   closeM();PEND.mode='';PEND.challenge='';
-  $('siUser').value=PEND.email;$('siPass').value='';
+  $('siUser').value=PEND.user||PEND.email;PEND.user='';$('siPass').value='';
   toast(r.message||'Email verified. Please sign in.');openM('mSignin')},
   function(e){busyBtn(b,false);$('vErr').textContent=e})};
 $('vResend').onclick=function(){
@@ -510,7 +512,7 @@ $('vResend').onclick=function(){
   if(r.challenge){PEND.challenge=r.challenge;cool(60)}
   $('vErr').textContent='';toast(r.message||'A new code was sent.')},function(e){$('vErr').textContent=e})};
 $('fGo').onclick=function(){var m=$('fgMail').value.trim();
- if(!m){$('fErr').textContent='Enter your username or registered email.';return}
+ if(!m){$('fErr').textContent='Enter your username.';return}
  var b=this;busyBtn(b,true,'Sending…');
  call(API.forgot,[m],function(r){busyBtn(b,false);
   if(!r||r.success!==true){$('fErr').textContent=(r&&r.error)||'Could not send the code.';return}

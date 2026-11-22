@@ -1,14 +1,15 @@
 /**
- * AdmissionPipeline.gs — application lifecycle, Admission ID and the enrollee → enrolled hand-off.
+ * AdmissionPipeline.gs — application lifecycle, Student ID hand-off and the enrollee → enrolled flow.
  *
  * ENROLLMENT PROCESS (v3)
  *   1. Registration creates an ENROLLEE account. ApplicationStatus = Draft.
  *   2. The enrollee fills in the Online Enrollment Form and submits it         → Submitted
  *   3. Admissions puts it under review                                          → Under Review
- *   4. Admissions approves it → Admission ID issued (MA-<year>-<10 random>)     → Approved
+ *   4. Admissions approves it                                                   → Approved   (the Enrollee Reference ENR-<year>-<4 digits> already exists since registration)
  *   5. The enrollee prints the enrollment form + parent consent form and brings the INITIAL requirements.
  *   6. Admissions records them (Admission Operations → learner → Requirements), then "Complete enrollment"
- *      (or sets Enrollment Status = Enrolled) → EnrollStatus = Enrolled; a section may now be assigned.
+ *      (or sets Enrollment Status = Enrolled) → EnrollStatus = Enrolled; the PERMANENT STUDENT ID (MAT-<year>-<0001>) is issued
+ *      at that moment, and a section may now be assigned. (Identifiers.gs)
  *   7. COMPLETION requirements are recorded later, whenever the learner submits them.
  *
  * Legacy records (blank ApplicationStatus, or Classification = Old) are never held to this flow.
@@ -70,8 +71,6 @@ function migrateApplicationStatus() {
   return { success: true, message: 'ApplicationStatus column ready at position ' + col + '.', data: { column: col, totalColumns: COLS.length } };
 }
 
-const ADM_ALPHA_ = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // 32 characters: letters and digits, without the look-alikes 0 O 1 I
-
 /** True when this record follows the enrollee flow. Blank status (legacy) and returning learners (Old) never do. */
 function isNewFlow_(r) {
   const v = String((r && r.ApplicationStatus) || '').trim();
@@ -112,19 +111,6 @@ function appMissing_(r) {
   return miss;
 }
 
-/** A fresh Admission ID: MA-<year issued>-<10 random letters/digits>. `taken` is a set of IDs already in use. */
-function newAdmissionId_(taken) {
-  const yr = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy');
-  for (let t = 0; t < 25; t++) {
-    const b = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, Utilities.getUuid() + '|' + Date.now() + '|' + Math.random());
-    let x = ''; for (let i = 0; i < 10; i++) x += ADM_ALPHA_.charAt((b[i] & 255) % ADM_ALPHA_.length);   // 256 / 32 is exact: no modulo bias
-    const id = 'MA-' + yr + '-' + x;
-    if (!taken[id]) return id;
-  }
-  throw new Error('Could not generate a unique Admission ID. Please try again.');
-}
-const admTaken_ = () => { const t = {}; colVals_('AdmissionID').forEach(v => { if (v) t[v] = 1; }); return t; };
-
 /** Writes {field: value} cells of one Students row, one cell each (no other column is touched). */
 function setCells_(sh, r, obj) {
   Object.keys(obj).forEach(k => { const c = COLS.indexOf(k) + 1; if (!c) throw new Error('Column ' + k + ' is missing. Reload the project (new fields were added to Code.gs).'); put_(sh, r, c, [[obj[k]]]); });
@@ -162,7 +148,7 @@ function enrolleeSubmitApplication(token) {
 }
 
 /**
- * STAFF: moves an application along the review stages. Approving issues the Admission ID (once; it is never re-issued).
+ * STAFF: moves an application along the review stages. (The Enrollee Reference already exists; approving does not change it.)
  * Allowed: Submitted -> Under Review | Declined, Under Review -> Approved | Declined, Approved -> Declined, Declined -> Under Review.
  */
 function admissionApplicationStatusSet(token, studentId, status, reason) {
@@ -178,7 +164,7 @@ function admissionApplicationStatusSet(token, studentId, status, reason) {
     const hit = findRow_('S', 'StudentID', id);
     if (!hit) throw new Error('Student record not found.');
     row = hit.o; old = appStatusOf_(row);
-    if (old === neu) return ok({ StudentID: id, ApplicationStatus: neu, Previous: old, AdmissionID: row.AdmissionID || '' }, 'No change.');
+    if (old === neu) return ok({ StudentID: id, ApplicationStatus: neu, Previous: old, AppRef: row.AppRef || '' }, 'No change.');
     if (old === 'Draft') throw new Error('The enrollee has not submitted the Online Enrollment Form yet.');
     if (row.EnrollStatus === 'Enrolled') throw new Error('This learner is already enrolled. Use the enrollment status (cancel / transfer) instead of the application status.');
     if ((APP_PIPE.FLOW[old] || []).indexOf(neu) < 0) throw new Error('An application cannot move from ' + old + ' to ' + neu + '. Next step: ' + ((APP_PIPE.FLOW[old] || []).join(' or ') || 'none') + '.');
@@ -186,19 +172,19 @@ function admissionApplicationStatusSet(token, studentId, status, reason) {
 
     const sh = sh_('S'), cells = { ApplicationStatus: neu };
     if (neu === 'Approved') {
-      if (!row.AdmissionID) { cells.AdmissionID = newAdmissionId_(admTaken_()); row.AdmissionID = cells.AdmissionID; }
+      if (!row.AppRef) { cells.AppRef = nextAppRef_(row.SchoolYear); row.AppRef = cells.AppRef; }   // only a record that pre-dates Identifiers.gs lacks one
       cells.ApprovedAt = nowStr_();
     }
     setCells_(sh, hit.r, cells);
     row.ApplicationStatus = neu;
-    appLogAdd_(u.FullName || u.Username || '', id, old, neu, row.EnrollStatus, why + (cells.AdmissionID ? (why ? ' | ' : '') + 'Admission ID ' + cells.AdmissionID : ''));
+    appLogAdd_(u.FullName || u.Username || '', id, old, neu, row.EnrollStatus, why + (cells.AppRef ? (why ? ' | ' : '') + 'Enrollee Reference ' + cells.AppRef : ''));
   } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
   if (!row || !neu || old === neu) return ok({ StudentID: id, ApplicationStatus: neu }, 'No change.');
-  audit_(u, 'application.status', id, old + ' -> ' + neu + (neu === 'Approved' ? ' (' + row.AdmissionID + ')' : ''));
+  audit_(u, 'application.status', id, old + ' -> ' + neu + (neu === 'Approved' ? ' (' + (row.AppRef || '') + ')' : ''));
   if (neu === 'Under Review') notify_(row, 'Your application is under review', 'The Admission Office is now reviewing your Online Enrollment Form.');
-  else if (neu === 'Approved') notify_(row, 'Your application is approved', 'Your Admission ID is ' + row.AdmissionID + '.\n\nNext steps:\n1. Sign in to the Enrollee Portal and print your Online Enrollment Form and the Parental Consent & Data Privacy Undertaking Form. Have them signed.\n2. Bring the printed forms and your initial requirements personally to the Admission Office.\n3. The Admission Office will check your documents and update your requirements list in the portal. Once processed, you are enrolled and a section will be assigned.\n4. Submit the remaining (completion) requirements when they become available.');
+  else if (neu === 'Approved') notify_(row, 'Your application is approved', 'Your Enrollee Reference is ' + row.AppRef + '.\n\nNext steps:\n1. Sign in to the Enrollee Portal and print your Online Enrollment Form and the Parental Consent & Data Privacy Undertaking Form. Have them signed.\n2. Bring the printed forms and your initial requirements personally to the Admission Office.\n3. The Admission Office will check your documents and update your requirements list in the portal. Once processed, you are enrolled: you will receive your permanent Student ID and a section will be assigned.\n4. Submit the remaining (completion) requirements when they become available.');
   else if (neu === 'Declined') notify_(row, 'Update on your application', 'We are unable to approve your application at this time.' + (reason ? '\n\nReason: ' + String(reason).trim().slice(0, 300) : '') + '\n\nPlease visit the Admission Office if you have questions.');
-  return ok({ StudentID: id, ApplicationStatus: neu, Previous: old, AdmissionID: row.AdmissionID || '' }, neu === 'Approved' ? 'Approved. Admission ID ' + row.AdmissionID + ' issued.' : 'Application status saved.');
+  return ok({ StudentID: id, ApplicationStatus: neu, Previous: old, AppRef: row.AppRef || '' }, neu === 'Approved' ? 'Approved. Enrollee Reference ' + (row.AppRef || '') + '.' : 'Application status saved.');
 }
 
 /**
@@ -219,31 +205,14 @@ function admissionProcessEnrollment(token, studentId) {
     if (old === 'Cancelled' || old === 'Transferred Out') throw new Error('This enrollment was ' + old.toLowerCase() + '. Re-open it from the learner record first.');
     enrollGate_(row);
     const h = holdsOf_(id); if (h.length) throw new Error('Cannot mark as Enrolled: active hold from ' + h.join(', ') + '. Clear the hold, or use "Allow temporary enrollment".');
+    ensurePermId_(row);                       // officially enrolled: issue the permanent Student ID
     row.EnrollStatus = 'Enrolled'; stampAudit_(row, u);
     put_(sh_('S'), hit.r, 1, [COLS.map(c => row[c] || '')]);
   } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
   audit_(u, 'enrollment.process', id, old + ' -> Enrolled');
   logStatus_([logRow_(row, old, u)]);
-  notify_(row, 'You are now enrolled', 'The Admission Office has processed your initial requirements and you are now enrolled. Your section will be assigned and posted in the portal. Please submit any remaining requirements once they are available.');
-  return ok({ StudentID: id, EnrollStatus: 'Enrolled' }, 'Enrolled. A section can now be assigned.');
-}
-
-/** OWNER, run once from the editor (optional). Gives an Admission ID to every learner who is already Approved / Enrolled and has none. */
-function backfillAdmissionIds() {
-  ownerOnly_();
-  const lock = LockService.getScriptLock(); lock.waitLock(30000);
-  try {
-    const rows = rows_('S'), taken = admTaken_(), col = COLS.indexOf('AdmissionID') + 1; let n = 0;
-    if (!col) throw new Error('AdmissionID is not part of COLS. Add it to FIELDS first.');
-    const sh = sh_('S'), out = rows.map(r => {
-      let v = r.AdmissionID || '';
-      if (!v && (r.EnrollStatus === 'Enrolled' || appStatusOf_(r) === 'Approved') && r.StudentID) { v = newAdmissionId_(taken); taken[v] = 1; n++; }
-      return [v];
-    });
-    if (rows.length) put_(sh, 2, col, out);
-    Logger.log('Admission IDs issued: ' + n);
-    return { success: true, message: n + ' Admission ID(s) issued.' };
-  } finally { try { lock.releaseLock(); } catch (_) {} }
+  notify_(row, 'You are now enrolled', 'The Admission Office has processed your initial requirements and you are now enrolled.\nYour permanent Student ID is ' + row.PermanentID + '.\n\nYour section will be assigned and posted in the portal. Please submit any remaining requirements once they are available.');
+  return ok({ StudentID: id, EnrollStatus: 'Enrolled', PermanentID: row.PermanentID }, 'Enrolled. Student ID ' + row.PermanentID + ' issued. A section can now be assigned.');
 }
 
 /** Board data for the Pipeline view. One read of the current school year's learners. Drafts are counted, not listed. */
@@ -256,7 +225,7 @@ function admissionPipelineData(token, query, limit) {
     let rows = rowsSY_();
     if (q) {
       rows = rows.filter(function (r) {
-        return (String(r.FullName || '') + ' ' + String(r.LRN || '') + ' ' + String(r.StudentID || '') + ' ' + String(r.AdmissionID || '')).toLowerCase().indexOf(q) >= 0;
+        return (String(r.FullName || '') + ' ' + String(r.LRN || '') + ' ' + String(r.StudentID || '') + ' ' + String(r.AppRef || '') + ' ' + String(r.PermanentID || '')).toLowerCase().indexOf(q) >= 0;
       });
     }
     rows.sort(function (a, b) { return String(b.CreatedAt || '').localeCompare(String(a.CreatedAt || '')); });
@@ -277,7 +246,8 @@ function admissionPipelineData(token, query, limit) {
       const iDone = plan ? plan.initial.filter(function (k) { return isDone_(r[k]); }).length : 0;
       col.cards.push({
         StudentID: r.StudentID || '',
-        AdmissionID: r.AdmissionID || '',
+        AppRef: r.AppRef || '',
+        PermanentID: r.PermanentID || '',
         FullName: r.FullName || '',
         LRN: r.LRN || '',
         GradeLevel: r.GradeLevel || '',

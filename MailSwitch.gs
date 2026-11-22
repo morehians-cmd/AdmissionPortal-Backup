@@ -60,18 +60,18 @@ function registerDirect_(p) {
     if (n >= cap) { alert_('regcap', 'Daily registration cap reached', 'More than ' + cap + ' registrations today. Could be a busy enrollment day, or abuse.'); throw new Error('Registration is busy right now. Please try again tomorrow or visit the Admissions Office.'); }
     if (!enrollOpen_() && !allowed_().includes(p.em)) throw new Error('Enrollment is currently closed. Please contact the Admissions Office.');
     const all = rows_('S'), me = (p.sn + '|' + p.fn + '|' + p.bd).toUpperCase();
-    const dup = all.some(s => s.LRN === p.lrn || (s.Email || '').toLowerCase() === p.em || (s.Surname + '|' + s.FirstName + '|' + s.Birthdate).toUpperCase() === me) || rows_('U').some(u => u.Username === p.em || (u.Email || '').toLowerCase() === p.em);
+    const dup = all.some(s => s.LRN === p.lrn || (s.Email || '').toLowerCase() === p.em || (s.Surname + '|' + s.FirstName + '|' + s.Birthdate).toUpperCase() === me) || rows_('U').some(u => u.Username === p.un || (u.Email || '').toLowerCase() === p.em);
     if (dup) throw new Error('We could not create an account with these details. If you already registered, please sign in; otherwise visit the Admission Office.');
     const SY = activeSY_(), g = p.g || {}, now = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd HH:mm:ss');
-    row = { StudentID:nextIdV2_(all, SY), CreatedAt:now, Surname:p.sn, FirstName:p.fn, LRN:p.lrn, Email:p.em0, Birthdate:p.bd, Age:age_(p.bd),
+    row = { ...newKeys_(SY), CreatedAt:now, Surname:p.sn, FirstName:p.fn, LRN:p.lrn, Email:p.em0, Birthdate:p.bd, Age:age_(p.bd),
       Classification:'New', SchoolYear:SY, EnrollStatus:'Not Enrolled', ReqConsent:'None', ApplicationStatus:'Draft', GuardName:g.name || '', GuardRelation:g.rel || '', GuardEmail:g.email || '', GuardMobile:g.mobile || '' };
     row.ConsentAt = now; row.FullName = p.sn + ', ' + p.fn;
     const sh = sh_('S'); put_(sh, sh.getLastRow() + 1, 1, [COLS.map(c => row[c] || '')]);
-    addUser_(p.em, p.pw, 'student', row.FullName, row.StudentID, p.em0);
+    addUser_(p.un, p.pw, 'student', row.FullName, row.StudentID, p.em0);
     pr.setProperty('REG_DAY', day + ':' + (n + 1));
-    audit_('self:' + p.em, 'student.register', row.StudentID, 'no e-mail verification (mail switch off)');
+    audit_('self:' + p.un, 'student.register', row.StudentID, 'no e-mail verification (mail switch off)');
   } catch (e) { return fail(e); } finally { if (held) { try { lock.releaseLock(); } catch (_) {} } }
-  return ok({ id:row.StudentID }, 'Account created. You can now sign in with your email and password.');
+  return ok({ id:row.AppRef, ref:row.AppRef, username:p.un }, 'Account created. Your username is "' + p.un + '" and your Enrollee Reference is ' + row.AppRef + '. You can now sign in.');
 }
 
 
@@ -79,11 +79,11 @@ function registerDirect_(p) {
 
 function forgotPassword(identifier) {
   try {
-    const key = String(identifier || '').trim().toLowerCase(); if (!key) throw new Error('Enter your username or registered email.');
+    const key = String(identifier || '').trim().toLowerCase(); if (!key) throw new Error('Enter your username.');
     const cache = CacheService.getScriptCache(), MSG = 'If the account exists, a 6-digit code has been sent to its registered email. It expires in 15 minutes. If you have reset your password several times, the account may be locked: please visit the Admission Office.';
     if (cache.get('fp_' + key)) throw new Error('A code was requested recently. Please wait 5 minutes, or use the code already sent to your email.');
     cache.put('fp_' + key, '1', 300);
-    const u = rows_('U').find(x => x.Username === key || (x.Email || '').toLowerCase() === key);
+    const u = rows_('U').find(x => x.Username === key);   // username only: an email address can no longer trigger reset mails
     if (u && u.Locked !== '1') {
       const s = rows_('S').find(x => x.StudentID === u.StudentID) || {};
       const to = u.Email || s.Email || (u.Username.indexOf('@') > 0 ? u.Username : '');

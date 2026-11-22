@@ -29,7 +29,7 @@ function notify_(row, subject, body) {
   try {
     if (typeof mailOn_ === 'function' && !mailOn_()) return;     // MailSwitch, if applied
     if (!EMAIL_RE.test(row.Email || '')) return;
-    queueMail_(row.Email, SCHOOL + ' - ' + subject, 'Hello ' + (row.FirstName || '') + ',\n\n' + body + '\n\n' + (row.AdmissionID ? 'Admission ID: ' + row.AdmissionID : 'Enrollment ID: ' + row.StudentID) + '\n\n' + SCHOOL + ' Admissions Office');
+    queueMail_(row.Email, SCHOOL + ' - ' + subject, 'Hello ' + (row.FirstName || '') + ',\n\n' + body + '\n\n' + idLines_(row) + '\n\n' + SCHOOL + ' Admissions Office');
   } catch (e) { Logger.log(e.message); }
 }
 
@@ -67,7 +67,7 @@ function notifyMany_(list, subject, body) {
     const now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss'), out = [];
     list.forEach(row => {
       if (!EMAIL_RE.test(row.Email || '')) return;
-      out.push([now, String(row.Email), SCHOOL + ' - ' + subject, 'Hello ' + (row.FirstName || '') + ',\n\n' + body + '\n\n' + (row.AdmissionID ? 'Admission ID: ' + row.AdmissionID : 'Enrollment ID: ' + row.StudentID) + '\n\n' + SCHOOL + ' Admissions Office']);
+      out.push([now, String(row.Email), SCHOOL + ' - ' + subject, 'Hello ' + (row.FirstName || '') + ',\n\n' + body + '\n\n' + idLines_(row) + '\n\n' + SCHOOL + ' Admissions Office']);
     });
     if (out.length) { const sh = mqSh_(); put_(sh, sh.getLastRow() + 1, 1, out); }
   } catch (e) { Logger.log('notifyMany: ' + e.message); }
@@ -91,9 +91,14 @@ function emailStatus(token, ids) {
     const waiting = Math.max(0, mqSh_().getLastRow() - 1), room = Math.max(0, quotaLeft_() - MAIL_RESERVE - waiting), send = withMail.slice(0, room);
     if (!send.length) throw new Error(room ? 'None of the selected learners has a valid email address.' : 'Today\'s e-mail allowance is used up. Try again tomorrow.');
     queueMailMany_(send.map(s => ({ to:s.Email, subject:SCHOOL + ' - Enrollment status update',
-      body:'Hello ' + (s.FirstName || '') + ',\n\nYour enrollment status is now: ' + (s.EnrollStatus || 'Not Enrolled').toUpperCase() + '.\n\nEnrollment ID: ' + s.StudentID + '\n\n' + SCHOOL + ' Admissions Office' })));
+      body:'Hello ' + (s.FirstName || '') + ',\n\nYour enrollment status is now: ' + (s.EnrollStatus || 'Not Enrolled').toUpperCase() + '.\n\n' + idLines_(s) + '\n\n' + SCHOOL + ' Admissions Office' })));
     audit_(u, 'mail.status', send.length + ' learner(s)', 'manual');
     const skipped = ids.length - send.length;
     return ok({ queued:send.length, skipped:skipped }, send.length + ' email(s) queued, sent within about 10 minutes' + (skipped ? '; ' + skipped + ' skipped (no valid email, or over today\'s allowance)' : '') + '.');
   } catch (e) { return fail(e); }
+}
+/** The identifier line(s) printed at the foot of every mail: Student ID once enrolled, plus the Enrollee Reference. */
+function idLines_(r) {
+  const ref = r.AppRef || r.StudentID || '';
+  return (r.PermanentID ? 'Student ID: ' + r.PermanentID + '\n' : '') + 'Enrollee Reference: ' + ref;
 }

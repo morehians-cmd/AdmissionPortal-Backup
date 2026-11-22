@@ -24,11 +24,11 @@ var PIPE_LABEL = { 'Submitted': 'Submitted', 'Under Review': 'Under review', 'Ap
 var PIPE_VERB = { 'Under Review': 'Start review', 'Approved': 'Approve', 'Declined': 'Decline' };
 
 function pipeline() {
-  head('Application Pipeline', 'Review submitted applications, approve to issue the Admission ID, then complete enrollment once the initial requirements are in.');
+  head('Application Pipeline', 'Review submitted applications, approve, then complete enrollment once the initial requirements are in. The permanent Student ID is issued at enrollment.');
   S.pq = S.pq || '';
   $('view').innerHTML =
     '<div class="card"><div class="sb">' +
-      '<input id="pq" value="' + esc(S.pq) + '" placeholder="Search name, LRN, Enrollment ID or Admission ID" onkeydown="if(event.key===\'Enter\')act.pipesearch()">' +
+      '<input id="pq" value="' + esc(S.pq) + '" placeholder="Search name, LRN, Student ID or Enrollee Ref" onkeydown="if(event.key===\'Enter\')act.pipesearch()">' +
       '<button class="btn" data-act="pipesearch">' + I.search + ' Search</button>' +
       '<span id="pnote" style="color:var(--mut);font-size:13px;align-self:center">Loading…</span>' +
     '</div></div>' +
@@ -72,7 +72,8 @@ function pipeCard(c) {
   return '<div class="pcard">' +
     '<button class="pnm" data-act="flopen" data-v="' + esc(c.StudentID) + '">' + esc(tc(c.FullName) || 'Unnamed learner') + '</button>' +
     '<div class="pmeta">' + esc(c.LRN || '') + (c.Category ? ' \u00b7 ' + esc(c.Category) : '') + '</div>' +
-    (c.AdmissionID ? '<div class="pmeta">Admission ID <b>' + esc(c.AdmissionID) + '</b></div>' : '') +
+    (c.PermanentID ? '<div class="pmeta">Student ID <b>' + esc(c.PermanentID) + '</b></div>' : '') +
+    ((c.AppRef || c.StudentID) ? '<div class="pmeta">Enrollee Ref <b>' + esc(c.AppRef || c.StudentID) + '</b></div>' : '') +
     '<div class="pmeta">' + esc(where || 'No grade / section') + (c.EnrollStatus ? ' \u00b7 ' + esc(c.EnrollStatus) : '') + '</div>' +
     prog +
     '<div class="pacts">' + btns + enr + '</div>' +
@@ -98,10 +99,10 @@ act.pipestat = function (v) {
     '<p style="color:var(--mut);margin:0 0 14px">' + esc(rec ? tc(rec.FullName) + (rec.LRN ? ' \u00b7 ' + rec.LRN : '') : id) + '</p>' +
     '<div class="f"><label for="prs">Reason / note' + (status === 'Declined' ? ' (required)' : ' (optional)') + '</label>' +
     '<textarea id="prs" maxlength="300" style="text-transform:none" placeholder="Why is this application moving to ' + esc(PIPE_LABEL[status] || status) + '?"></textarea></div>' +
-    (status === 'Approved' ? '<p style="font-size:12.5px;margin:10px 0 0"><b>Approving issues the enrollee\u2019s Admission ID</b> (MA-year-10 characters) and emails the next steps: print the forms, bring the initial requirements to the Admission Office.</p>' : '') +
+    (status === 'Approved' ? '<p style="font-size:12.5px;margin:10px 0 0"><b>Approving emails the next steps</b>: print the forms, bring the initial requirements to the Admission Office. The permanent Student ID (MAT-year-number) is issued when the learner is enrolled.</p>' : '') +
     '<p style="color:var(--mut);font-size:12.5px;margin:10px 0 0">The change is written to the Students sheet and the Application Status Log.</p>' +
     '</div><div class="ft"><button class="btn alt" data-act="pipex">Cancel</button>' +
-    '<button class="btn" data-act="pipsave" data-v="' + esc(id) + '|' + esc(status) + '">' + (status === 'Approved' ? 'Approve and issue Admission ID' : 'Save status') + '</button></div></div>';
+    '<button class="btn" data-act="pipsave" data-v="' + esc(id) + '|' + esc(status) + '">' + (status === 'Approved' ? 'Approve application' : 'Save status') + '</button></div></div>';
   document.body.appendChild(m);
 };
 

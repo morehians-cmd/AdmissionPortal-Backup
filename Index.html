@@ -1203,7 +1203,8 @@ html[data-theme=dark] .shchip.sh-pending{
   <div class="hp-field"><label class="hp-lb" for="rs">Surname</label><input id="rs"></div>
   <div class="hp-field"><label class="hp-lb" for="rf">First name</label><input id="rf"></div>
   <div class="hp-field"><label class="hp-lb" for="rl">LRN (12 digits)</label><input id="rl" maxlength="12" inputmode="numeric"></div>
-  <div class="hp-field"><label class="hp-lb" for="re">Email (your username)</label><input id="re" type="email"></div>
+  <div class="hp-field"><label class="hp-lb" for="ru">Username (you will sign in with this)</label><input id="ru" autocomplete="username" maxlength="30" placeholder="4-30 characters: letters, numbers, . _ -" style="text-transform:none"></div>
+  <div class="hp-field"><label class="hp-lb" for="re">Email (for notices and password reset codes)</label><input id="re" type="email"></div>
   <div class="hp-field"><label class="hp-lb" for="rb">Birth date</label><input id="rb" type="date" onchange="gate()"></div>
   <div id="gbox" class="hidden">
    <p class="hp-warn">Below 18: parent / legal guardian details required</p>
@@ -1235,7 +1236,7 @@ const reqLevel=g=>{const i=S.grades.indexOf(g);return i<0?'':i<2?'PRE':i<9?'ELEM
 function reqsFor(r){const lv=reqLevel(r.GradeLevel),ru=S.cfg.reqRules[lv];if(!ru)return{level:'',req:[],show:[]};
  const tf=ru.opt.includes('ReqTransferee')&&S.cfg.reqTf.includes(r.Category);
  return{level:lv,req:ru.req,show:S.cfg.reqAll.filter(k=>ru.req.includes(k)||(tf&&k==='ReqTransferee')||(r[k]&&r[k]!=='None'))}}
-const idLabel=r=>r&&r.AdmissionID?'Admission ID':'Enrollment ID',idValue=r=>(r&&(r.AdmissionID||r.StudentID))||'';
+const idLabel=r=>r&&r.PermanentID?'Student ID':'Enrollee Ref',idValue=r=>(r&&(r.PermanentID||r.AppRef||r.StudentID))||'',sidShow=idValue;   // primary = permanent Student ID (MAT-...), secondary = Application Reference (APP-...)
 const abbr=c=>Object.keys(S.clusters).find(k=>S.clusters[k]===c);
 
 const enter=r=>{Object.assign(S,r.data);try{sessionStorage.setItem('mrh_t',S.token)}catch(e){}$('login').classList.add('hidden');$('app').classList.remove('hidden');boot()};
@@ -1269,11 +1270,11 @@ const act={out:()=>{clearInterval(CD);if($('idm'))$('idm').remove();try{google.s
  acct:()=>{const u=prompt('Username (leave blank to use the LRN):');if(u===null)return;const p=prompt('Temporary password (leave blank to auto-generate):');if(p===null)return;call('createLogin',[T(),S.t.rec.StudentID,u,p],r=>alert('Account created.\\n\\nUsername: '+r.data.username+'\\nTemporary password: '+r.data.password+(r.data.emailed?'\\n\\n(Also emailed to the student.)':'\\n\\n(No email on file - give these to the student personally.)')))},
  tip:v=>toast(v),
  showreg:()=>$('regbox').classList.toggle('hidden'),
- reg:()=>{const g=i=>$(i).value;S.regData={surname:g('rs'),firstName:g('rf'),lrn:g('rl'),birthdate:g('rb'),email:g('re'),password:g('rpw'),guardName:g('gn'),guardRel:g('gr'),guardEmail:g('ge'),guardMobile:g('gm')};privModal(true)},
+ reg:()=>{const g=i=>$(i).value;S.regData={surname:g('rs'),firstName:g('rf'),lrn:g('rl'),birthdate:g('rb'),username:g('ru').trim().toLowerCase(),email:g('re'),password:g('rpw'),guardName:g('gn'),guardRel:g('gr'),guardEmail:g('ge'),guardMobile:g('gm')};privModal(true)},
  print:()=>window.print(),tab:v=>{if(S.t)collect(S.t);S.cur=v;adm()},
  close:v=>{S.tabs=S.tabs.filter(t=>t.key!==v);if(S.cur===v)S.cur='search';adm()},
  search:()=>call('searchStudents',[T(),$('q').value,S.flt||'All'],r=>{$('bulk').innerHTML='<div class="bkb"><span>Selected: <b id="selc">0</b></span><button class="btn alt" data-act="bulk" data-v="Enrolled">Mark Enrolled</button><button class="btn alt" data-act="bulk" data-v="Not Enrolled">Mark Not Enrolled</button><button class="btn alt" data-act="bulkmail">Email status to selected</button><span id="selbn"></span></div>';
-  $('hits').innerHTML=`<table><thead><tr><th><input type="checkbox" data-act="selall"></th><th>ID</th><th>Learner</th><th>LRN</th><th>Grade &amp; Section</th><th>Enrollment</th><th></th></tr></thead><tbody>${r.data.map(s=>{const st=s.EnrollStatus||'Not Enrolled',o=st==='Cancelled'?['Cancelled']:['Not Enrolled','Enrolled','Transferred Out'];return `<tr><td><input type="checkbox" class="sel" value="${esc(s.StudentID)}"></td><td>${esc(s.StudentID)}</td><td><b>${esc(tc(s.FullName))}</b></td><td>${esc(s.LRN)}</td><td>${esc(tc(s.GradeLevel))} ${esc(tc(s.Section))}</td><td><select data-act="rowst" data-id="${esc(s.StudentID)}" style="height:34px;border-radius:999px;border:1px solid var(--line);padding:0 10px" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select> <span class="chip ${stc(st)}">${esc(st)}</span></td><td><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')||'<tr><td colspan="7">No matching learners.</td></tr>'}</tbody></table>`}),
+  $('hits').innerHTML=`<table><thead><tr><th><input type="checkbox" data-act="selall"></th><th>ID</th><th>Learner</th><th>LRN</th><th>Grade &amp; Section</th><th>Enrollment</th><th></th></tr></thead><tbody>${r.data.map(s=>{const st=s.EnrollStatus||'Not Enrolled',o=st==='Cancelled'?['Cancelled']:['Not Enrolled','Enrolled','Transferred Out'];return `<tr><td><input type="checkbox" class="sel" value="${esc(s.StudentID)}"></td><td>${esc(sidShow(s))}</td><td><b>${esc(tc(s.FullName))}</b></td><td>${esc(s.LRN)}</td><td>${esc(tc(s.GradeLevel))} ${esc(tc(s.Section))}</td><td><select data-act="rowst" data-id="${esc(s.StudentID)}" style="height:34px;border-radius:999px;border:1px solid var(--line);padding:0 10px" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select> <span class="chip ${stc(st)}">${esc(st)}</span></td><td><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')||'<tr><td colspan="7">No matching learners.</td></tr>'}</tbody></table>`}),
  rowst:()=>{},selall:()=>{const c=window.event.target.checked;document.querySelectorAll('.sel').forEach(x=>x.checked=c)},
  flt:v=>{S.flt=v;adm()},
  bulk:st=>{const ids=[...document.querySelectorAll('.sel:checked')].map(x=>x.value);if(!ids.length)return toast('Select at least one learner',false);if(!confirm('Set '+ids.length+' learner(s) to '+st+'?'))return;call('setStatus',[T(),ids,st],r=>{toast(r.message);act.search()})},
@@ -1294,7 +1295,7 @@ const act={out:()=>{clearInterval(CD);if($('idm'))$('idm').remove();try{google.s
  delc:id=>{if(confirm('Permanently delete '+id+' and their portal login?'))call('deleteStudent',[T(),id],r=>{toast(r.message);runRep('noconsent')})},
  forgot:()=>resetModal(1),
  rsthave:()=>{S.fpid=$('fpid').value;resetModal(2)},
- rstsend:()=>{const id=$('fpid').value.trim();if(!id)return toast('Enter your username or email',false);call('forgotPassword',[id],r=>{toast(r.message);S.fpid=id;resetModal(2)})},
+ rstsend:()=>{const id=$('fpid').value.trim();if(!id)return toast('Enter your username',false);call('forgotPassword',[id],r=>{toast(r.message);S.fpid=id;resetModal(2)})},
  rstgo:()=>{const id=$('fpid').value.trim(),p=$('fpn').value;if($('fpn2').value!==p)return toast('Passwords do not match',false);call('resetPassword',[id,$('fpc').value,p],r=>{toast(r.message);$('u').value=id;act.rstx()})},
  rstx:()=>{const m=$('rm');if(m)m.remove()},
  pconsent:()=>call('getStudent',[T()],r=>printConsent(r.data)),
@@ -1536,7 +1537,7 @@ document.addEventListener('input',e=>{if(S.ic&&e.target.closest&&e.target.closes
 function idModal(){const old=$('im');if(old)old.remove();const c=S.ic,m=document.createElement('div');m.className='mod';m.id='im';
  const fi=(l,id,v,ph)=>`<div class="f" style="margin-bottom:10px"><label>${l}</label><input id="${id}" data-idf="1" value="${esc(v)}" ${ph?`placeholder="${esc(ph)}"`:''} style="text-transform:uppercase" autocomplete="off"></div>`,
   hint=c.last?'Highest used for TLC'+c.sy+': <b>'+esc(c.last)+'</b>':'No TLC'+c.sy+' numbers yet.';
- m.innerHTML=`<div style="max-width:1000px"><div class="bd"><h3 style="color:var(--navy);margin:0 0 4px">Student ID card</h3><p style="color:var(--mut);margin:0 0 16px">${esc(tc(c.rec.FullName))} &middot; ${esc(c.rec.StudentID)}</p>
+ m.innerHTML=`<div style="max-width:1000px"><div class="bd"><h3 style="color:var(--navy);margin:0 0 4px">Student ID card</h3><p style="color:var(--mut);margin:0 0 16px">${esc(tc(c.rec.FullName))} &middot; ${esc(sidShow(c.rec))}</p>
  <div style="display:flex;gap:24px;flex-wrap:wrap"><div id="idprev" style="display:flex;gap:16px;flex-wrap:wrap"></div><div style="flex:1;min-width:300px">
  ${fi('Student ID number','idn',c.number,'TLC2027-0001')}<small class="hint" style="margin:-4px 0 12px">${hint} This number stays with the learner.</small>
  <div class="f" style="margin-bottom:10px"><label>ID photo</label><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn alt" data-act="idphoto">${c.own?'Replace ID photo':'Upload ID photo'}</button><small style="color:var(--mut)">${c.own?'Using the saved ID photo.':'Using the account photo until you upload one.'}</small></div></div>
@@ -1672,10 +1673,10 @@ act.selall=()=>{const c=document.querySelector('[data-act=selall]').checked;docu
 act.search=()=>call('searchStudents',[T(),$('q').value,S.flt||'All'],r=>{const L=r.data;$('admn').textContent=L.length+(L.length===1?' learner':' learners');
  $('bulk').innerHTML=`<div class="bkb"><span>Selected: <b id="selc">0</b></span><button class="btn alt" data-act="bulk" data-v="Enrolled">Mark Enrolled</button><button class="btn alt" data-act="bulk" data-v="Not Enrolled">Mark Not Enrolled</button><button class="btn alt" data-act="bulk" data-v="Transferred Out">Mark Transferred Out</button></div>`;
  $('hits').innerHTML=L.length?`<table class="at"><thead><tr><th><input type="checkbox" data-act="selall"></th><th>Learner</th><th>LRN</th><th>Grade &amp; Section</th><th>Enrollment</th><th></th></tr></thead><tbody>${L.map(s=>{const st=s.EnrollStatus||'Not Enrolled',o=st==='Cancelled'?['Cancelled']:['Not Enrolled','Enrolled','Transferred Out'],p=String(s.FullName||'').split(','),ini=((p[0]||'?').trim()[0]||'?')+(((p[1]||'').trim()[0])||'');
-  return `<tr><td><input type="checkbox" class="sel" value="${esc(s.StudentID)}"></td><td><div class="lrn"><span class="av2">${esc(ini)}</span><div><b>${esc(tc(s.FullName))}</b><small>${esc(s.StudentID)}${s.SchoolYear?' \u00b7 SY '+esc(s.SchoolYear):''}</small></div></div></td><td>${esc(s.LRN)}</td><td>${esc(tc(s.GradeLevel))} ${esc(tc(s.Section))}</td><td><select class="stsel ${stc(st)}" data-act="rowst" data-id="${esc(s.StudentID)}" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select></td><td><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')}</tbody></table>`:'<div class="aemp">No matching learners.</div>'});
+  return `<tr><td><input type="checkbox" class="sel" value="${esc(s.StudentID)}"></td><td><div class="lrn"><span class="av2">${esc(ini)}</span><div><b>${esc(tc(s.FullName))}</b><small>${esc(sidShow(s))}${s.SchoolYear?' \u00b7 SY '+esc(s.SchoolYear):''}</small></div></div></td><td>${esc(s.LRN)}</td><td>${esc(tc(s.GradeLevel))} ${esc(tc(s.Section))}</td><td><select class="stsel ${stc(st)}" data-act="rowst" data-id="${esc(s.StudentID)}" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select></td><td><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')}</tbody></table>`:'<div class="aemp">No matching learners.</div>'});
 function recHero(t){const r=t.rec,p=String(r.FullName||'').split(','),nm=r.FullName?tc(r.FullName):(r.Surname||r.FirstName?tc([r.Surname,r.FirstName].filter(Boolean).join(', ')):'New enrollee'),
  ini=((r.FullName?(p[0]||'').trim()[0]:(r.Surname||nm)[0])||'N')+(r.FullName?((p[1]||'').trim()[0]||''):(r.FirstName||'')[0]||''),gs=((r.GradeLevel||'')+' '+(r.Section||'')).trim();
- return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip ${r.StudentID?'':'sh-unsaved'}">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip ${(!r.EnrollStatus||r.EnrollStatus==='Not Enrolled')?'sh-pending':''}">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(tc(gs))}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`}
+ return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip ${r.StudentID?'':'sh-unsaved'}">${r.StudentID?(r.PermanentID?'Student ID ':'Ref ')+esc(sidShow(r))+(r.PermanentID&&r.AppRef?' \u00b7 '+esc(r.AppRef):''):'Not yet saved'}</span><span class="shchip ${(!r.EnrollStatus||r.EnrollStatus==='Not Enrolled')?'sh-pending':''}">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(tc(gs))}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`}
 
 function stuProfile(keep){head('Student Profile','Review and update your information');S.cur='stu';
  if(keep===true)return $('view').innerHTML=formHTML(S.st);call('getStudent',[T()],r=>{S.st={rec:r.data,edit:false};$('view').innerHTML=formHTML(S.st)})}
@@ -1916,7 +1917,7 @@ function confirmHTML(r){const C=S.cfg,sch=schOf(r);
  <h4 style="margin-top:2.5mm">VERIFICATION &amp; APPROVALS</h4><div class="hd3"><span>Verified By</span><span>Approved By</span></div>
  <div class="sg"><div><div class="l"><div class="ln0"></div>Admissions Officer</div><div class="d"><div class="ln0"></div>Date</div></div><div><div class="l"><div class="ln0"></div>Admissions Head</div><div class="d"><div class="ln0"></div>Date</div></div></div>
  </div></div>`}
-const fileName=(r,suf)=>String(r.FullName||'Learner').replace(/[^A-Za-z0-9\u00c0-\u024f ()-]/g,'').replace(/\s+/g,' ').trim()+'-'+String(r.StudentID||'').trim()+(suf?'-'+suf:'');
+const fileName=(r,suf)=>String(r.FullName||'Learner').replace(/[^A-Za-z0-9\u00c0-\u024f ()-]/g,'').replace(/\s+/g,' ').trim()+'-'+String(sidShow(r)||'').trim()+(suf?'-'+suf:'');
 function loadJs(u){return new Promise((ok,no)=>{const e=document.createElement('script');e.src=u;e.onload=ok;e.onerror=()=>no(new Error('Could not load the PDF library. Check your internet connection.'));document.head.appendChild(e)})}
 const CF=['Tuition Fees','Miscellaneous Fees','School Uniform','P.E. Shirt','School ID','Processing Fee','Others'],fm=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const RF=['Tuition Fee','Miscellaneous Fee','Others'];
@@ -2040,8 +2041,8 @@ function resetModal(step){
  const m=document.createElement('div');m.className='mod';m.id='rm';
  m.innerHTML=`<div style="max-width:430px"><div class="bd"><h3 style="color:var(--navy);margin-bottom:6px">Reset password</h3>`+
  (step===1
-  ?`<p style="color:var(--mut);margin:0 0 14px">Enter your username or registered email. We will email you a 6-digit code.</p>${f('Username or email','fpid','text',S.fpid||$('u').value)}<a href="javascript:void(0)" data-act="rsthave" style="color:var(--blue);font-weight:600;font-size:13.5px">I already have a code</a></div><div class="ft"><button class="btn alt" data-act="rstx">Cancel</button><button class="btn" data-act="rstsend">Send code</button></div></div>`
-  :`<p style="color:var(--mut);margin:0 0 14px">Enter the 6-digit code from your email and choose a new password.</p>${f('Username or email','fpid','text',S.fpid)}${f('6-digit code','fpc','text')}${f('New password (min. 8 characters)','fpn','password')}${f('Confirm new password','fpn2','password')}</div><div class="ft"><button class="btn alt" data-act="rstx">Cancel</button><button class="btn" data-act="rstgo">Reset password</button></div></div>`);
+  ?`<p style="color:var(--mut);margin:0 0 14px">Enter your username. We will email a 6-digit code to the email address on the account.</p>${f('Username','fpid','text',S.fpid||$('u').value)}<a href="javascript:void(0)" data-act="rsthave" style="color:var(--blue);font-weight:600;font-size:13.5px">I already have a code</a></div><div class="ft"><button class="btn alt" data-act="rstx">Cancel</button><button class="btn" data-act="rstsend">Send code</button></div></div>`
+  :`<p style="color:var(--mut);margin:0 0 14px">Enter the 6-digit code from your email and choose a new password.</p>${f('Username','fpid','text',S.fpid)}${f('6-digit code','fpc','text')}${f('New password (min. 8 characters)','fpn','password')}${f('Confirm new password','fpn2','password')}</div><div class="ft"><button class="btn alt" data-act="rstx">Cancel</button><button class="btn" data-act="rstgo">Reset password</button></div></div>`);
  document.body.appendChild(m);
 }
 I.cal=ic('M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z');
@@ -2200,12 +2201,12 @@ act.eformpdf=()=>{const r=S.t.rec;savePdf(enrollFormHTML(r,A()?(r.Photo||''):S.u
 act.slippdf=()=>{const r=S.t.rec,d=slipData(r);savePdf(confirmSlipHTML(r,r.Photo||'',d.reqs,d.sch),fileName(r,'Confirmation-Slip'))};
 
 /* ===== Fix bundle: verified registration + policy sanitizer ===== */
-act.okpriv=()=>{if(!$('pc').checked)return toast('Please tick the consent checkbox',false);S.regData.consent=true;$('pm').remove();call('registerAccount',[S.regData],r=>{toast(r.message);if(r.data&&r.data.challenge)regModal(r.data);else{$('regbox').classList.add('hidden');$('u').value=S.regData.email}})};
+act.okpriv=()=>{if(!$('pc').checked)return toast('Please tick the consent checkbox',false);S.regData.consent=true;$('pm').remove();call('registerAccount',[S.regData],r=>{toast(r.message);if(r.data&&r.data.challenge)regModal(r.data);else{$('regbox').classList.add('hidden');$('u').value=S.regData.username}})};
 
 function regModal(d){const old=$('rgm');if(old)old.remove();S.regc=d.challenge;const m=document.createElement('div');m.className='mod';m.id='rgm';
  m.innerHTML=`<div style="max-width:430px"><div class="bd"><h3 style="color:var(--navy);margin-bottom:6px">Verify your email</h3><p style="color:var(--mut);margin:0 0 14px">Enter the 6-digit code sent to <b>${esc(d.hint)}</b>. It expires in 15 minutes.</p><div class="f"><label>6-digit code</label><input id="rcode" type="text" maxlength="6" inputmode="numeric" autocomplete="one-time-code" data-num="1" style="text-transform:none;letter-spacing:6px;font-size:20px" onkeydown="if(event.key==='Enter')act.regok()"></div><p style="color:var(--mut);font-size:13px;margin:12px 0 0">No code after a few minutes? You may already have an account. Try <b>Forgot password?</b> or contact the Admissions Office.</p></div><div class="ft"><button class="btn alt" data-act="regx">Cancel</button><button class="btn" data-act="regok">Verify &amp; create account</button></div></div>`;
  document.body.appendChild(m);$('rcode').focus()}
-act.regok=()=>call('confirmRegistration',[S.regc,$('rcode').value],r=>{$('rgm').remove();toast(r.message);$('regbox').classList.add('hidden');$('u').value=S.regData.email});
+act.regok=()=>call('confirmRegistration',[S.regc,$('rcode').value],r=>{$('rgm').remove();toast(r.message);$('regbox').classList.add('hidden');$('u').value=S.regData.username});
 act.regx=()=>{const m=$('rgm');if(m)m.remove()};
 act.advv=v=>{const q=JSON.parse(v);runRep('advd',{a:q[0],s:q[1]})};
 act.advback=()=>selRep('adviser');
@@ -2254,7 +2255,7 @@ function admLoad(){
   $('bulk').innerHTML='<div class="bkb"><span>Selected: <b id="selc">0</b></span><button class="btn alt" data-act="bulk" data-v="Enrolled">Mark Enrolled</button><button class="btn alt" data-act="bulk" data-v="Not Enrolled">Mark Not Enrolled</button><span id="selbn"></span></div>';
   $('hits').innerHTML=L.length?`<table class="at"><thead><tr><th><input type="checkbox" data-act="selall"></th><th>Learner</th><th>LRN</th><th>Grade &amp; Section</th><th>Enrollment</th><th></th></tr></thead><tbody>${L.map(s=>{
    const st=s.EnrollStatus||'Not Enrolled',o=st==='Cancelled'?['Cancelled']:st==='Transferred Out'?['Transferred Out','Not Enrolled','Enrolled']:st==='Temporary'?['Temporary','Not Enrolled','Enrolled']:['Not Enrolled','Enrolled'],p=String(s.FullName||'').split(','),ini=((p[0]||'?').trim()[0]||'?')+(((p[1]||'').trim()[0])||'');
-   return `<tr><td><input type="checkbox" class="sel" value="${esc(s.StudentID)}" ${st==='Cancelled'?'disabled':''}></td><td><div class="lrn"><span class="av2">${esc(ini)}</span><div><b>${esc(tc(s.FullName))}</b><small>${esc(s.StudentID)}${s.SchoolYear?' \u00b7 SY '+esc(s.SchoolYear):''}</small></div></div></td><td>${esc(s.LRN)}</td><td>${esc(tc(s.GradeLevel))} ${esc(tc(s.Section))}</td><td><select class="stsel ${stc(st)}" data-act="rowst" data-id="${esc(s.StudentID)}" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select></td><td><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')}</tbody></table>`
+   return `<tr><td><input type="checkbox" class="sel" value="${esc(s.StudentID)}" ${st==='Cancelled'?'disabled':''}></td><td><div class="lrn"><span class="av2">${esc(ini)}</span><div><b>${esc(tc(s.FullName))}</b><small>${esc(sidShow(s))}${s.SchoolYear?' \u00b7 SY '+esc(s.SchoolYear):''}</small></div></div></td><td>${esc(s.LRN)}</td><td>${esc(tc(s.GradeLevel))} ${esc(tc(s.Section))}</td><td><select class="stsel ${stc(st)}" data-act="rowst" data-id="${esc(s.StudentID)}" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select></td><td><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')}</tbody></table>`
    +(L.length<d.total?`<div style="text-align:center;margin-top:16px"><button class="btn alt" data-act="more">Load 50 more</button><div style="color:var(--mut);font-size:12.5px;margin-top:6px">Showing ${L.length} of ${d.total}</div></div>`:'')
    :'<div class="aemp">No matching learners.</div>';
   selRefresh()})}
@@ -3680,7 +3681,7 @@ function acRec(rec) {
 }
 act.acopen = id => call('getAdvisee', [T(), id], r => {
   const rec = r.data, old = $('acr'); if (old) old.remove(); const m = document.createElement('div'); m.className = 'mod'; m.id = 'acr';
-  m.innerHTML = `<div style="max-width:980px"><div class="bd"><h3 style="color:var(--navy);margin:0 0 4px">${esc(tc(rec.FullName || ''))}</h3><p style="color:var(--mut);margin:0 0 6px">${esc(rec.StudentID)} \u00b7 Read-only advisory view. Please keep this information confidential.</p>${acRec(rec)}</div><div class="ft"><button class="btn alt" data-act="acx2">Close</button></div></div>`;
+  m.innerHTML = `<div style="max-width:980px"><div class="bd"><h3 style="color:var(--navy);margin:0 0 4px">${esc(tc(rec.FullName || ''))}</h3><p style="color:var(--mut);margin:0 0 6px">${esc(sidShow(rec))} \u00b7 Read-only advisory view. Please keep this information confidential.</p>${acRec(rec)}</div><div class="ft"><button class="btn alt" data-act="acx2">Close</button></div></div>`;
   document.body.appendChild(m)
 });
 
@@ -4236,7 +4237,7 @@ function admDraw(d){const L=d.rows;S.ids=d.ids;S.total=d.total;
    const st=s.EnrollStatus||'Not Enrolled',o=st==='Cancelled'?['Cancelled']:st==='Transferred Out'?['Transferred Out','Not Enrolled','Enrolled']:st==='Temporary'?['Temporary','Not Enrolled','Enrolled']:['Not Enrolled','Enrolled'],
    p=String(s.FullName||'').split(','),ini=((p[0]||'?').trim()[0]||'?')+(((p[1]||'').trim()[0])||'');
    return `<tr><td class="nolab"><input type="checkbox" class="sel" value="${esc(s.StudentID)}" aria-label="Select ${esc(tc(s.FullName))}" ${st==='Cancelled'?'disabled':''}></td>
-    <td class="nolab"><div class="lrn" data-act="open" data-v="${esc(s.StudentID)}"><span class="av2">${esc(ini)}</span><div><b>${esc(tc(s.FullName))}</b><small>${esc(s.StudentID)}${s.SchoolYear?' \u00b7 SY '+esc(s.SchoolYear):''}</small></div></div></td>
+    <td class="nolab"><div class="lrn" data-act="open" data-v="${esc(s.StudentID)}"><span class="av2">${esc(ini)}</span><div><b>${esc(tc(s.FullName))}</b><small>${esc(sidShow(s))}${s.SchoolYear?' \u00b7 SY '+esc(s.SchoolYear):''}</small></div></div></td>
     <td data-label="LRN">${esc(s.LRN)}</td><td data-label="Class">${esc(gsLabel(s))}</td>
     <td data-label="Status"><select class="stsel ${stc(st)}" data-act="rowst" data-id="${esc(s.StudentID)}" aria-label="Enrollment status" ${st==='Cancelled'?'disabled':''}>${o.map(x=>`<option ${x===st?'selected':''}>${x}</option>`).join('')}</select></td>
     <td class="nolab"><button class="btn alt" data-act="open" data-v="${esc(s.StudentID)}">Open</button></td></tr>`}).join('')}</tbody></table>`
@@ -4276,7 +4277,7 @@ function railHTML(t){const r=t.rec,st=r.EnrollStatus||'Not Enrolled',p=String(r.
  ph=A()?r.Photo:(S.user&&S.user.Photo),holds=A()?(r.HoldOffices||[]):(r.Holds||[]).map(h=>h.Office),
  row=(l,v)=>v?`<div class="rrw"><span>${l}</span><b>${esc(v)}</b></div>`:'';
  return `<div class="rrail" role="complementary" aria-label="Learner summary"><div class="card"><div class="rpho" style="${ph?`background-image:url(${ph})`:''}">${ph?'':esc((a+b).toUpperCase())}</div>
- <h3 class="rnm">${esc(nm)}</h3><div class="rid">${r.StudentID?esc(r.StudentID):'Not yet saved'}</div>
+ <h3 class="rnm">${esc(nm)}</h3><div class="rid">${r.StudentID?esc(sidShow(r)):'Not yet saved'}</div>
  <div class="rchips"><span class="chip ${stc(st)}">${esc(st)}</span>${holds.map(h=>`<span class="chip warn">Hold: ${esc(h)}</span>`).join('')}</div>
  ${row('Grade &amp; section',gsLabel(r))}${row('LRN',r.LRN)}${row('School year',r.SchoolYear)}${row('Classification',r.Classification)}${row('Category',r.Category)}${st==='Temporary'&&r.TempUntil?row('Temporary until',fmtD(r.TempUntil)):''}
  ${A()&&r.ProcessedBy?row('Last processed',r.ProcessedBy+(r.ProcessedDate?' \u00b7 '+fmtS(r.ProcessedDate):'')):''}
@@ -4336,7 +4337,7 @@ document.addEventListener('focusout',e=>{const k=e.target.dataset&&e.target.data
 /* the record banner (shown on narrow screens and in the New Enrollee pop-up) uses the same Grade & Section label */
 recHero=function(t){const r=t.rec,p=String(r.FullName||'').split(','),nm=r.FullName?tc(r.FullName):(r.Surname||r.FirstName?tc([r.Surname,r.FirstName].filter(Boolean).join(', ')):'New enrollee'),
  ini=((r.FullName?(p[0]||'').trim()[0]:(r.Surname||nm)[0])||'N')+(r.FullName?((p[1]||'').trim()[0]||''):(r.FirstName||'')[0]||''),gs=gsLabel(r);
- return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip ${r.StudentID?'':'sh-unsaved'}">${r.StudentID?'ID '+esc(r.StudentID):'Not yet saved'}</span><span class="shchip ${(!r.EnrollStatus||r.EnrollStatus==='Not Enrolled')?'sh-pending':''}">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(gs)}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`};
+ return `<div class="shero rcd"><div class="rcdi"><div class="avb">${esc(ini.toUpperCase())}</div><div><h2>${esc(nm)}</h2><div class="shch" style="margin-top:8px"><span class="shchip ${r.StudentID?'':'sh-unsaved'}">${r.StudentID?(r.PermanentID?'Student ID ':'Ref ')+esc(sidShow(r))+(r.PermanentID&&r.AppRef?' \u00b7 '+esc(r.AppRef):''):'Not yet saved'}</span><span class="shchip ${(!r.EnrollStatus||r.EnrollStatus==='Not Enrolled')?'sh-pending':''}">${esc(r.EnrollStatus||'Not Enrolled')}${r.EnrollStatus==='Temporary'&&r.TempUntil?' until '+esc(fmtS(r.TempUntil)):''}</span>${(r.HoldOffices||[]).length?'<span class="shchip" style="background:#d97706;border-color:#d97706">Hold: '+esc(r.HoldOffices.join(', '))+'</span>':''}${gs?`<span class="shchip">${esc(gs)}</span>`:''}${r.LRN?`<span class="shchip">LRN ${esc(r.LRN)}</span>`:''}</div></div></div></div>`};
 
  /* ===== Student Home v2 + Reports v2 =====
    PASTE at the very END of the main script in Index.html, AFTER admission-ui-v2.js (it uses gsLabel from that file).
@@ -4825,16 +4826,16 @@ const xfEnr=s=>s.EnrollStatus==='Enrolled'||s.EnrollStatus==='Temporary';
 const xfLabel=(s,st)=>!xfOn(s)||st==='Enrolled'||st==='Temporary'?st:({Draft:'Draft \u2013 not yet submitted',Submitted:'Submitted','Under Review':'Under review',Approved:'Approved \u2013 submit requirements',Declined:'Declined'})[xfSt(s)]||st;
 const HS_FLOW=[['xf:form','Online enrollment form','Fill in and submit your Online Enrollment Form'],
  ['xf:review','Application review','Your application is being reviewed'],
- ['xf:id','Admission ID','Your Admission ID will be issued once you are approved'],
  ['xf:print','Print and sign your forms','Print the enrollment form and the parent consent form'],
  ['xf:initial','Initial requirements','Bring your initial requirements to the Admission Office'],
  ['xf:enrolled','Enrollment','The Admission Office is processing your enrollment'],
+ ['xf:sid','Permanent Student ID','Issued when you are officially enrolled'],
  ['xf:further','Further requirements','Submit your remaining requirements when they are available']];
 const hsFor=s=>xfOn(s)?HS_FLOW:HS;
-function xfStat(k,s){const st=xfSt(s),appr=st==='Approved'||xfDone(s,'AdmissionID')||xfEnr(s);
+function xfStat(k,s){const st=xfSt(s),appr=st==='Approved'||xfDone(s,'ApprovedAt')||xfEnr(s);
  if(k==='xf:form')return{done:st!=='Draft',msg:st==='Draft'?'Not yet submitted':'Submitted'+(s.AppSubmittedAt?' on '+fmtD(String(s.AppSubmittedAt).slice(0,10)):''),btn:st==='Draft'?['Open the form','nav','sp']:''};
  if(k==='xf:review')return{done:appr,msg:appr?'Approved':st==='Declined'?'Your application was declined. Please visit the Admission Office.':st==='Under Review'?'Under review by the Admission Office':st==='Draft'?'Starts after you submit the form':'Waiting for the Admission Office to start the review',btn:''};
- if(k==='xf:id')return{done:!!s.AdmissionID,msg:s.AdmissionID||'Issued once your application is approved',btn:''};
+ if(k==='xf:sid')return{done:!!s.PermanentID,msg:s.PermanentID||'Issued once you are officially enrolled. Your Enrollee Reference is '+(s.AppRef||s.StudentID||'')+'.',btn:''};
  if(k==='xf:print'){const ok=xfDone(s,'ReqEnrollForm')&&xfDone(s,'ReqConsent');return{done:ok,msg:ok?'Signed forms received by the office':appr?'Print both forms, have them signed by your parent / guardian, and bring them':'Available after your application is approved',btn:ok||!appr?'':['Print enrollment form','penrform','']}}
  if(k==='xf:initial'){const c=xfCnt(s,'initial'),ok=c.n>0&&c.d===c.n;return{done:ok,msg:appr?c.d+' of '+c.n+' initial documents received':'Applies after your application is approved',btn:ok||!appr?'':['See the list','nav','rq']}}
  if(k==='xf:enrolled'){const ok=xfEnr(s);return{done:ok,msg:ok?(s.EnrollStatus==='Temporary'?'Enrolled temporarily':'You are enrolled'+(s.Section?' \u2013 section assigned':'; your section will be assigned soon')):appr?'The office confirms your enrollment once the initial requirements are verified':'Follows your approval and initial requirements',btn:''}}
@@ -4849,17 +4850,17 @@ function xfBanner(s){const st=xfSt(s),locked=st!=='Draft'&&!xfEnr(s);
  if(st==='Draft'){h='Online Enrollment Form';p='Complete every section, save, then submit your application. Once submitted the form is locked while the Admission Office reviews it.';
   b='<button class="btn" data-act="xfsubmit">Submit application</button>'}
  else if(st==='Submitted'||st==='Under Review'){cls='warn';h='Application '+(st==='Submitted'?'submitted':'under review');p='Your form is locked while it is being reviewed. We will email you when there is an update. Need a correction? Please contact the Admission Office.'}
- else if(st==='Approved'){cls='ok';h='Application approved';p='Your Admission ID is <span class="xfi">'+esc(s.AdmissionID||'(being issued)')+'</span>. Print your enrollment form and the parent consent form, have them signed, and bring them with your initial requirements to the Admission Office.';
+ else if(st==='Approved'){cls='ok';h='Application approved';p='Your Enrollee Reference is <span class="xfi">'+esc(s.AppRef||s.StudentID||'')+'</span>. Print your enrollment form and the parent consent form, have them signed, and bring them with your initial requirements to the Admission Office.';
   b='<button class="btn" data-act="penrform">Print enrollment form</button><button class="btn alt" data-act="pconsent">Print consent form</button><button class="btn alt" data-act="nav" data-v="rq">Initial requirements</button>'}
  else if(st==='Declined'){cls='no';h='Application declined';p='Your application was not approved. Please visit the Admission Office if you have questions.'}
- if(xfEnr(s)){cls='ok';h='You are enrolled';p='Your Admission ID: <span class="xfi">'+esc(s.AdmissionID||'\u2014')+'</span>. You can keep your profile up to date; some identity details are locked.';b=''}
+ if(xfEnr(s)){cls='ok';h='You are enrolled';p='Your Student ID: <span class="xfi">'+esc(s.PermanentID||'(being issued)')+'</span> &middot; Enrollee Reference: '+esc(s.AppRef||s.StudentID||'')+'. You can keep your profile up to date; some identity details are locked.';b=''}
  return `<div class="xfb ${cls}">${xfEnr(s)?'':bar}<h4>${h}</h4><p>${p}</p>${b?`<div class="xfa">${b}</div>`:''}</div>${locked?'<style>#view [data-act="edit"]{display:none}</style>':''}`}
 const _formHTMLXf=formHTML;
 formHTML=function(t){const h=_formHTMLXf(t),r=t&&t.rec;
  if(!r)return h;
  if(!A()&&xfOn(r)){head('Online Enrollment Form','Complete every section, then submit it for review');return xfBanner(r)+h}
- if(A()&&(xfOn(r)||r.AdmissionID)){const c=xfCnt(r,'initial');
-  return `<div class="xfb ${r.AdmissionID?'ok':''}"><h4>Application: ${esc(xfLabel(r,xfSt(r)))}${r.AdmissionID?' &middot; Admission ID <span class="xfi">'+esc(r.AdmissionID)+'</span>':''}</h4><p style="margin:0">${xfOn(r)?'Initial requirements recorded: '+c.d+' of '+c.n+'. ':''}Approve applications in <b>Application Pipeline</b>; a learner can be marked Enrolled only after approval and when every initial requirement is recorded.</p></div>`+h}
+ if(A()&&(xfOn(r)||r.PermanentID)){const c=xfCnt(r,'initial');
+  return `<div class="xfb ${r.PermanentID?'ok':''}"><h4>Application: ${esc(xfLabel(r,xfSt(r)))} &middot; Enrollee Ref <span class="xfi">${esc(r.AppRef||r.StudentID||'')}</span>${r.PermanentID?` &middot; Student ID <span class="xfi">${esc(r.PermanentID)}</span>`:''}</h4><p style="margin:0">${xfOn(r)?'Initial requirements recorded: '+c.d+' of '+c.n+'. ':''}Approve applications in <b>Application Pipeline</b>; a learner can be marked Enrolled only after approval and when every initial requirement is recorded.</p></div>`+h}
  return h};
 act.xfsubmit=()=>{if(S.t&&S.t.edit){toast('Please save your changes first, then submit.','warn');return}
  if(!confirm('Submit your Online Enrollment Form for review?\n\nYou will not be able to edit it while it is being reviewed.'))return;
@@ -4867,8 +4868,8 @@ act.xfsubmit=()=>{if(S.t&&S.t.edit){toast('Please save your changes first, then 
 const _editXf=act.edit;
 act.edit=()=>{const r=S.t&&S.t.rec;if(!A()&&r&&xfOn(r)&&xfSt(r)!=='Draft'&&!xfEnr(r)){toast('Your form is locked while the application is being processed.',false);return}_editXf()};
 
-/* ---- printing: the enrollment form needs the Admission ID, so it opens after approval ---- */
-function xfPrintOk(s){if(A()||!xfOn(s)||s.AdmissionID)return true;toast('You can print your forms once your application is approved and your Admission ID is issued.',false);return false}
+/* ---- printing: the forms open after approval ---- */
+function xfPrintOk(s){if(A()||!xfOn(s)||s.ApprovedAt||s.PermanentID)return true;toast('You can print your forms once your application is approved.',false);return false}
 act.penrform=()=>call('getStudent',[T()],r=>{if(xfPrintOk(r.data))printEnrollForm(r.data)});
 act.pconsent=()=>call('getStudent',[T()],r=>{if(xfPrintOk(r.data))printConsent(r.data)});
 

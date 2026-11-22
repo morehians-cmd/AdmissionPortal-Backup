@@ -78,7 +78,7 @@ function reenrollRun(token, o) {
     if (!todo.length) throw new Error('Nothing to re-enroll. Only learners with status Enrolled from a previous school year can be re-enrolled; Grade 12 completers are not carried over unless you choose "retain grade".');
     if (todo.length > 1) { try { doBackup_(); } catch (_) {} }                // safety copy before a bulk change
 
-    const now = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd HH:mm:ss'), hist = [], logs = [];
+    const now = Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd HH:mm:ss'), hist = [], logs = [], mkApp = appRefMaker_(all.map(x => x.AppRef)), mkPerm = permIdMaker_(all.map(x => x.PermanentID));
     todo.forEach(i => {
       const r = all[i], old = Object.assign({}, r), g = GRADES.indexOf(old.GradeLevel), ng = retain ? old.GradeLevel : GRADES[g + 1];
       hist.push([old.StudentID, old.SchoolYear, old.Classification, old.Category, old.GradeLevel, old.Cluster, old.Section, old.EnrollStatus, now, u.Username, JSON.stringify(old).slice(0, 49000)]);
@@ -93,6 +93,8 @@ function reenrollRun(token, o) {
       REENROLL_RESET.forEach(k => { r[k] = 'None'; if (k !== 'ReqRemarks') r[k + 'Date'] = ''; });
       ['CancelDate', 'CancelReason', 'CancelReasonOther', 'DestSchool', 'DestAddress', 'DestType', 'DestGrade'].forEach(k => r[k] = '');
       r.EnrollStatus = 'Not Enrolled'; r.Age = age_(r.Birthdate); stampAudit_(r, u);
+      r.AppRef = mkApp(SY);                                                             // a new enrollment transaction: new Enrollee Reference (the old one stays in the history snapshot)
+      if (!r.PermanentID) r.PermanentID = mkPerm(old);                                // learner enrolled before Student IDs existed: issue it now
       r.StatusChangedAt = old.StatusChangedAt || '';
       logs.push(logRow_(r, 'Enrolled', u));
     });
