@@ -1376,7 +1376,7 @@ const pfSet=f=>document.querySelectorAll('.pfx').forEach(x=>x.checked=f(x));
 const secList=g=>{const o=[];Object.keys(S.sections).forEach(k=>{if(k.split('|')[0]===g)S.sections[k].forEach(x=>{if(!o.includes(x))o.push(x)})});return o.sort()};
 const secOpts=()=>'<option value="*">All sections</option>'+secList(S.rf.grade).map(x=>`<option value="${esc(x)}" ${S.rf.section===x?'selected':''}>${esc(x)}</option>`).join('')+'<option value="(none)">Unassigned</option>';
 function rfGrade(){S.rf={grade:$('rfg').value,section:'*'};$('rfs').innerHTML=secOpts()}
-function selRep(t){S.rt=t;document.querySelectorAll('.rc').forEach(b=>b.classList.toggle('on',b.dataset.v===t));const f=$('rfil');$('rout').innerHTML='';
+function selRep(t){try{localStorage.setItem(RRK,JSON.stringify([t].concat(rrGet().filter(k=>k!==t)).slice(0,4)))}catch(e){} S.rt=t;document.querySelectorAll('.rc').forEach(b=>b.classList.toggle('on',b.dataset.v===t));const f=$('rfil');$('rout').innerHTML='';
  if(['advisory','personal','requirements'].includes(t)){f.innerHTML=`<div class="card rfc"><div class="ch"><h3>Choose a class</h3></div><div class="g" style="align-items:end"><div class="f"><label>Grade level</label><select id="rfg" onchange="rfGrade()">${S.grades.map(g=>`<option ${g===S.rf.grade?'selected':''}>${g}</option>`).join('')}</select></div><div class="f"><label>Section</label><select id="rfs">${secOpts()}</select></div><div class="f"><button class="btn" data-act="rgo">Generate report</button></div></div></div>${t==='personal'?pickerHTML():''}`;f.scrollIntoView({behavior:'smooth',block:'start'})}
  else if(t==='scholar'){S.rlv=S.rlv||'All';f.innerHTML=`<div class="card rfc"><div class="ch"><h3>School level</h3></div><div class="rpills">${['All'].concat(RGROUPS).map(x=>`<button class="pill ${x===S.rlv?'on':''}" data-act="rlvl" data-v="${esc(x)}">${x==='All'?'All levels':esc(x)}</button>`).join('')}</div></div>`;runRep('scholar',S.rlv)}
  else{f.innerHTML='';runRep(t)}}
@@ -2266,6 +2266,7 @@ function selRefresh(){
  const boxes=[...document.querySelectorAll('.sel:not(:disabled)')],n=boxes.filter(x=>x.checked).length,c=$('selc'),b=$('selbn');if(!c)return;
  c.textContent=S.allSel?(S.ids||[]).length:n;
  if(!b)return;
+ b.classList.toggle('on',(parseInt(c.textContent,10)||0)>0);
  if(S.allSel)b.innerHTML='<span style="color:var(--navy)">'+(S.total>(S.ids||[]).length?'First '+S.ids.length+' of '+S.total+' matching selected (repeat for the rest). ':'All '+S.ids.length+' matching learners selected. ')+'</span><a href="javascript:void(0)" data-act="selclear" style="color:var(--blue);font-weight:600">Clear</a>';
  else if(boxes.length&&n===boxes.length&&(S.ids||[]).length>n)b.innerHTML='<a href="javascript:void(0)" data-act="selmatch" style="color:var(--blue);font-weight:600">Select all '+S.ids.length+(S.total>S.ids.length?' (max 500)':'')+' matching learners</a>';
  else b.innerHTML=''}
@@ -2400,6 +2401,7 @@ I.help=ic('M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9.1 9a3 3 0 0 1 5.8 1c0 2-3
 I.bldg=ic('M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 10h.01M15 10h.01');
 const CHEV=ic('M6 9l6 6 6-6');
 function menuFor(){
+ if(ACD())return [['home','Academics',I.book],['ev','Campus Bulletin',I.cal],['me','My Profile',I.me]];
  const F=FULL();
  if(OFC())return[['fl',S.user.Clearance+' Desk',I.flag],['ev','Campus Bulletin',I.cal],['me','My Profile',I.me]];
  const guides=[['about','About Moreh Academy',I.bldg],['cluster','Senior High Cluster Guide',I.sch],['handbook','Student Handbook',I.book],['facilities','Facilities & Campus Tour',I.bldg]];
@@ -2722,7 +2724,7 @@ function renderNav(m){S.menu=m;
  $('nav').innerHTML=m.map((e,i)=>Array.isArray(e)
   ?(e[0]==='me'?'<div class="nlabel">Account</div>':'')+navBtn(e)
   :`<div class="ng" data-g="${i}"><button class="nav ngh" data-act="ngtoggle" data-v="${i}" aria-label="${esc(e.g)}" aria-haspopup="true" aria-expanded="false" aria-controls="ns${i}">${e.i}<span>${e.g}</span>${nbHTML(e.g)}<span class="chev">${CHEV}</span></button><div class="ns" id="ns${i}"><div class="nsh">${e.g}</div>${e.items.map(x=>navBtn(x,1)).join('')}</div></div>`).join('');
- sbInit()}\n  navBadgeSync();loadBadges()
+ sbInit();navBadgeSync();loadBadges()}
 
 /* flyout open / close */
 let FT=null;
@@ -3005,8 +3007,6 @@ function badgeSet(id,n,c){if(n>0)NAVB[id]={n:n,t:n>99?'99+':String(n),c:c};else 
 function loadBadges(){if(!S.token||!A()||ACD())return;BT=Date.now();
  if(!OFC())google.script.run.withSuccessHandler(r=>{if(r&&r.success)badgeSet('adm',Number(r.data.stats.today)||0,'g')}).withFailureHandler(()=>{}).dashboard(S.token);
  google.script.run.withSuccessHandler(r=>{if(r&&r.success)badgeSet('fl',((r.data&&r.data.flags)||[]).length,'y')}).withFailureHandler(()=>{}).holdsOverview(S.token)}
-const _rnS5=renderNav;renderNav=function(m){_rnS5(m);navBadgeSync();loadBadges()};
-
 /* Badge refresh is part of the holds renderer so the page updates from the same dataset. */
 
 setInterval(()=>{if(S.token&&A()&&!document.hidden)loadBadges()},180000);
@@ -3694,11 +3694,7 @@ CLOSEA.push('acx','acx2');
 `; document.head.appendChild(s) })();
 
 /* ---------- menu, home, bottom nav, badges ---------- */
-const _menuAc = menuFor;
-menuFor = function () {
-  if (ACD()) return [['home', 'Academics', I.book], ['ev', 'Campus Bulletin', I.cal], ['me', 'My Profile', I.me]];
-  return _menuAc().map(e => Array.isArray(e) || e.g !== 'System Administration' ? e : Object.assign({}, e, { items: e.items.concat([['ac', 'Academics', I.book]]) }));
-};
+
 
 /* ---------- state helpers ---------- */
 const acF = () => S.ac.f || (S.ac.f = { g: S.ac.grades[0] || '', c: '', sub: '', sec: '', t: '', name: '' });
@@ -4360,8 +4356,7 @@ function admDraw(d){const L=d.rows;S.ids=d.ids;S.total=d.total;
  selRefresh()}
 
 /* the bulk bar only shows while something is selected */
-const _srV2=selRefresh;
-selRefresh=function(){_srV2();const b=$('bulk'),c=$('selc');if(b&&c)b.classList.toggle('on',(parseInt(c.textContent,10)||0)>0)};
+
 
 /* =====================================================================
    LEARNER RECORD
@@ -4535,9 +4530,6 @@ function homeStudent(){head('Dashboard','Your enrollment at a glance');
    ===================================================================== */
 const RRK='mrh_rr';
 const rrGet=()=>{try{const ok=RL().map(x=>x[0]);return JSON.parse(localStorage.getItem(RRK)||'[]').filter(k=>ok.includes(k))}catch(e){return []}};
-
-const _selRepR=selRep;
-selRep=function(t){try{localStorage.setItem(RRK,JSON.stringify([t].concat(rrGet().filter(k=>k!==t)).slice(0,4)))}catch(e){}_selRepR(t)};
 
 function repFilter(v){const q=String(v||'').trim().toLowerCase();let n=0;
  document.querySelectorAll('#view .rsel').forEach(g=>{let c=0;
