@@ -2512,10 +2512,7 @@ function websitePage(){
 function wsRenderLegacy(){
  const d=S.site,m=S.siteMeta||{},home=m.home||'';
  $('view').innerHTML=[
-  `<div class="card"><div class="ch"><h3>Homepage content</h3><span class="chip ${m.saved?'ok':'warn'}">${m.saved?'Saved copy is live':'Built-in defaults'}</span></div>
-   <p style="color:var(--mut);margin-top:0">This edits the public homepage${home?' at <b>'+esc(home)+'</b>':''}. It is stored in the Content sheet; nothing else in the portal changes.</p>
-   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="wssave">Save &amp; publish</button><button class="btn alt" data-act="wsreload">Discard changes</button>${home?'<button class="btn alt" data-act="wsview">Open homepage</button>':''}<button class="btn red" data-act="wsreset">Reset to defaults</button></div>
-   ${m.updatedAt?`<p style="color:var(--mut);font-size:13px;margin-bottom:0">Last saved ${esc(new Date(m.updatedAt).toLocaleString())} by ${esc(m.updatedBy||'—')}.</p>`:''}</div>`,
+
   `<div class="card"><div class="ch"><h3>School identity</h3></div><div class="g">${wf('Tagline','masthead.tagline',d.masthead.tagline)}</div></div>`,
   wcard('ids','Schools in the top bar',(d.masthead.ids||[]).map((x,i)=>wrow('ids',i,WS_LISTS.ids.n,
    wf('School name','masthead.ids.'+i+'.name',x.name)+wf('Short name (2–4 letters)','masthead.ids.'+i+'.short',x.short)+wf('Logo image URL','masthead.ids.'+i+'.logo',x.logo)+wf('Facebook page URL','masthead.ids.'+i+'.fb',x.fb))).join(''),'The logo is optional; the short name is shown when there is none.'),
