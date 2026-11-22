@@ -3526,11 +3526,24 @@ nav=function(id){
   if(S.token&&A()&&Date.now()-BT>60000)loadBadges();
 };
 
-const _bootCE=boot;
-boot=function(){_bootCE();
+/* ===== Unified boot router =====
+   Combines student theme setup, Scholarships navigation, and
+   Career Evaluation access initialization into one boot layer. */
+const _bootBase=boot;
+boot=function(){
+ const stu=!A();
+ document.body.classList.toggle('stu',stu);
+ _bootBase();
+
  google.script.run.withSuccessHandler(r=>{if(!r||!r.success)return;const was=S.cl;S.cl=!!r.data.allowed;
   if(S.cl!==was&&S.menu){renderNav(menuFor());document.querySelectorAll('#nav .nav').forEach(b=>b.classList.toggle('on',b.dataset.v===S.navId))}})
-  .withFailureHandler(()=>{}).clusterAccess(S.token)};
+  .withFailureHandler(()=>{}).clusterAccess(S.token);
+
+ if(stu){
+  const me=document.querySelector('#side .me');
+  if(me&&!me.querySelector('.stprem'))me.insertAdjacentHTML('afterbegin','<button class="stprem" data-act="nav" data-v="sch"><span class="stpi">'+I.star+'</span><span>Scholarships</span></button>');
+ }
+};
 
 /* ---------- the assessment ---------- */
 function ceShuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -3911,11 +3924,6 @@ button.sv-k{cursor:pointer}button.sv-k:hover{background:var(--soft)}
 
 /* students: blue theme class, no collapsed rail, amber Scholarships block */
 new MutationObserver(()=>{const b=document.body;if(b.classList.contains('stu')&&b.classList.contains('sbc'))b.classList.remove('sbc')}).observe(document.body,{attributes:true,attributeFilter:['class']});
-const _bootSv=boot;
-boot=function(){const stu=!A();document.body.classList.toggle('stu',stu);_bootSv();
- if(stu){const me=document.querySelector('#side .me');
-  if(me&&!me.querySelector('.stprem'))me.insertAdjacentHTML('afterbegin','<button class="stprem" data-act="nav" data-v="sch"><span class="stpi">'+I.star+'</span><span>Scholarships</span></button>')}};
-
 /* ---------- pieces ---------- */
 const SVSTAR=on=>`<svg viewBox="0 0 24 24" width="20" height="20" class="sv-s${on?' on':''}" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
 const svStars=n=>{n=Math.max(0,Math.min(5,n));return `<span class="sv-sr" role="img" aria-label="${n} of 5 stars">${[1,2,3,4,5].map(i=>SVSTAR(i<=n)).join('')}</span>`};
