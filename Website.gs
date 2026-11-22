@@ -234,9 +234,39 @@ function siteRead_() {
   return out;
 }
 
+/** Build the homepage news feed from the Campus Bulletin source of truth.
+ * Legacy homepage.news.items is retained for backwards compatibility, but once bulletin
+ * posts exist they become the public homepage feed instead of requiring duplicate entry. */
+function siteNews_() {
+  try {
+    const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    const rows = evRows_().filter(e => e.EventDate >= today);
+    return rows
+      .filter(e => e.Category === 'Announcement' || e.Category !== 'Announcement')
+      .sort((a, b) => (a.EventDate + a.EventTime).localeCompare(b.EventDate + b.EventTime))
+      .slice(0, 6)
+      .map(e => ({
+        title: e.Title,
+        date: e.EventDate,
+        summary: e.Details || (e.Category === 'Announcement' ? 'School announcement from Moreh Academy.' : 'Upcoming Moreh Academy event.'),
+        link: e.Category === 'Announcement' ? 'route:news/school-announcements' : 'route:news/upcoming-events'
+      }));
+  } catch (_) {
+    return [];
+  }
+}
+
 /** PUBLIC. Homepage.html calls this at boot and passes the result straight to applyContent(),
  *  so it must return the content itself — not an ok() wrapper. null = use the built-in defaults. */
-function getPublishedHomepage() { try { return siteRead_(); } catch (e) { return null; } }
+function getPublishedHomepage() {
+  try {
+    const d = siteRead_();
+    if (!d) return null;
+    const liveNews = siteNews_();
+    if (liveNews.length) d.sections.news = Object.assign({}, d.sections.news || {}, { items: liveNews });
+    return d;
+  } catch (e) { return null; }
+}
 
 /** PUBLIC. The homepage's draft preview reads the same saved copy. */
 function getDraftHomepage() { return getPublishedHomepage(); }
