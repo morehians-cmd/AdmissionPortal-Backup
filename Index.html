@@ -2923,7 +2923,7 @@ function bnInit(){const L=OFC()?[['Desk','fl',I.flag],['Bulletin','ev',I.cal],['
  :[['Dashboard','home',I.home],['Admissions','adm',I.adm],['Holds','fl',I.flag],['Bulletin','ev',I.cal],['Profile','me',I.me]];
  $('bnav').innerHTML=L.map(x=>`<button data-act="nav" data-v="${x[1].split(',')[0]}" data-ids="${x[1]}">${x[2]}<span>${x[0]}</span></button>`).join('')}
 function bnMark(id){document.querySelectorAll('#bnav button').forEach(b=>{const on=b.dataset.ids.split(',').includes(id);b.classList.toggle('on',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})}
-const _navStep3=nav;nav=function(id){_navStep3(id);bnMark(id)};
+
 function fstUpd(){const on=navigator.onLine,e=$('fst');e.className='fst '+(on?'on':'off');e.lastElementChild.textContent=on?'Online':'You are offline'}
 addEventListener('online',fstUpd);addEventListener('offline',fstUpd);fstUpd();$('fyr').textContent=new Date().getFullYear();
 
@@ -2993,7 +2993,7 @@ function loadBadges(){if(!S.token||!A())return;BT=Date.now();
  if(!OFC())google.script.run.withSuccessHandler(r=>{if(r&&r.success)badgeSet('adm',Number(r.data.stats.today)||0,'g')}).withFailureHandler(()=>{}).dashboard(S.token);
  google.script.run.withSuccessHandler(r=>{if(r&&r.success)badgeSet('fl',((r.data&&r.data.flags)||[]).length,'y')}).withFailureHandler(()=>{}).holdsOverview(S.token)}
 const _rnS5=renderNav;renderNav=function(m){_rnS5(m);navBadgeSync();loadBadges()};
-const _navS5=nav;nav=function(id){_navS5(id);if(S.token&&A()&&Date.now()-BT>60000)loadBadges()};
+
 const _frS5=flagsRender;flagsRender=function(){_frS5();if(S.fo&&S.fo.flags)badgeSet('fl',S.fo.flags.length,'y')};
 setInterval(()=>{if(S.token&&A()&&!document.hidden)loadBadges()},180000);
 
@@ -3513,10 +3513,18 @@ menuFor=function(){const ok=!!S.cl;
   e.items.forEach(x=>{if(x[0]==='cluster'&&!ok)return;it.push(x);if(x[0]==='cluster')it.push(['ce','Career Evaluation',ABI.target])});
   return Object.assign({},e,{items:it})})};
 
-const _navTrack=nav;
+/* ===== Unified navigation router =====
+   Combines bottom-nav marking, pending badges, Career Evaluation access,
+   and System Manager access checks into one navigation layer. */
+const _navBase=nav;
 nav=function(id){
- if((id==='cluster'||id==='ce')&&!S.cl){toast('This section is for incoming Grade 11 learners.','warn');id='home'}
- S.navId=id;_navTrack(id)};
+  if(['um','set','ia'].includes(id)&&!SYS()){toast('This section is for the main administrator only.','warn');id='home'}
+  if((id==='cluster'||id==='ce')&&!S.cl){toast('This section is for incoming Grade 11 learners.','warn');id='home'}
+  S.navId=id;
+  _navBase(id);
+  bnMark(id);
+  if(S.token&&A()&&Date.now()-BT>60000)loadBadges();
+};
 
 const _bootCE=boot;
 boot=function(){_bootCE();
@@ -3649,10 +3657,7 @@ function cgCard(c,i){const col=clColor(c,i),ini=esc(c.key.slice(0,5).toUpperCase
 
 /* 4. Page: replace the earlier cluster layout (cards, compare table, quick picker) with the new cards */
 /* ===== System Manager: no System Administration pages ===== */
-const _navSM=nav;
-nav=function(id){
- if(['um','set','ia'].includes(id)&&!SYS()){toast('This section is for the main administrator only.','warn');id='home'}
- _navSM(id)}; 
+ 
 
  /* ===== Academics (Phase B) =====
    Paste at the very END of the main script in Index.html (after the Career Evaluation / Cluster Guide v3 block).
