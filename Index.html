@@ -2586,7 +2586,8 @@ function wsRenderLegacy(){
 function wsRender(){
   wsRenderLegacy();
   const v=$('view');
-  if(!v || v.dataset.wsShell==='1') return;
+  if(!v) return;
+  delete v.dataset.wsShell;
   v.dataset.wsShell='1';
   const m=S.siteMeta||{}, d=S.site||{};
   const counts={
@@ -2715,10 +2716,10 @@ act.wsreload=()=>{if(confirm('Discard unsaved changes?'))websitePage()};
 act.wsview=()=>{if(S.siteMeta&&S.siteMeta.home)window.open(S.siteMeta.home,'_blank','noopener')};
 act.wsbulletin=()=>{try{document.querySelector('[data-act="nav"][data-v="ev"]')?.click()}catch(_){} };
 act.wsabout=()=>{try{document.querySelector('[data-act="nav"][data-v="cp"]')?.click()}catch(_){} };
-act.wsreset=()=>{if(!confirm('Discard the homepage draft and reload the latest published version? The public website will not change.'))return;call('resetSiteAdmin',[T()],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()})};
+act.wsreset=()=>{if(!confirm('Discard the homepage draft and reload the latest published version? The public website will not change.'))return;call('resetSiteAdmin',[T()],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);websitePage()})};
 act.pgsave=()=>{if(!S.pg)return;call('savePagesAdmin',[T(),S.pg.text],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);websitePage()})};
 act.pgreload=()=>{if(confirm('Discard unsaved page changes?'))websitePage()};
-act.pgreset=()=>{if(!S.pg)return;if(!confirm('Discard all inner-page drafts and reload the latest published pages?'))return;call('resetPagesAdmin',[T()],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
+act.pgreset=()=>{if(!S.pg)return;if(!confirm('Discard all inner-page drafts and reload the latest published pages?'))return;call('resetPagesAdmin',[T()],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);websitePage()})};
 
 /* ===== Scoop-style sidebar: replaces navBtn, renderNav and act.ngtoggle ===== */
 // Optional badges. Key = menu id or group name. c = r (red) | y (yellow) | g (green)
