@@ -262,10 +262,27 @@ function getPublishedHomepage() {
 function siteMediaPublic_(ref) { const m=String(ref||'').match(/^gallery:([^:]+):(.+)$/); if(!m)return /^https?:\/\//i.test(String(ref||''))?String(ref):''; try{if(!galRead_(m[1]).list.some(x=>x.id===String(m[2])))return '';return photo_(String(m[2]))||'';}catch(_){return '';} }
 function siteResolveSectionMedia_(sections) { const s=sections||{}; if(s.masthead&&Array.isArray(s.masthead.ids))s.masthead.ids=s.masthead.ids.map(x=>Object.assign({},x,{logo:siteMediaPublic_(x&&x.logo)})); if(s.about&&s.about.photo)s.about.photo=siteMediaPublic_(s.about.photo); if(s.hero&&Array.isArray(s.hero.slides))s.hero.slides=s.hero.slides.map(siteMediaPublic_); if(s.programs&&Array.isArray(s.programs.items))s.programs.items=s.programs.items.map(x=>Object.assign({},x,{photo:siteMediaPublic_(x&&x.photo)})); if(s.news&&Array.isArray(s.news.items))s.news.items=s.news.items.map(x=>Object.assign({},x,{photo:siteMediaPublic_(x&&x.photo)})); return s; }
 
-/** OWNER-ONLY preview data. Public endpoints continue to read published storage only. */
-function getDraftHomepage(token) {
+/** Issue a short-lived, unguessable preview ticket to an authenticated owner. */
+function createWebsitePreviewTicket(token) {
   try {
     owner_(token);
+    const ticket = Utilities.getUuid(), cache = CacheService.getScriptCache();
+    cache.put('website_preview_' + ticket, String(token), 600);
+    return ok({ url:ScriptApp.getService().getUrl() + '?preview=draft&pt=' + encodeURIComponent(ticket) }, 'Preview link created. It expires in 10 minutes.');
+  } catch (e) { return fail(e); }
+}
+function websitePreviewOwner_(ticket) {
+  ticket = String(ticket || '');
+  if (!/^[A-Za-z0-9-]{36}$/.test(ticket)) throw new Error('Preview link is invalid or expired.');
+  const token = CacheService.getScriptCache().get('website_preview_' + ticket);
+  if (!token) throw new Error('Preview link has expired. Create a new preview link.');
+  return owner_(token);
+}
+
+/** Ticket-protected preview data. Public endpoints continue to read published storage only. */
+function getDraftHomepage(ticket) {
+  try {
+    websitePreviewOwner_(ticket);
     const d = websiteDraftRead_(SITE_DRAFT_KEY_, 'site') || siteRead_();
     if (!d) return null;
     return { updatedAt:d.updatedAt, updatedBy:d.updatedBy, sections:siteResolveSectionMedia_(d.sections) };
@@ -348,10 +365,10 @@ function siteResolvePageMedia_(blocks){return (Array.isArray(blocks)?blocks:[]).
 function getPublishedPage(route) {
   try { const d = pagesRead_(), p = d && d.pages[String(route || '')]; return p && p.length ? { blocks: siteResolvePageMedia_(p) } : null; } catch (e) { return null; }
 }
-/** OWNER-ONLY inner-page preview. */
-function getDraftPage(token, route) {
+/** Ticket-protected inner-page preview. */
+function getDraftPage(route, ticket) {
   try {
-    owner_(token);
+    websitePreviewOwner_(ticket);
     const d = websiteDraftRead_(PAGES_DRAFT_KEY_, 'pages') || pagesRead_();
     const p = d && d.pages[String(route || '')];
     return p && p.length ? { blocks:siteResolvePageMedia_(p) } : null;
