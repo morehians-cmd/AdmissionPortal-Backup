@@ -215,11 +215,11 @@ img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflo
 <div id="toast" role="status"></div>
 
 <script>
-/* ===== Backend hooks. Sign-in functions live in Auth.gs. createAccount is still a placeholder (item 3, later). ===== */
+/* ===== Backend hooks. Public content comes from Website.gs; authentication uses HomepageBridge.gs. ===== */
 /* Auth is Old AP's single account system, reached through HomepageBridge.gs. */
 var API={getHomepage:'getPublishedHomepage',getDraft:'getDraftHomepage',getPage:'getPublishedPage',getPageDraft:'getDraftPage',getPolicy:'getPublishedPolicy',signIn:'homepageSignIn',signOut:'homepageSignOut',whoAmI:'',register:'homepageRegister',verify:'homepageVerifyCode',confirmReg:'homepageConfirmRegistration',forgot:'homepageForgotPassword',reset:'homepageResetPassword'};
 
-/* ===== Content model (Phase 2 will load this from Sheets, published copy) ===== */
+/* ===== Client fallback. Kept for immediate rendering and when the CMS endpoint is unavailable. ===== */
 var DEFAULT_HOME={
  ids:[{name:'Moreh Academy',short:'MA',logo:'',fb:'https://facebook.com/ilovemoreh'},
       {name:'Moreh Global Innovative College',short:'MG',logo:'',fb:'https://facebook.com/MorehGlobal2019'},
@@ -230,7 +230,7 @@ var DEFAULT_HOME={
   enroll:{label:'Enroll Now!',to:'#create'},discover:{label:'Discover Moreh Academy',to:'route:about'},
   slides:['','',''],intervalMs:6500},
  values:[{label:'Quality Education',icon:'📘',on:true},{label:'Holistic Development',icon:'🧍',on:true},{label:'Academic Excellence',icon:'🏆',on:true},{label:'Supportive Community',icon:'🤝',on:true},{label:'A Brighter Future',icon:'⭐',on:true}],
- footer:{loc:'Moreh Academy, Taguig City, Philippines',phone:'Admissions: 0961 876 6886',email:'registrar@morehacademy.com',fb:'https://facebook.com/ilovemoreh',yt:'https://youtube.com/'},
+ footer:{loc:'Ground Floor, Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City',phone:'Admissions: 0961 876 6886',email:'morehians@gmail.com',fb:'https://facebook.com/ilovemoreh',yt:'https://youtube.com/'},
 sectionTitle:'Your Journey to Moreh Academy',sectionSub:'Six simple steps toward becoming a Moreh Academy student.',
  steps:[{t:'Create an Account',d:'Register your applicant account.',i:'👤'},{t:'Complete Application',d:'Fill out the application form.',i:'📝'},{t:'Submit Requirements',d:'Upload the required documents.',i:'📎'},{t:'Application Review',d:'Application assessment by the school.',i:'🔍'},{t:'Admission Decision',d:'Receive your application result.',i:'📬'},{t:'Enrollment Confirmation',d:'Complete your enrollment.',i:'✅'}],
  aboutPreview:{heading:'Building a Strong Foundation for Lifelong Success',linkLabel:'Learn More',text:'Moreh Academy is a learning community committed to providing excellent and values-driven education from Kindergarten to Grade 12.',photo:''},
