@@ -2391,10 +2391,11 @@ function menuFor(){
  const F=FULL();
  if(OFC())return[['fl',S.user.Clearance+' Desk',I.flag],['ev','Campus Bulletin',I.cal],['me','My Profile',I.me]];
  const guides=[['about','About Moreh Academy',I.bldg],['cluster','Senior High Cluster Guide',I.sch],['handbook','Student Handbook',I.book],['facilities','Facilities & Campus Tour',I.bldg]];
+ const guideItems=guides.reduce((a,x)=>{if(x[0]==='cluster'&&!S.cl)return a;a.push(x);if(x[0]==='cluster')a.push(['ce','Career Evaluation',ABI.target]);return a},[]);
  if(A())return[
   ...(F?[{g:'Overview',i:I.home,items:[['home','Dashboard',I.home],['rep','Analytics & Reports',I.rep]]}]:[['home','Dashboard',I.home]]),
   {g:'Operations & Management',i:I.adm,items:[['adm','Admission Operations',I.adm],['pipe','Application Pipeline',I.rep],['fl','Holds Management',I.flag],['sch','Scholarships',I.sch],['tf','Schedule of Fees',I.tf]]},
-  {g:'Institutional Resources',i:I.book,items:[...guides,...(F?[['gd','Enrollment Guide',I.rep]]:[])]},
+  {g:'Institutional Resources',i:I.book,items:[...guideItems,...(F?[['gd','Enrollment Guide',I.rep]]:[])]},
   {g:'Communication',i:I.mega,items:[['ev','Campus Bulletin',I.cal],['faq','Help Center & FAQs',I.help]]},
   ...(F?[{g:'Website',i:I.web,items:[['web','Website Management',I.web]]}]:[]),
   ...(SYS()?[{g:'System Administration',i:I.cal,items:[['um','User Management',I.users],['set','Enrollment Settings',I.cal],['ia','ID Artwork',I.sch]]}]:[]),
@@ -2402,7 +2403,7 @@ function menuFor(){
  return[
   ['home','Home',I.home],
   {g:'Enrollment & Academics',i:I.adm,items:[['sp','Student Profile & Account',I.adm],['rq','School Requirements',I.rep],['tf','Schedule of Fees',I.tf],['sch','Scholarships',I.sch]]},
-  {g:'Campus & Student Life',i:I.book,items:guides},
+  {g:'Campus & Student Life',i:I.book,items:guideItems},
   {g:'Support & Updates',i:I.help,items:[['ev','Campus Bulletin',I.cal],['faq','Help Center & FAQs',I.help]]},
   ['me','My Profile',I.me]];
 }
@@ -3507,12 +3508,6 @@ const CE_Q=[
 
 /* ---------- access: Cluster Guide + Career Evaluation are for incoming Grade 11 (and the main administrator, who maintains them) ---------- */
 S.cl=false;
-const _menuCE=menuFor;
-menuFor=function(){const ok=!!S.cl;
- return _menuCE().map(e=>{if(Array.isArray(e))return e;const it=[];
-  e.items.forEach(x=>{if(x[0]==='cluster'&&!ok)return;it.push(x);if(x[0]==='cluster')it.push(['ce','Career Evaluation',ABI.target])});
-  return Object.assign({},e,{items:it})})};
-
 /* ===== Unified navigation router =====
    Combines bottom-nav marking, pending badges, Career Evaluation access,
    and System Manager access checks into one navigation layer. */
