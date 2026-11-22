@@ -209,9 +209,9 @@ const SITE_SEED_ = {
         ['School Achievements', 'Celebrating our students and staff.', '🏅']] }
     ] },
     footer: {
-      loc: 'Moreh Academy, Taguig City, Philippines',
+      loc: 'Ground Floor, Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City',
       phone: 'Admissions: 0961 876 6886',
-      email: 'registrar@morehacademy.com',
+      email: 'morehians@gmail.com',
       fb: 'https://facebook.com/ilovemoreh',
       yt: 'https://youtube.com/'
     },
@@ -253,7 +253,6 @@ function siteNews_() {
     const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
     const rows = evRows_().filter(e => e.EventDate >= today);
     return rows
-      .filter(e => e.Category === 'Announcement' || e.Category !== 'Announcement')
       .sort((a, b) => (a.EventDate + a.EventTime).localeCompare(b.EventDate + b.EventTime))
       .slice(0, 6)
       .map(e => ({
