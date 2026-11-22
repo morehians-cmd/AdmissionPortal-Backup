@@ -104,16 +104,6 @@ function forgotPassword(identifier) {
 /* ============================ 4. RESET COUNTER + LOCK ============================ */
 
 /** Counts this reset request for the school year. Returns true if a code may be sent, false if the account just got locked. */
-function resetGate_(u) {
-  const lock = LockService.getScriptLock();
-  if (!lock.tryLock(3000)) throw new Error('The service is busy. Please try again.');
-  try {
-    const pr = PropertiesService.getScriptProperties(), k = 'rs_' + activeSY_() + '_' + u.Username, n = parseInt(pr.getProperty(k) || '0', 10) + 1;
-    pr.setProperty(k, String(n));
-    if (n >= RESET_LIMIT) { setLocked_(u.Username, true); audit_('self:' + u.Username, 'account.lock', u.StudentID, n + ' password reset requests'); return false; }
-    return true;
-  } finally { try { lock.releaseLock(); } catch (_) {} }
-}
 function setLocked_(username, on) {
   const sh = sh_('U'), r = sh.getRange(1, 1, sh.getLastRow(), 1).getValues().flat().indexOf(username) + 1;
   if (!r) return;
