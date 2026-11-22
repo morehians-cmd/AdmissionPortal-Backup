@@ -1365,7 +1365,15 @@ function rep(){head('Reports','Choose a report to generate');S.rt='';S.rep=null;
  const R=Object.fromEntries(RL().map(x=>[x[0],x]));
  const quick=['daily','overview','section','scholar'].map(k=>{const x=R[k];return `<div class="shc rq" data-act="rp" data-v="${k}"><div class="shh"><span class="ki ${x[3]}">${x[4]}</span><span>${x[1]}</span></div><p>${x[2]}</p><span class="go">Open report</span></div>`}).join('');
  const grp=RGRP.map(g=>`<div class="rgl">${g[0]}</div><div class="rsel">${g[1].map(k=>{const x=R[k];return `<button class="rc" data-act="rp" data-v="${k}"><span class="ri ${x[3]}">${x[4]}</span><span class="rtx"><b>${x[1]}</b><small>${x[2]}</small></span></button>`}).join('')}</div>`).join('');
- $('view').innerHTML=`<div class="shero rph"><div class="sht"><div><h2>Reports</h2><p>Pick a report to see live numbers. Every report can be printed or saved as PDF, and downloaded as CSV for Excel.</p></div></div><div class="shk">${quick}</div></div><div class="card"><div class="ch"><h3>All Reports</h3></div>${grp}</div><div id="rfil"></div><div id="rout"></div>`}
+ $('view').innerHTML=`<div class="shero rph"><div class="sht"><div><h2>Reports</h2><p>Pick a report to see live numbers. Every report can be printed or saved as PDF, and downloaded as CSV for Excel.</p></div></div><div class="shk">${quick}</div></div><div class="card"><div class="ch"><h3>All Reports</h3></div>${grp}</div><div id="rfil"></div><div id="rout"></div>`
+ const card=[...document.querySelectorAll('#view .card')].find(c=>{const h=c.querySelector('.ch h3');return h&&/All Reports/.test(h.textContent)});if(!card)return;
+ const R=Object.fromEntries(RL().map(x=>[x[0],x])),rc=rrGet();
+ card.querySelector('.ch').insertAdjacentHTML('afterend',
+  '<div class="rsrch"><input id="rsq" type="search" placeholder="Search reports" aria-label="Search reports" oninput="repFilter(this.value)"></div>'
+  +(rc.length?`<div class="rrec"><span>Recently viewed</span>${rc.map(k=>`<button class="pill" data-act="rp" data-v="${k}">${esc(R[k][1])}</button>`).join('')}</div>`:'')
+  +'<div id="rsn" class="aemp hidden">No matching reports.</div>')};
+
+}
 const PDEF=['LRN','Classification','Category','GradeLevel','Section','Birthdate','Age','SexualOrient','Religion','Mobile','FatherName','FatherOccupation','FatherEducation','FatherMobile','FatherReligion','MotherName','MotherOccupation','MotherEducation','MotherMobile','MotherReligion','EmName','EmRelation','EmMobile'];
 const flab=f=>{let l=String(f[2]).replace(/\s*\([^)]*\)\s*$/,'');if(f[0]==='family'){const pp=f[1].indexOf('Father')===0?'Father':'Mother';if(l.indexOf(pp)!==0)l=pp+' '+l}return l};
 function pickerHTML(){const on=S.pf||PDEF;
@@ -3256,7 +3264,10 @@ function fqPost(){const dm=dmEl();if(!dm)return;
  const maps=typeof GALMAP==='string'?GALMAP:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City');
  const h=document.createElement('div');h.className='card';
  h.innerHTML=`<div class="ch"><h3>Still need help?</h3></div><div class="nhl"><div>${I.cal}<span>Mon\u2013Fri 8:00 AM \u2013 5:00 PM<br>Sat 8:00 AM \u2013 3:00 PM</span></div><div>${ic(CIC.tel)}<a href="tel:09618766886">0961 876 6886</a></div><div>${ic(CIC.mail)}<a href="mailto:morehians@gmail.com">morehians@gmail.com</a></div><div>${ic(CIC.pin)}<a href="${maps}" target="_blank" rel="noopener">Admissions Office, Reyes St., Central Bicutan \u2013 view map</a></div></div>`;
- const side=document.querySelector('#view .sidenav');(side||dm).appendChild(h)}
+ const side=document.querySelector('#view .sidenav');(side||dm).appendChild(h)const nh=[...document.querySelectorAll('#view .nhl')].pop();
+ if(nh&&!nh.parentElement.querySelector('[data-act=cfopen]'))nh.parentElement.insertAdjacentHTML('beforeend','<button class="btn" data-act="cfopen" style="margin-top:14px;width:100%;justify-content:center">Send us a message</button>')};
+
+}
 act.qf=v=>{if(v==='pwd'){nav('me');act.pedit()}else nav(v)};
 
 function cpR5Apply(){const c=S.cp;if(!c)return false;
@@ -3335,10 +3346,6 @@ act.guidetabs=()=>{const b=$('gbody');if(!b)return;if(b.querySelector('h4'))retu
    Paste at the very end of the main script, after the content-page upgrade block.
    Needs the new Contact.gs deployed on the Apps Script side. */
 const CFT=['Enrollment / admission','Requirements','Payments and fees','Scholarship','Account or password','Other'];
-const _fqCF=fqPost;
-fqPost=function(){_fqCF();if(A())return;const nh=[...document.querySelectorAll('#view .nhl')].pop();
- if(nh&&!nh.parentElement.querySelector('[data-act=cfopen]'))nh.parentElement.insertAdjacentHTML('beforeend','<button class="btn" data-act="cfopen" style="margin-top:14px;width:100%;justify-content:center">Send us a message</button>')};
-
 act.cfopen=()=>{const old=$('cfm');if(old)old.remove();const m=document.createElement('div');m.className='mod';m.id='cfm';
  m.innerHTML=`<div style="max-width:480px"><div class="bd"><h3 style="color:var(--navy);margin-bottom:6px">Send us a message</h3><p style="color:var(--mut);margin:0 0 14px">The Admissions Office will reply by email, usually within the next working day.</p>
  <div class="f" style="margin-bottom:12px"><label>Topic</label><select id="cft">${CFT.map(x=>`<option>${x}</option>`).join('')}</select></div>
@@ -4536,15 +4543,6 @@ function repFilter(v){const q=String(v||'').trim().toLowerCase();let n=0;
   g.querySelectorAll('.rc').forEach(b=>{const ok=!q||b.textContent.toLowerCase().includes(q);b.classList.toggle('hidden',!ok);if(ok)c++});
   g.classList.toggle('hidden',!c);const l=g.previousElementSibling;if(l&&l.classList.contains('rgl'))l.classList.toggle('hidden',!c);n+=c});
  const e=$('rsn');if(e)e.classList.toggle('hidden',n>0)}
-
-const _repR=rep;
-rep=function(){_repR();
- const card=[...document.querySelectorAll('#view .card')].find(c=>{const h=c.querySelector('.ch h3');return h&&/All Reports/.test(h.textContent)});if(!card)return;
- const R=Object.fromEntries(RL().map(x=>[x[0],x])),rc=rrGet();
- card.querySelector('.ch').insertAdjacentHTML('afterend',
-  '<div class="rsrch"><input id="rsq" type="search" placeholder="Search reports" aria-label="Search reports" oninput="repFilter(this.value)"></div>'
-  +(rc.length?`<div class="rrec"><span>Recently viewed</span>${rc.map(k=>`<button class="pill" data-act="rp" data-v="${k}">${esc(R[k][1])}</button>`).join('')}</div>`:'')
-  +'<div id="rsn" class="aemp hidden">No matching reports.</div>')};
 
   /* ===== Schedule of Fees + Scholarships: segmented controls v2 =====
    PASTE at the very END of the main script in Index.html (after home-reports-ui-v2.js). No backend changes.
