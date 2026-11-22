@@ -2613,7 +2613,7 @@ function wsRender(){
       '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
         status+
         (home?'<button class="btn alt" data-act="wsview">Open website</button>':'')+
-        '<button class="btn alt" data-act="wssave">Save draft</button>'+ '<button class="btn" data-act="wspublish">Publish website</button>'+ 
+        '<button class="btn alt" data-act="wssave">Save draft</button>'+ '<button class="btn alt" data-act="wspreview">Preview draft</button>'+ '<button class="btn" data-act="wspublish">Publish website</button>'+ 
       '</div>'+
     '</div>'+
     '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin-top:18px">'+
@@ -2710,6 +2710,7 @@ act.wsmove=v=>{const p=String(v).split(':'),k=p[0],i=+p[1],step=+p[2],a=k==='ord
 act.wstoggle=k=>{const dp=S.site.display,h=dp.hidden||(dp.hidden=[]),i=h.indexOf(k);if(i<0)h.push(k);else h.splice(i,1);wsRender()};
 act.wssave=()=>call('saveSiteAdmin',[T(),S.site],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);websitePage()});
 act.wspublish=()=>{if(!confirm('Publish the saved homepage and inner-page drafts to the public website?'))return;call('publishWebsiteAdmin',[T()],r=>{toast(r.message);websitePage()})};
+act.wspreview=()=>{const win=window.open('about:blank','_blank');call('createWebsitePreviewTicket',[T()],r=>{if(win)win.location.href=r.data.url;else toast('Allow pop-ups to open the preview.',false)},m=>{if(win)win.close();toast(m,false)})};
 act.wsreload=()=>{if(confirm('Discard unsaved changes?'))websitePage()};
 act.wsview=()=>{if(S.siteMeta&&S.siteMeta.home)window.open(S.siteMeta.home,'_blank','noopener')};
 act.wsbulletin=()=>{try{document.querySelector('[data-act="nav"][data-v="ev"]')?.click()}catch(_){} };
