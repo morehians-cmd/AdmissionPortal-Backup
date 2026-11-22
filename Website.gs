@@ -32,7 +32,8 @@ const SITE_SECTIONS = ['admission', 'about', 'programs', 'news'];
 /* ---------- sanitising: never trust what the browser posts ---------- */
 const wsS_ = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ' ').trim().slice(0, n);
 const wsLink_ = v => /^(https?:\/\/|mailto:|#|route:)/i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
-const wsImg_ = v => /^https?:\/\//i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
+const wsMedia_ = v => { const s=String(v==null?'':v).trim(); if(/^https?:\/\//i.test(s)) return s.slice(0,500); if(/^gallery:[A-Za-z0-9_-]+:[A-Za-z0-9_-]{1,80}$/i.test(s)) return s.slice(0,180); return ''; };
+const wsImg_ = wsMedia_;
 const wsArr_ = (a, n) => Array.isArray(a) ? a.slice(0, n) : [];
 /* An absent field keeps its built-in text, so content saved before a card existed still opens. */
 const wsPick_ = (v, d, n) => v == null ? d : wsS_(v, n);
@@ -276,9 +277,13 @@ function getPublishedHomepage() {
     if (liveAbout) d.sections.about = Object.assign({}, d.sections.about || {}, liveAbout);
     const liveNews = siteNews_();
     if (liveNews.length) d.sections.news = Object.assign({}, d.sections.news || {}, { items: liveNews });
+    d.sections = siteResolveSectionMedia_(d.sections);
     return d;
   } catch (e) { return null; }
 }
+
+function siteMediaPublic_(ref) { const m=String(ref||'').match(/^gallery:([^:]+):(.+)$/); if(!m)return /^https?:\/\//i.test(String(ref||''))?String(ref):''; try{if(!galRead_(m[1]).list.some(x=>x.id===String(m[2])))return '';return photo_(String(m[2]))||'';}catch(_){return '';} }
+function siteResolveSectionMedia_(sections) { const s=sections||{}; if(s.about&&s.about.photo)s.about.photo=siteMediaPublic_(s.about.photo); if(s.hero&&Array.isArray(s.hero.slides))s.hero.slides=s.hero.slides.map(siteMediaPublic_); return s; }
 
 /** PUBLIC. The homepage's draft preview reads the same saved copy. */
 function getDraftHomepage() { return getPublishedHomepage(); }
@@ -344,7 +349,7 @@ function pagesBlocks_(t) {
   let para = [];
   const flush = () => { if (para.length) { out.push({ type: 'p', text: para.join('\n') }); para = []; } };
   lines.forEach(line => {
-    const h = /^\s*#{1,3}\s+(.+)$/.exec(line), im = /^\s*!\[([^\]]*)\]\((https:\/\/[^)\s]+)\)\s*$/.exec(line);
+    const h = /^\s*#{1,3}\s+(.+)$/.exec(line), im = /^\s*!\[([^\]]*)\]\((https:\/\/[^)\s]+|gallery:[A-Za-z0-9_-]+:[A-Za-z0-9_-]{1,80})\)\s*$/.exec(line);
     if (h) { flush(); out.push({ type: 'h2', text: h[1].trim() }); }
     else if (im) { flush(); out.push({ type: 'img', url: im[2], alt: im[1] }); }
     else para.push(line);
@@ -380,10 +385,10 @@ function pagesRead_() {
   return out;
 }
 
-/** PUBLIC. Homepage.html stores the result at HOME.pages[route]; null = nothing saved for that page.
- *  Like getPublishedHomepage() this returns the content itself, not an ok() wrapper. */
+/** PUBLIC. Homepage.html stores the result at HOME.pages[route]; controlled Gallery references are resolved before delivery. */
+function siteResolvePageMedia_(blocks){return (Array.isArray(blocks)?blocks:[]).map(b=>{if(!b)return b;const x=Object.assign({},b);if(x.type==='img'&&x.url)x.url=siteMediaPublic_(x.url);return x;});}
 function getPublishedPage(route) {
-  try { const d = pagesRead_(), p = d && d.pages[String(route || '')]; return p && p.length ? { blocks: p } : null; } catch (e) { return null; }
+  try { const d = pagesRead_(), p = d && d.pages[String(route || '')]; return p && p.length ? { blocks: siteResolvePageMedia_(p) } : null; } catch (e) { return null; }
 }
 function getDraftPage(route) { return getPublishedPage(route); }
 
@@ -416,14 +421,18 @@ function siteMediaUsage_(){
   const site=siteRead_(), sections=site?site.sections:siteClean_(SITE_SEED_);
   const hero=Array.isArray(sections.hero&&sections.hero.slides)?sections.hero.slides.filter(Boolean):[];
   hero.forEach((url,i)=>add('hero-'+(i+1),'Homepage Hero'+(i+1?' · Slide '+(i+1):'')));
+  if(sections.about&&/^gallery:/i.test(String(sections.about.photo||''))){const m=String(sections.about.photo).match(/^gallery:([^:]+):(.+)$/);if(m)add('gallery-'+m[1]+'-'+m[2],'Homepage About');}
+  try{const pages=pagesRead_();Object.keys((pages&&pages.pages)||{}).forEach(route=>{(pages.pages[route]||[]).forEach(b=>{if(b&&b.type==='img'&&/^gallery:/i.test(String(b.url||''))){const m=String(b.url).match(/^gallery:([^:]+):(.+)$/);if(m)add('gallery-'+m[1]+'-'+m[2],'Inner Page · '+route);}});});}catch(_){}
   try{GAL_PAGES.forEach(page=>{galRead_(page).list.forEach(p=>add('gallery-'+page+'-'+p.id,page==='facilities'?'Facilities Gallery':'Cluster Guide Gallery'));});}catch(_){}
   return use;
 }
+
 
 function mediaInventory_(){
   const site=siteRead_(), sections=site?site.sections:siteClean_(SITE_SEED_), meta=mediaMetaRead_(), usage=siteMediaUsage_(), out=[];
   const hero=Array.isArray(sections.hero&&sections.hero.slides)?sections.hero.slides.filter(Boolean):[];
   hero.forEach((url,i)=>{const id='hero-'+(i+1),m=meta[id]||{};out.push({id:id,type:'image',title:m.title||'Homepage Hero '+(i+1),alt:m.alt||'Moreh Academy homepage hero image '+(i+1),caption:m.caption||'',url:String(url),source:'Homepage Hero',page:'homepage',usedOn:usage[id]||[],editable:true})});
+  if(sections.about&&sections.about.photo){const ref=String(sections.about.photo),id=/^gallery:/i.test(ref)?'gallery-'+ref.split(':')[1]+'-'+ref.split(':').slice(2).join(':'):'about-1',m=meta[id]||{};out.push({id:id,type:'image',title:m.title||'Homepage About image',alt:m.alt||'Moreh Academy students',caption:m.caption||'',url:/^https?:\/\//i.test(ref)?ref:'',source:'Homepage About',page:'homepage',refId:/^gallery:/i.test(ref)?ref.split(':').slice(2).join(':'):'',usedOn:usage[id]||[],editable:true})}
   GAL_PAGES.forEach(page=>{try{galRead_(page).list.forEach(p=>{const id='gallery-'+page+'-'+p.id,m=meta[id]||{};out.push({id:id,type:'image',title:m.title||p.cap||'Untitled photo',alt:m.alt||p.cap||'Moreh Academy '+page+' photo',caption:m.caption||p.cap||'',url:'',source:page==='facilities'?'Facilities':'Cluster Guide',page:page,refId:p.id,usedOn:usage[id]||[],editable:true})}catch(_){} });
   return {items:out};
 }
