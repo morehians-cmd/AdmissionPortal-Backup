@@ -72,18 +72,6 @@ function homepageSignOut(token) {
   return logout(token);
 }
 
-/* ---------------------------------------------------------------------------
- * Content endpoints used by Homepage.html.
- *
- * The homepage CMS (New AP's HomepageMgmt.gs / PagesMgmt.gs) is not part of this
- * merge, so these return null and the homepage renders its built-in DEFAULT_HOME
- * content. They exist because Homepage.html calls them at boot: a missing function
- * would throw synchronously in google.script.run and stop the page from rendering.
- *
- * When the CMS is installed later, DELETE these four stubs — the real functions
- * have the same names and Apps Script does not allow duplicates.
- * ------------------------------------------------------------------------- */
-function getPublishedHomepage() { return null; }
-function getDraftHomepage() { return null; }
-function getPublishedPage(route) { return null; }
-function getDraftPage(route) { return null; }
+/* The homepage's content endpoints (getPublishedHomepage, getDraftHomepage and the
+ * per-page stubs) live in Website.gs, together with the Website Management editor's
+ * save/reset functions. This file is authentication only. */

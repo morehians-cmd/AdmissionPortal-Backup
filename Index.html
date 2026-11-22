@@ -1225,7 +1225,7 @@ html[data-theme=dark] .shchip.sh-pending{
 const $=id=>document.getElementById(id),S={tabs:[],cur:'search'};
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ic=d=>`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
-const I={home:ic('M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z'),adm:ic('M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6'),rep:ic('M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h8'),me:ic('M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'),out:ic('M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9'),search:ic('M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3'),x:ic('M18 6L6 18M6 6l12 12')};
+const I={home:ic('M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z'),adm:ic('M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6'),rep:ic('M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h8'),me:ic('M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'),out:ic('M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9'),search:ic('M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3'),x:ic('M18 6L6 18M6 6l12 12'),web:ic('M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z')};
 function toast(m,k=true){const t=$('toast');t.textContent=m;t.style.background=k==='warn'?'#b86e00':k?'#198754':'#c0392b';t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),4000)}
 function call(fn,a,cb){$('load').classList.remove('hidden');google.script.run.withSuccessHandler(r=>{$('load').classList.add('hidden');if(!r.success){toast(r.error,false);if(/Session expired/.test(r.error))setTimeout(()=>location.reload(),1500);return}cb(r)}).withFailureHandler(e=>{$('load').classList.add('hidden');toast(e.message,false)})[fn](...a)}
 const T=()=>S.token,A=()=>S.user.Role==='admin',head=(t,s)=>{$('title').textContent=t;$('sub').textContent=s||''};
@@ -1245,7 +1245,7 @@ function boot(){try{boot0()}catch(e){$('app').classList.remove('hidden');toast('
 function boot0(){const u=S.user;$('role').textContent=A()?'Admin':'Student';$('who').textContent=u.FullName||u.Username;$('uname').textContent=tc(u.FullName||u.Username);$('urole').textContent=A()?ROLEN(u.Clearance):'Student';setAv();topInit();
 renderNav(menuFor());document.querySelector('[data-act=out]').innerHTML=I.out+'Sign out';if(u.MustChange==='1'){S.pe=true;nav('me');toast('Please set a new password to continue.','warn')}else{nav(OFC()?'fl':'home');if(!OFC())loadNotifs()}idleReset()}
 
-function nav(id){$('dd').classList.add('hidden');$('np').classList.add('hidden');document.querySelectorAll('#nav .nav').forEach(b=>b.classList.toggle('on',b.dataset.v===id));const hit=document.querySelector('#nav .sub[data-v="'+id+'"]'),hg=hit&&hit.closest('.ng');if(hg){document.querySelectorAll('#nav .ng').forEach(x=>{x.classList.toggle('open',x===hg);x.querySelector('.ngh').classList.toggle('has',x===hg)})}$('side').classList.remove('open');({home,adm,rep,pipe:pipeline,me:profile,sp:stuProfile,rq:stuReq,pp:privacyPage,ev:eventsPage,um:usersPage,set:settingsPage,sch:schPage,tf:tuitionPage,fl:flagsPage,gd:guidePage,about:()=>contentPage('about'),cluster:()=>contentPage('cluster'),handbook:()=>contentPage('handbook'),facilities:()=>contentPage('facilities'),faq:()=>contentPage('faq'),ia:idArtPage,ce:careerPage,ac:acadPage})[id]()}
+function nav(id){$('dd').classList.add('hidden');$('np').classList.add('hidden');document.querySelectorAll('#nav .nav').forEach(b=>b.classList.toggle('on',b.dataset.v===id));const hit=document.querySelector('#nav .sub[data-v="'+id+'"]'),hg=hit&&hit.closest('.ng');if(hg){document.querySelectorAll('#nav .ng').forEach(x=>{x.classList.toggle('open',x===hg);x.querySelector('.ngh').classList.toggle('has',x===hg)})}$('side').classList.remove('open');({home,adm,rep,pipe:pipeline,me:profile,sp:stuProfile,rq:stuReq,pp:privacyPage,ev:eventsPage,um:usersPage,set:settingsPage,web:websitePage,sch:schPage,tf:tuitionPage,fl:flagsPage,gd:guidePage,about:()=>contentPage('about'),cluster:()=>contentPage('cluster'),handbook:()=>contentPage('handbook'),facilities:()=>contentPage('facilities'),faq:()=>contentPage('faq'),ia:idArtPage,ce:careerPage,ac:acadPage})[id]()}
 
 const csvCell=c=>{let s=String(c==null?'':c);if(/^[=+\-@\t\r]/.test(s))s="'"+s;else if(/^(0\d+|\d{11,})$/.test(s))return '="'+s+'"';return '"'+s.split('"').join('""')+'"'};
 const act={out:()=>{clearInterval(CD);if($('idm'))$('idm').remove();try{google.script.run.logout(S.token)}catch(e){}S.token=null;$('app').classList.add('hidden');const m=document.createElement('div');m.className='mod';m.innerHTML='<div style="max-width:430px;padding:32px;text-align:center"><h3 style="color:var(--navy);margin-bottom:8px">You have been signed out</h3><p style="color:var(--mut)">For your security, please refresh the page before signing in again.</p><div><button class="btn" onclick="location.reload()" style="margin-top:8px">Refresh page</button></div></div>';document.body.appendChild(m)},
@@ -2398,6 +2398,7 @@ function menuFor(){
   {g:'Operations & Management',i:I.adm,items:[['adm','Admission Operations',I.adm],['pipe','Application Pipeline',I.rep],['fl','Holds Management',I.flag],['sch','Scholarships',I.sch],['tf','Schedule of Fees',I.tf]]},
   {g:'Institutional Resources',i:I.book,items:[...guides,...(F?[['gd','Enrollment Guide',I.rep]]:[])]},
   {g:'Communication',i:I.mega,items:[['ev','Campus Bulletin',I.cal],['faq','Help Center & FAQs',I.help]]},
+  ...(F?[{g:'Website',i:I.web,items:[['web','Website Management',I.web]]}]:[]),
   ...(SYS()?[{g:'System Administration',i:I.cal,items:[['um','User Management',I.users],['set','Enrollment Settings',I.cal],['ia','ID Artwork',I.sch]]}]:[]),
   ['me','My Profile',I.me]];
  return[
@@ -2463,6 +2464,100 @@ document.addEventListener('change',e=>{if(e.target.id!=='galf')return;const f=e.
   const cap=prompt('Caption for this photo (optional, max 120 characters):','');if(cap===null)return;
   call('addGalleryPhoto',[T(),c.id,url,cap],r=>{c.gal=r.data.list;S.gp[r.data.id]=url;toast(r.message);if(S.cp===c)galDraw()})};
  im.src=URL.createObjectURL(f)});
+
+/* ===== Website Management: edit the public homepage without touching Homepage.html ===== */
+const WS_NAMES={admission:'Admission steps',about:'About Moreh Academy preview',programs:'Academic programs',news:'News & announcements'},
+ WS_LISTS={
+  ids:{p:'masthead.ids',n:'School',make:()=>({name:'',short:'',logo:'',fb:''})},
+  slides:{p:'hero.slides',n:'Slide',make:()=>''},
+  values:{p:'values.items',n:'Value',make:()=>({label:'',icon:'★',on:true})},
+  steps:{p:'admission.steps',n:'Step',make:()=>({t:'',d:'',i:'•'})},
+  programs:{p:'programs.items',n:'Program',make:()=>({name:'',desc:'',on:true})},
+  news:{p:'news.items',n:'Item',make:()=>({title:'',date:'',summary:'',link:''})}};
+S.site=null;S.siteMeta=null;
+const wspGet=(o,p)=>p.split('.').reduce((v,k)=>v==null?undefined:v[k],o);
+const wspSet=(o,p,v)=>{const a=p.split('.'),last=a.pop();let t=o;a.forEach(k=>{t=t[k]});t[last]=v};
+const wf=(label,path,val,type)=>`<div class="f"><label>${esc(label)}</label><input data-sp="${path}" type="${type||'text'}" value="${esc(val==null?'':val)}"></div>`;
+const wt=(label,path,val)=>`<div class="f"><label>${esc(label)}</label><textarea data-sp="${path}" rows="3">${esc(val==null?'':val)}</textarea></div>`;
+const wc=(label,path,val)=>`<label style="display:flex;gap:8px;align-items:center;margin-top:22px"><input type="checkbox" data-sp="${path}" ${val?'checked':''}> ${esc(label)}</label>`;
+const wrow=(key,i,name,inner)=>`<div style="border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><b>${esc(name)} ${i+1}</b><span style="display:flex;gap:6px"><button class="btn alt" data-act="wsmove" data-v="${key}:${i}:-1" title="Move up" aria-label="Move up">↑</button><button class="btn alt" data-act="wsmove" data-v="${key}:${i}:1" title="Move down" aria-label="Move down">↓</button><button class="btn red" data-act="wsdel" data-v="${key}:${i}">Remove</button></span></div><div class="g">${inner}</div></div>`;
+const wcard=(key,title,body,note)=>`<div class="card"><div class="ch"><h3>${esc(title)}</h3><span><button class="btn alt" data-act="wsadd" data-v="${key}">+ Add</button></span></div>${note?`<p style="color:var(--mut);margin:-6px 0 12px">${esc(note)}</p>`:''}${body||'<p style="color:var(--mut);margin-bottom:0">None yet — use “+ Add”.</p>'}</div>`;
+
+/* Inner pages: one textarea per route, saved together. Plain text becomes the block list the
+   homepage already renders (## heading, - bullet, ![alt](url) photo). */
+function pgsCard(){
+ const g=S.pg;if(!g)return '<div class="card"><div class="ch"><h3>Inner pages</h3></div><p style="color:var(--mut);margin-bottom:0">Loading pages…</p></div>';
+ const opt=(v,l)=>`<option value="${esc(v)}" ${v===g.route?'selected':''}>${esc(l)}</option>`;
+ const groups=g.cat.map(m=>`<optgroup label="${esc(m.label)}">${m.noRoot?'':opt(m.id,m.label+' (overview)')}${m.subs.map(s=>opt(s.r,s.label)).join('')}</optgroup>`).join('');
+ const txt=g.text[g.route]||'',live=Object.keys(g.text).some(k=>g.text[k]);
+ return `<div class="card"><div class="ch"><h3>Inner pages</h3><span class="chip ${live?'ok':'warn'}">${live?'Saved copy is live':'Built-in text'}</span></div>
+  <p style="color:var(--mut);margin-top:0">The pages in the homepage menu below the sections above. A page with nothing saved shows its built-in cards and “Content coming soon”.</p>
+  <div class="f"><label for="pgSel">Page</label><select id="pgSel">${groups}</select></div>
+  <div class="f"><label for="pgTxt">Content</label><textarea id="pgTxt" rows="14" maxlength="6000" placeholder="Write this page here.&#10;&#10;## A heading&#10;A paragraph with **bold**, *italic* and [a link](https://example.com).&#10;- a bullet&#10;&#10;![Photo caption](https://example.com/photo.jpg)">${esc(txt)}</textarea></div>
+  <p style="color:var(--mut);font-size:13px;margin-top:6px">Start a line with <b>##</b> for a heading, <b>-</b> for a bullet and <b>![alt](https://…)</b> for a photo. Blank lines separate paragraphs.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="pgsave">Save pages</button><button class="btn alt" data-act="pgreload">Discard changes</button><button class="btn red" data-act="pgreset">Reset all pages</button></div>
+  ${g.meta&&g.meta.updatedAt?`<p style="color:var(--mut);font-size:13px;margin-bottom:0">Last saved ${esc(new Date(g.meta.updatedAt).toLocaleString())} by ${esc(g.meta.updatedBy||'—')}.</p>`:''}</div>`;
+}
+function websitePage(){
+ head('Website Management','Edit the public homepage and its inner pages. Saved changes go live immediately.');
+ call('getSiteAdmin',[T()],r=>{
+  S.site=r.data.sections;S.siteMeta=r.data;
+  call('getPagesAdmin',[T()],p=>{
+   const cat=p.data.catalogue,first=cat.filter(g=>g.subs.length)[0];
+   S.pg={cat:cat,route:(S.pg&&S.pg.route)||(first?first.subs[0].r:'contact'),text:p.data.pages,meta:p.data};
+   wsRender();
+  },m=>{S.pg=null;wsRender();toast(m)});
+ });
+}
+function wsRender(){
+ const d=S.site,m=S.siteMeta||{},home=m.home||'';
+ $('view').innerHTML=[
+  `<div class="card"><div class="ch"><h3>Homepage content</h3><span class="chip ${m.saved?'ok':'warn'}">${m.saved?'Saved copy is live':'Built-in defaults'}</span></div>
+   <p style="color:var(--mut);margin-top:0">This edits the public homepage${home?' at <b>'+esc(home)+'</b>':''}. It is stored in the Content sheet; nothing else in the portal changes.</p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="wssave">Save &amp; publish</button><button class="btn alt" data-act="wsreload">Discard changes</button>${home?'<button class="btn alt" data-act="wsview">Open homepage</button>':''}<button class="btn red" data-act="wsreset">Reset to defaults</button></div>
+   ${m.updatedAt?`<p style="color:var(--mut);font-size:13px;margin-bottom:0">Last saved ${esc(new Date(m.updatedAt).toLocaleString())} by ${esc(m.updatedBy||'—')}.</p>`:''}</div>`,
+  `<div class="card"><div class="ch"><h3>School identity</h3></div><div class="g">${wf('Tagline','masthead.tagline',d.masthead.tagline)}</div></div>`,
+  wcard('ids','Schools in the top bar',(d.masthead.ids||[]).map((x,i)=>wrow('ids',i,WS_LISTS.ids.n,
+   wf('School name','masthead.ids.'+i+'.name',x.name)+wf('Short name (2–4 letters)','masthead.ids.'+i+'.short',x.short)+wf('Logo image URL','masthead.ids.'+i+'.logo',x.logo)+wf('Facebook page URL','masthead.ids.'+i+'.fb',x.fb))).join(''),'The logo is optional; the short name is shown when there is none.'),
+  `<div class="card"><div class="ch"><h3>Hero (top of the homepage)</h3></div><div class="g">${wf('Small line above the name','hero.title',d.hero.title)}${wf('School name (large)','hero.name',d.hero.name)}${wf('Subtitle','hero.subtitle',d.hero.subtitle)}${wt('Description','hero.desc',d.hero.desc)}${wf('Main button label','hero.enroll.label',d.hero.enroll.label)}${wf('Main button link (#create, route:about, https://…)','hero.enroll.to',d.hero.enroll.to)}${wf('Second button label','hero.discover.label',d.hero.discover.label)}${wf('Second button link','hero.discover.to',d.hero.discover.to)}${wf('Slide interval (milliseconds)','hero.intervalMs',d.hero.intervalMs,'number')}</div></div>`,
+  wcard('slides','Hero slides',(d.hero.slides||[]).map((x,i)=>wrow('slides',i,WS_LISTS.slides.n,wf('Image URL (empty = coloured background)','hero.slides.'+i,x))).join(''),'An empty slide keeps the built-in blue and orange background.'),
+  wcard('values','Our values strip',(d.values.items||[]).map((x,i)=>wrow('values',i,WS_LISTS.values.n,wf('Label','values.items.'+i+'.label',x.label)+wf('Icon (emoji)','values.items.'+i+'.icon',x.icon)+wc('Show','values.items.'+i+'.on',x.on))).join('')),
+  `<div class="card"><div class="ch"><h3>Admission process</h3></div><div class="g">${wf('Section title','admission.title',d.admission.title)}${wf('Section subtitle','admission.sub',d.admission.sub)}</div></div>`,
+  wcard('steps','Admission steps',(d.admission.steps||[]).map((x,i)=>wrow('steps',i,WS_LISTS.steps.n,wf('Step title','admission.steps.'+i+'.t',x.t)+wt('Description','admission.steps.'+i+'.d',x.d)+wf('Icon (emoji)','admission.steps.'+i+'.i',x.i))).join(''),'They are numbered automatically, in the order shown here.'),
+  `<div class="card"><div class="ch"><h3>About preview</h3></div><div class="g">${wf('Heading','about.heading',d.about.heading)}${wt('Paragraph','about.text',d.about.text)}${wf('Link label','about.linkLabel',d.about.linkLabel)}${wf('Photo URL','about.photo',d.about.photo)}</div></div>`,
+  `<div class="card"><div class="ch"><h3>Academic programs</h3></div><div class="g">${wf('Section title','programs.title',d.programs.title)}</div></div>`,
+  wcard('programs','Program cards',(d.programs.items||[]).map((x,i)=>wrow('programs',i,WS_LISTS.programs.n,wf('Program','programs.items.'+i+'.name',x.name)+wt('Description','programs.items.'+i+'.desc',x.desc)+wc('Show','programs.items.'+i+'.on',x.on))).join('')),
+  `<div class="card"><div class="ch"><h3>News &amp; announcements</h3></div><div class="g">${wf('Section title','news.title',d.news.title)}</div></div>`,
+  wcard('news','Announcements',(d.news.items||[]).map((x,i)=>wrow('news',i,WS_LISTS.news.n,wf('Title','news.items.'+i+'.title',x.title)+wf('Date (e.g. 12 Aug 2026)','news.items.'+i+'.date',x.date)+wt('Summary','news.items.'+i+'.summary',x.summary)+wf('Read-more link','news.items.'+i+'.link',x.link))).join(''),'With no announcements the homepage shows a short “No announcements yet” card.'),
+  `<div class="card"><div class="ch"><h3>Footer &amp; contact</h3></div><div class="g">${wf('Address','footer.loc',d.footer.loc)}${wf('Phone','footer.phone',d.footer.phone)}${wf('Email','footer.email',d.footer.email)}${wf('Facebook URL','footer.fb',d.footer.fb)}${wf('YouTube URL','footer.yt',d.footer.yt)}</div></div>`,
+  `<div class="card"><div class="ch"><h3>Section order &amp; visibility</h3></div><div class="g" style="grid-template-columns:1fr">${(d.display.order||[]).map((k,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)"><b style="flex:1">${esc(WS_NAMES[k]||k)}</b><button class="btn alt" data-act="wsmove" data-v="order:${i}:-1" aria-label="Move up">↑</button><button class="btn alt" data-act="wsmove" data-v="order:${i}:1" aria-label="Move down">↓</button><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-act="wstoggle" data-v="${k}" ${((d.display.hidden||[]).indexOf(k)<0)?'checked':''}> Show</label></div>`).join('')}<label style="display:flex;gap:8px;align-items:center;padding:10px 0"><input type="checkbox" data-act="wstoggle" data-v="values" ${((d.display.hidden||[]).indexOf('values')<0)?'checked':''}> Show the “Our values” strip above the sections</label></div></div>`,
+  `<div class="card"><div class="ch"><h3>Menu &amp; page cards</h3></div>
+   <p style="color:var(--mut);margin-top:0">The six menus in the top bar and the cards on each group page. Renaming a card keeps its address and its saved content.</p>
+   ${((d.nav&&d.nav.menus)||[]).map((m,i)=>`<div style="border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px">
+     <b>Menu ${i+1}</b>
+     <div class="g">${wf('Menu name','nav.menus.'+i+'.label',m.label)}${wf('Menu description','nav.menus.'+i+'.lead',m.lead)}</div>
+     ${(m.subs||[]).map((x,j)=>`<div style="border-top:1px solid var(--line);margin-top:12px;padding-top:12px"><b style="font-size:13px;color:var(--mut)">Card ${j+1}</b><div class="g">${wf('Card title','nav.menus.'+i+'.subs.'+j+'.label',x.label)}${wf('Card description','nav.menus.'+i+'.subs.'+j+'.lead',x.lead)}${wf('Icon (emoji)','nav.menus.'+i+'.subs.'+j+'.icon',x.icon)}</div></div>`).join('')}
+    </div>`).join('')}</div>`,
+  pgsCard()
+ ].join('');
+ wsBind();
+}
+function wsBind(){const v=$('view');v.querySelectorAll('[data-sp]').forEach(el=>{const h=()=>{wspSet(S.site,el.dataset.sp,el.type==='checkbox'?el.checked:el.value)};el.oninput=h;el.onchange=h});
+ const sel=$('pgSel'),ta=$('pgTxt');
+ if(sel&&S.pg)sel.onchange=()=>{S.pg.route=sel.value;wsRender()};
+ if(ta&&S.pg)ta.oninput=()=>{S.pg.text[S.pg.route]=ta.value};
+}
+act.wsadd=k=>{const L=WS_LISTS[k];if(!L)return;const a=wspGet(S.site,L.p);if(!Array.isArray(a))return;a.push(L.make());wsRender()};
+act.wsdel=v=>{const p=String(v).split(':'),L=WS_LISTS[p[0]];if(!L)return;const a=wspGet(S.site,L.p);if(!Array.isArray(a))return;a.splice(+p[1],1);wsRender()};
+act.wsmove=v=>{const p=String(v).split(':'),k=p[0],i=+p[1],step=+p[2],a=k==='order'?S.site.display.order:wspGet(S.site,WS_LISTS[k].p);if(!Array.isArray(a))return;const j=i+step;if(j<0||j>=a.length)return;const t=a[i];a[i]=a[j];a[j]=t;wsRender()};
+act.wstoggle=k=>{const dp=S.site.display,h=dp.hidden||(dp.hidden=[]),i=h.indexOf(k);if(i<0)h.push(k);else h.splice(i,1);wsRender()};
+act.wssave=()=>call('saveSiteAdmin',[T(),S.site],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()});
+act.wsreload=()=>{if(confirm('Discard unsaved changes?'))websitePage()};
+act.wsview=()=>{if(S.siteMeta&&S.siteMeta.home)window.open(S.siteMeta.home,'_blank','noopener')};
+act.wsreset=()=>{if(!confirm('Return the homepage to its built-in content? The saved copy is removed and the built-in text is shown again.'))return;call('resetSiteAdmin',[T()],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()})};
+act.pgsave=()=>{if(!S.pg)return;call('savePagesAdmin',[T(),S.pg.text],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
+act.pgreload=()=>{if(confirm('Discard unsaved page changes?'))websitePage()};
+act.pgreset=()=>{if(!S.pg)return;if(!confirm('Remove the saved copy of every inner page? They go back to their built-in text.'))return;call('resetPagesAdmin',[T()],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
 
 /* ===== Scoop-style sidebar: replaces navBtn, renderNav and act.ngtoggle ===== */
 // Optional badges. Key = menu id or group name. c = r (red) | y (yellow) | g (green)
