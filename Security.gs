@@ -96,8 +96,12 @@ function addUser_(username, password, role, fullName, studentId, email, mustChan
   put_(sh, sh.getLastRow() + 1, 1, [UCOLS.map(c => o[c])]);
 }
 function pub_(u) {
+  const hit = u.StudentID ? findRow_('S', 'StudentID', u.StudentID) : null, s = (hit && hit.o) || null;
+  // Enrollee = a student account that is not enrolled yet (new enrollees and returning learners re-enrolling).
+  // The browser shows them the limited enrollee portal; once the office marks them Enrolled, the flag turns off.
+  const enrollee = u.Role === 'student' && !!s && (!s.EnrollStatus || s.EnrollStatus === 'Not Enrolled');
   return { Username:u.Username, Role:u.Role, FullName:u.FullName, Designation:u.Designation, Department:u.Department, Clearance:u.Clearance,
-    Email:u.Email || ((findRow_('S', 'StudentID', u.StudentID) || {}).o || {}).Email || '', StudentID:u.StudentID, Photo:photo_(u.PhotoID), MustChange:u.MustChange || '' };
+    Email:u.Email || (s && s.Email) || '', StudentID:u.StudentID, Photo:photo_(u.PhotoID), MustChange:u.MustChange || '', Enrollee:enrollee ? '1' : '' };
 }
 
 /* ---------- sessions (versioned, sliding) ---------- */

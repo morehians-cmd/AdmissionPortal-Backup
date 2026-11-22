@@ -235,7 +235,7 @@ function saveStudent(token, rec) {
     if (!admin && old && appLocked_(old)) throw new Error('Your Online Enrollment Form is ' + (appStatusOf_(old) === 'Declined' ? 'closed (application declined)' : 'locked while it is ' + appStatusOf_(old).toLowerCase()) + '. Please contact the Admission Office if something needs to be corrected.');
     row = old ? Object.assign({}, old) : {}; oldStatus = old ? old.EnrollStatus : ''; isNew = !old;
     FIELDS.forEach(f => { if (f[3]==='auto'||(!admin&&!stuCan_(f))) return; row[f[1]] = String(rec[f[1]]==null?'':rec[f[1]]).trim(); if (f[3]==='txt' && !/(Email|Facebook)$/.test(f[1])) row[f[1]] = row[f[1]].toUpperCase(); });
-    if (!admin && old && old.EnrollStatus === 'Enrolled') IDLOCK.forEach(k => row[k] = old[k]);   // identity lock (Hardening)
+    if (!admin && old && old.EnrollStatus === 'Enrolled') IDLOCK.forEach(k => { if (old[k]) row[k] = old[k]; });   // identity lock (Hardening): filled values are locked; a blank one (e.g. birth date of a self-registered current student) may still be completed once
     if (!row.EnrollStatus) row.EnrollStatus = 'Not Enrolled';
     if (isNew) row.ApplicationStatus = 'Submitted';   // staff-encoded walk-in: nothing for the enrollee to submit; goes straight to review
     if (row.Email && !EMAIL_RE.test(row.Email)) throw new Error('Enter a valid student email address.');

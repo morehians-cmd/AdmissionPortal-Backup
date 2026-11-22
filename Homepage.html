@@ -161,7 +161,8 @@ img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflo
   <p class="err" id="siErr" role="alert"></p>
   <button class="btn blue" id="siGo" style="width:100%">Sign in</button>
   <button class="swap" data-swap="mForgot">Forgot password?</button><br>
-  <button class="swap" data-swap="mCreate">No account yet? Create one</button>
+  <button class="swap" data-swap="mCreate">New enrollee? Create an account</button><br>
+  <button class="swap" data-swap="mCurrent">Current student? Create your account</button>
 </div></div>
 <div class="modal" id="mCreate" role="dialog" aria-modal="true" aria-labelledby="caT"><div class="box">
   <button class="x" data-close aria-label="Close">×</button><h2 id="caT">Create account</h2>
@@ -187,6 +188,30 @@ img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflo
   <label class="chk"><input type="checkbox" id="caTerms"><span>I agree to the <a id="lnkTerms" href="#" target="_blank" rel="noopener">Terms of Service</a> and <a id="lnkPriv" href="#" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>
   <p class="err" id="caErr" role="alert"></p>
   <button class="btn blue" id="caGo" style="width:100%">Create account</button>
+  <button class="swap" data-swap="mCurrent">Already enrolled at Moreh? Current student account</button><br>
+  <button class="swap" data-swap="mSignin">Already registered? Sign in</button>
+</div></div>
+<div class="modal" id="mCurrent" role="dialog" aria-modal="true" aria-labelledby="cuT"><div class="box">
+  <button class="x" data-close aria-label="Close">×</button><h2 id="cuT">Current student account</h2>
+  <p class="note">For learners who are already enrolled at Moreh Academy. New to Moreh? Use <button class="swap" type="button" data-swap="mCreate" style="display:inline">New enrollee account</button> instead.</p>
+  <div class="f"><label for="cuSurname">Surname</label><input id="cuSurname" autocomplete="family-name"></div>
+  <div class="f"><label for="cuFirst">First name</label><input id="cuFirst" autocomplete="given-name"></div>
+  <div class="f"><label for="cuMiddle">Middle name</label><input id="cuMiddle" autocomplete="additional-name"></div>
+  <div class="f"><label for="cuLrn">LRN (12 digits)</label><input id="cuLrn" inputmode="numeric" maxlength="12" placeholder="123456789012"></div>
+  <div class="f"><label for="cuGrade">Grade level</label><select id="cuGrade"><option value="">Select grade level</option></select></div>
+  <div class="f"><label for="cuSection">Section</label><select id="cuSection" disabled><option value="">Select grade level first</option></select></div>
+  <div class="f"><label for="cuCat">Category</label><select id="cuCat"><option value="">Select category</option></select></div>
+  <div class="f" id="cuTlcBox" style="display:none"><label for="cuTlc">TLC ID number</label><input id="cuTlc" maxlength="13" autocapitalize="characters" spellcheck="false" placeholder="TLC2026-0001">
+    <p class="note" id="cuTlcNote">Enter your current TLC ID number, the same one reported to the TLC Office. It will be used as is for your school ID.</p></div>
+  <div class="f"><label for="cuUser">Username (you will sign in with this)</label><input id="cuUser" autocomplete="username" maxlength="30" autocapitalize="none" spellcheck="false"></div>
+  <p class="note">4 to 30 characters: letters, numbers, dot, underscore or hyphen. No spaces and no @.</p>
+  <div class="f"><label for="cuMail">Email (for notices and password reset codes)</label><input id="cuMail" type="email" autocomplete="email"></div>
+  <div class="f"><label for="cuPass">Password</label><input id="cuPass" type="password" autocomplete="new-password"></div>
+  <p class="note">8 or more characters, with at least one letter and one number.</p>
+  <div class="f"><label for="cuPass2">Confirm password</label><input id="cuPass2" type="password" autocomplete="new-password"></div>
+  <label class="chk"><input type="checkbox" id="cuTerms"><span>I agree to the <a id="lnkTerms2" href="#" target="_blank" rel="noopener">Terms of Service</a> and <a id="lnkPriv2" href="#" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>
+  <p class="err" id="cuErr" role="alert"></p>
+  <button class="btn blue" id="cuGo" style="width:100%">Create student account</button>
   <button class="swap" data-swap="mSignin">Already registered? Sign in</button>
 </div></div>
 <div class="modal" id="mVerify" role="dialog" aria-modal="true" aria-labelledby="vT"><div class="box">
@@ -219,7 +244,7 @@ img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflo
 <script>
 /* ===== Backend hooks. Sign-in functions live in Auth.gs. createAccount is still a placeholder (item 3, later). ===== */
 /* Auth is Old AP's single account system, reached through HomepageBridge.gs. */
-var API={getHomepage:'getPublishedHomepage',getDraft:'getDraftHomepage',getPage:'getPublishedPage',getPageDraft:'getDraftPage',getPolicy:'getPublishedPolicy',signIn:'homepageSignIn',signOut:'homepageSignOut',whoAmI:'',register:'homepageRegister',verify:'homepageVerifyCode',confirmReg:'homepageConfirmRegistration',forgot:'homepageForgotPassword',reset:'homepageResetPassword'};
+var API={getHomepage:'getPublishedHomepage',getDraft:'getDraftHomepage',getPage:'getPublishedPage',getPageDraft:'getDraftPage',getPolicy:'getPublishedPolicy',signIn:'homepageSignIn',signOut:'homepageSignOut',whoAmI:'',register:'homepageRegister',registerCur:'homepageRegisterCurrent',confirmCur:'homepageConfirmCurrent',curOpts:'currentStudentOptions',verify:'homepageVerifyCode',confirmReg:'homepageConfirmRegistration',forgot:'homepageForgotPassword',reset:'homepageResetPassword'};
 
 /* ===== Content model (Phase 2 will load this from Sheets, published copy) ===== */
 var DEFAULT_HOME={
@@ -251,6 +276,7 @@ var APP_BASE='<?= baseUrl ?>';
 var APP_PAGE='<?= page ?>';
 var APP_PREVIEW='<?= preview ?>';
 var APP_TICKET='<?= ticket ?>';
+var APP_OPEN='<?= open ?>';
 var HOME=DEFAULT_HOME,$=function(i){return document.getElementById(i)};
 function safeUrl(u){return /^(https?:|mailto:|#|route:)/i.test(u||'')?u:'#'}
 function esc(s){var d=document.createElement('div');d.textContent=s==null?'':s;return d.innerHTML.replace(/"/g,'&quot;')}
@@ -383,7 +409,7 @@ function render(){
  $('values').innerHTML=h.values.filter(function(v){return v.on}).map(function(v){return '<li><span class="ic" aria-hidden="true">'+esc(v.icon)+'</span>'+esc(v.label)+'</li>'}).join('');
  var r=cur_route(),home=(r==='home');$('hero').hidden=!home;$('homepage-values').hidden=!home||((HOME.display||{}).hidden||[]).indexOf('values')>-1;if(APP_PREVIEW&&!$('pvBar')){var pb=document.createElement('div');pb.id='pvBar';pb.textContent='Draft preview. Visitors do not see this version.';pb.style.cssText='background:#FF941F;color:#062E70;text-align:center;font:700 13px Poppins,sans-serif;padding:6px';document.body.insertBefore(pb,document.body.firstChild)}$('sections').innerHTML=home?renderHome():renderPage(r);document.title=(home?'Moreh Academy':pageInfo(r).title+' | Moreh Academy');if(!home)window.scrollTo(0,0);
  $('fLoc').textContent=h.footer.loc;$('fPhone').textContent=h.footer.phone;$('fMail').textContent=h.footer.email;$('fMail').href='mailto:'+h.footer.email;
- $('fCopy').textContent='© '+new Date().getFullYear()+' Moreh Academy. All rights reserved.'; $('lnkTerms').href=link('terms');$('lnkPriv').href=link('privacy');
+ $('fCopy').textContent='© '+new Date().getFullYear()+' Moreh Academy. All rights reserved.'; $('lnkTerms').href=link('terms');$('lnkPriv').href=link('privacy');$('lnkTerms2').href=link('terms');$('lnkPriv2').href=link('privacy');
  bindNav();if(home)initCarousel();else clearInterval(timer);
 }
 
@@ -475,7 +501,7 @@ function cool(sec){var b=$('vResend'),s=sec;clearInterval(rsT);b.disabled=true;b
 function ageFrom(iso){if(!/^\d{4}-\d{2}-\d{2}$/.test(iso||''))return '';var d=new Date(iso),n=new Date(),a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;return a>=0&&a<=120?a:''}
 function caGuard(){var box=$('caGuardBox'),a=ageFrom($('caBirth').value);if(box)box.style.display=(a!==''&&a<18)?'block':'none'}
 function startVerify(msg){$('vMsg').textContent=msg||('Enter the 6-digit code we sent to '+PEND.email+'.');$('vCode').value='';$('vErr').textContent='';openM('mVerify');cool(60);
- $('vResend').style.visibility=(PEND.mode==='reg')?'visible':'hidden'}
+ $('vResend').style.visibility=(PEND.mode==='reg'||PEND.mode==='cur')?'visible':'hidden'}
 $('caGo').onclick=function(){
  var sn=$('caSurname').value.trim(),fn=$('caFirst').value.trim(),lrn=$('caLrn').value.trim(),bd=$('caBirth').value,un=$('caUser').value.trim().toLowerCase(),m=$('caMail').value.trim(),mo=$('caMobile').value.trim(),p=$('caPass').value,p2=$('caPass2').value,bad=[],msg='',age=ageFrom(bd);
  if(sn.length<1)bad.push('caSurname');if(fn.length<1)bad.push('caFirst');if(!/^[1-5]\d{11}$/.test(lrn))bad.push('caLrn');if(age==='')bad.push('caBirth');
@@ -497,7 +523,7 @@ $('caGo').onclick=function(){
   function(e){busyBtn(b,false);$('caErr').textContent=e})};
 $('vGo').onclick=function(){var c=$('vCode').value.replace(/\D/g,'');if(c.length!==6){$('vErr').textContent='Enter the 6-digit code.';return}
  var b=this;busyBtn(b,true,'Verifying…');
- var fn=(PEND.mode==='otp')?API.verify:API.confirmReg;
+ var fn=(PEND.mode==='otp')?API.verify:(PEND.mode==='cur'?API.confirmCur:API.confirmReg);
  call(fn,[PEND.challenge,c],function(r){busyBtn(b,false);
   if(!r||r.success!==true){$('vErr').textContent=(r&&r.error)||'Verification failed.';return}
   if(PEND.mode==='otp'&&r.token){saveToken(r.token);closeM();goPortal();return}
@@ -506,8 +532,8 @@ $('vGo').onclick=function(){var c=$('vCode').value.replace(/\D/g,'');if(c.length
   toast(r.message||'Email verified. Please sign in.');openM('mSignin')},
   function(e){busyBtn(b,false);$('vErr').textContent=e})};
 $('vResend').onclick=function(){
- if(PEND.mode!=='reg'||!PEND.form){$('vErr').textContent='Use "Forgot password?" if you need a new sign-in code.';return}
- call(API.register,[PEND.form],function(r){
+ if((PEND.mode!=='reg'&&PEND.mode!=='cur')||!PEND.form){$('vErr').textContent='Use "Forgot password?" if you need a new sign-in code.';return}
+ call(PEND.mode==='cur'?API.registerCur:API.register,[PEND.form],function(r){
   if(!r||r.success!==true){$('vErr').textContent=(r&&r.error)||'Could not send the code.';return}
   if(r.challenge){PEND.challenge=r.challenge;cool(60)}
   $('vErr').textContent='';toast(r.message||'A new code was sent.')},function(e){$('vErr').textContent=e})};
@@ -529,6 +555,41 @@ $('rGo').onclick=function(){var c=$('rCode').value.replace(/\D/g,''),p=$('rPass'
 document.querySelectorAll('.modal input').forEach(function(i){i.addEventListener('keydown',function(e){
  if(e.key==='Enter'&&i.type!=='checkbox'){var b=i.closest('.box').querySelector('.btn.blue');if(b)b.click()}})});
 
+/* ===== Current student account (CurrentStudent.gs) ===== */
+var CUR={opt:null,loading:false};
+function curFill(){var o=CUR.opt;if(!o)return;
+ var g=$('cuGrade');if(g.options.length<=1)o.grades.forEach(function(x){var e=document.createElement('option');e.value=x;e.textContent=x;g.appendChild(e)});
+ var c=$('cuCat');if(c.options.length<=1)o.categories.forEach(function(x){var e=document.createElement('option');e.value=x.v;e.textContent=x.l;e.dataset.tlc=x.tlc?'1':'';c.appendChild(e)});
+ $('cuTlcNote').textContent='Enter your current TLC ID number, the same one reported to the TLC Office for SY '+String(o.sy).replace('-','\u2013')+'. It will be used as is for your school ID.'}
+function curInit(){if(CUR.opt){curFill();return}if(CUR.loading)return;CUR.loading=true;
+ call(API.curOpts,[],function(r){CUR.loading=false;var d=r&&r.success?r.data:null;if(!d){$('cuErr').textContent='Could not load the grade levels. Please try again.';return}CUR.opt=d;curFill()},
+  function(m){CUR.loading=false;$('cuErr').textContent=m})}
+var _openMCur=openM;openM=function(id){_openMCur(id);if(id==='mCurrent')curInit()};
+$('cuGrade').onchange=function(){var s=$('cuSection'),g=this.value,L=(CUR.opt&&CUR.opt.sections[g])||[];s.innerHTML='';
+ var d=document.createElement('option');d.value='';d.textContent=g?'Select section':'Select grade level first';s.appendChild(d);
+ if(g==='Grade 11'||g==='Grade 12'){var grp={};L.forEach(function(x){(grp[x[1]]=grp[x[1]]||[]).push(x[0])});
+  Object.keys(grp).forEach(function(k){var og=document.createElement('optgroup');og.label=k+' \u2013 '+(CUR.opt.clusters[k]||'');grp[k].forEach(function(n){var e=document.createElement('option');e.value=n;e.textContent=n;og.appendChild(e)});s.appendChild(og)})}
+ else L.forEach(function(x){var e=document.createElement('option');e.value=x[0];e.textContent=x[0];s.appendChild(e)});
+ s.disabled=!g};
+$('cuCat').onchange=function(){var o=this.options[this.selectedIndex],on=!!(o&&o.dataset.tlc);$('cuTlcBox').style.display=on?'block':'none';if(!on)$('cuTlc').value=''};
+$('cuGo').onclick=function(){
+ var v=function(i){return $(i).value.trim()},sn=v('cuSurname'),fn=v('cuFirst'),mn=v('cuMiddle'),lrn=v('cuLrn'),gr=v('cuGrade'),sec=v('cuSection'),cat=v('cuCat'),tlc=v('cuTlc').toUpperCase(),
+  un=v('cuUser').toLowerCase(),m=v('cuMail'),p=$('cuPass').value,p2=$('cuPass2').value,bad=[],msg='',tlcOn=$('cuTlcBox').style.display!=='none';
+ if(!sn)bad.push('cuSurname');if(!fn)bad.push('cuFirst');if(!/^[1-5]\d{11}$/.test(lrn))bad.push('cuLrn');if(!gr)bad.push('cuGrade');if(!sec)bad.push('cuSection');if(!cat)bad.push('cuCat');
+ if(tlcOn&&!/^TLC\d{4}-\d{4}$/.test(tlc))bad.push('cuTlc');
+ if(!/^[a-z0-9][a-z0-9._-]{3,29}$/.test(un))bad.push('cuUser');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m))bad.push('cuMail');if(pwBad(p))bad.push('cuPass');if(p2!==p)bad.push('cuPass2');
+ if(bad.length)msg=bad.indexOf('cuTlc')>-1?'Enter your TLC ID number exactly as issued, like TLC2026-0001.':(bad.length===1&&bad[0]==='cuPass2')?'Passwords do not match.':bad.indexOf('cuPass')>-1?PWRULE:bad.indexOf('cuUser')>-1?'Choose a username of 4 to 30 characters: letters, numbers, dot, underscore or hyphen.':'Complete all fields. LRN must be 12 digits and start with 1-5.';
+ else if(!$('cuTerms').checked)msg='Please accept the Terms of Service and Privacy Policy.';
+ mark(['cuSurname','cuFirst','cuLrn','cuGrade','cuSection','cuCat','cuTlc','cuUser','cuMail','cuPass','cuPass2'],bad);$('cuErr').textContent=msg;if(msg)return;
+ var b=this;busyBtn(b,true,'Creating\u2026');
+ PEND.form={surname:sn,firstName:fn,middleName:mn,lrn:lrn,grade:gr,section:sec,category:cat,tlcId:tlc,username:un,email:m,password:p,consent:true};
+ call(API.registerCur,[PEND.form],function(r){busyBtn(b,false);
+  if(!r||r.success!==true){$('cuErr').textContent=(r&&r.error)||'Could not create the account.';return}
+  $('cuPass').value=$('cuPass2').value='';
+  if(!r.challenge){closeM();$('siUser').value=un;toast(r.message||'Account created. Please sign in.');openM('mSignin');return}
+  PEND.mode='cur';PEND.email=m;PEND.user=un;PEND.challenge=r.challenge;startVerify(r.message||('Enter the 6-digit code we sent to '+m+'.'))},
+  function(e){busyBtn(b,false);$('cuErr').textContent=e})};
+
 function loadPolicy(){HOME.policy=null;PG.loading=cur_route();
  call(API.getPolicy,[],function(h){HOME.policy=h||'';PG.loading='';render()},function(){HOME.policy='';PG.loading='';render()})}
 window.addEventListener('hashchange',function(){if(APP_PAGE)return;if(cur_route()==='privacy'){loadPolicy();return}render()});
@@ -540,6 +601,8 @@ PG.loading=(cur_route()!=='home')?cur_route():'';render();
   function(m){PG.loading='';render();if(APP_PREVIEW)toast(m,true)})})();
 /* The website's Privacy page reads the policy the portal stores, not a copy of its own. */
 if(cur_route()==='privacy')loadPolicy();
+/* Arriving from the portal (signed out / expired) or from a Create-account link: open the matching pop-up. */
+if(APP_OPEN==='signin')openM('mSignin');else if(APP_OPEN==='create')openM('mCreate');else if(APP_OPEN==='current')openM('mCurrent');
 /* Sessions are held by the portal; the homepage only signs in and hands over. */
 call(APP_PREVIEW?API.getDraft:API.getHomepage,APP_PREVIEW?[APP_TICKET]:[],function(d){applyContent(d);render()},function(m){if(APP_PREVIEW)toast(m,true)});
 </script>
