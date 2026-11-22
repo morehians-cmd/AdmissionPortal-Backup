@@ -2922,7 +2922,7 @@ tbMeasure();
 function bnInit(){const L=OFC()?[['Desk','fl',I.flag],['Bulletin','ev',I.cal],['Profile','me',I.me]]
  :!A()?[['Home','home',I.home],['Enrollment','sp,rq,sch,tf',I.adm],['Bulletin','ev',I.cal],['Help','faq',I.help],['Profile','me',I.me]]
  :[['Dashboard','home',I.home],['Admissions','adm',I.adm],['Holds','fl',I.flag],['Bulletin','ev',I.cal],['Profile','me',I.me]];
- $('bnav').innerHTML=L.map(x=>`<button data-act="nav" data-v="${x[1].split(',')[0]}" data-ids="${x[1]}">${x[2]}<span>${x[0]}</span></button>`).join('')}
+ $('bnav').innerHTML=(ACD()?[['Academics','home',I.book],['Bulletin','ev',I.cal],['Profile','me',I.me]]:L).map(x=>`<button data-act="nav" data-v="${x[1].split(',')[0]}" data-ids="${x[1]}">${x[2]}<span>${x[0]}</span></button>`).join('')}
 function bnMark(id){document.querySelectorAll('#bnav button').forEach(b=>{const on=b.dataset.ids.split(',').includes(id);b.classList.toggle('on',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})}
 
 function fstUpd(){const on=navigator.onLine,e=$('fst');e.className='fst '+(on?'on':'off');e.lastElementChild.textContent=on?'Online':'You are offline'}
@@ -2990,7 +2990,7 @@ function navBadgeSync(){
   if(base)b.setAttribute('aria-label',base+(x?', '+x.t+' pending':''));
   if(!x)return;const sp=document.createElement('span');sp.className='nb2 '+x.c;sp.textContent=x.t;b.insertBefore(sp,b.querySelector(':scope>.chev'))})}
 function badgeSet(id,n,c){if(n>0)NAVB[id]={n:n,t:n>99?'99+':String(n),c:c};else delete NAVB[id];navBadgeSync()}
-function loadBadges(){if(!S.token||!A())return;BT=Date.now();
+function loadBadges(){if(!S.token||!A()||ACD())return;BT=Date.now();
  if(!OFC())google.script.run.withSuccessHandler(r=>{if(r&&r.success)badgeSet('adm',Number(r.data.stats.today)||0,'g')}).withFailureHandler(()=>{}).dashboard(S.token);
  google.script.run.withSuccessHandler(r=>{if(r&&r.success)badgeSet('fl',((r.data&&r.data.flags)||[]).length,'y')}).withFailureHandler(()=>{}).holdsOverview(S.token)}
 const _rnS5=renderNav;renderNav=function(m){_rnS5(m);navBadgeSync();loadBadges()};
@@ -3688,10 +3688,6 @@ menuFor = function () {
 };
 const _homeAc = home;
 home = function () { return ACD() ? acadPage() : _homeAc() };
-const _bnAc = bnInit;
-bnInit = function () { _bnAc(); if (ACD()) $('bnav').innerHTML = [['Academics', 'home'], ['Bulletin', 'ev'], ['Profile', 'me']].map(x => `<button data-act="nav" data-v="${x[1]}" data-ids="${x[1]}">${x[1] === 'home' ? I.book : x[1] === 'ev' ? I.cal : I.me}<span>${x[0]}</span></button>`).join('') };
-const _lbAc = loadBadges;
-loadBadges = function () { if (ACD()) return; _lbAc() };
 
 /* ---------- state helpers ---------- */
 const acF = () => S.ac.f || (S.ac.f = { g: S.ac.grades[0] || '', c: '', sub: '', sec: '', t: '', name: '' });
