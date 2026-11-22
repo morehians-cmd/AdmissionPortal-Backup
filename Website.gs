@@ -281,12 +281,10 @@ function websitePreviewOwner_(ticket) {
 
 /** Ticket-protected preview data. Public endpoints continue to read published storage only. */
 function getDraftHomepage(ticket) {
-  try {
-    websitePreviewOwner_(ticket);
-    const d = websiteDraftRead_(SITE_DRAFT_KEY_, 'site') || siteRead_();
-    if (!d) return null;
-    return { updatedAt:d.updatedAt, updatedBy:d.updatedBy, sections:siteResolveSectionMedia_(d.sections) };
-  } catch (e) { return fail(e); }
+  websitePreviewOwner_(ticket);
+  const d = websiteDraftRead_(SITE_DRAFT_KEY_, 'site') || siteRead_();
+  if (!d) return null;
+  return { updatedAt:d.updatedAt, updatedBy:d.updatedBy, sections:siteResolveSectionMedia_(d.sections) };
 }
 
 /* ---------- inner pages (About, Admissions, Academics, Campus Life, Forms, News) ----------
@@ -367,12 +365,10 @@ function getPublishedPage(route) {
 }
 /** Ticket-protected inner-page preview. */
 function getDraftPage(route, ticket) {
-  try {
-    websitePreviewOwner_(ticket);
-    const d = websiteDraftRead_(PAGES_DRAFT_KEY_, 'pages') || pagesRead_();
-    const p = d && d.pages[String(route || '')];
-    return p && p.length ? { blocks:siteResolvePageMedia_(p) } : null;
-  } catch (e) { return fail(e); }
+  websitePreviewOwner_(ticket);
+  const d = websiteDraftRead_(PAGES_DRAFT_KEY_, 'pages') || pagesRead_();
+  const p = d && d.pages[String(route || '')];
+  return p && p.length ? { blocks:siteResolvePageMedia_(p) } : null;
 }
 
 /** PUBLIC. The website's Privacy page. It renders the Data Privacy Policy the portal already
@@ -497,8 +493,12 @@ function publishWebsiteAdmin(token) {
     const ou=owner_(token), sd=websiteDraftRead_(SITE_DRAFT_KEY_,'site'), pd=websiteDraftRead_(PAGES_DRAFT_KEY_,'pages');
     if(!sd&&!pd)throw new Error('There are no saved website drafts to publish.');
     const now=new Date().toISOString();
-    if(sd){const b=siteRow_(),json=JSON.stringify({updatedAt:now,updatedBy:ou.Username,sections:sd.sections});if(json.length>SITE_MAX)throw new Error('The homepage content is too long to publish.');put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[SITE_KEY,json]]);}
-    if(pd){const b=pagesRow_(),json=JSON.stringify({updatedAt:now,updatedBy:ou.Username,pages:pd.pages});if(json.length>PAGES_MAX)throw new Error('The inner-page content is too long to publish.');put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[PAGES_KEY,json]]);}
+    const siteJson=sd?JSON.stringify({updatedAt:now,updatedBy:ou.Username,sections:sd.sections}):'';
+    const pagesJson=pd?JSON.stringify({updatedAt:now,updatedBy:ou.Username,pages:pd.pages}):'';
+    if(siteJson&&siteJson.length>SITE_MAX)throw new Error('The homepage content is too long to publish.');
+    if(pagesJson&&pagesJson.length>PAGES_MAX)throw new Error('The inner-page content is too long to publish.');
+    if(sd){const b=siteRow_();put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[SITE_KEY,siteJson]]);}
+    if(pd){const b=pagesRow_();put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[PAGES_KEY,pagesJson]]);}
     CacheService.getScriptCache().removeAll([SITE_CACHE_KEY,PAGES_CACHE_KEY]);
     audit_(ou,'website.publish','homepage+pages','');
     return ok({publishedAt:now,publishedBy:ou.Username,homepage:!!sd,pages:!!pd},'Website drafts published. Visitors will now see the updated content.');
