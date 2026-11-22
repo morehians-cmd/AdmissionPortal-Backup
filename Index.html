@@ -2944,7 +2944,7 @@ $('gs').addEventListener('keydown',e=>{
 
 /* profile dropdown: aria, outside click, Escape */
 const ddClose=()=>{$('dd').classList.add('hidden');$('av').setAttribute('aria-expanded','false')};
-act.dd=()=>{const o=$('dd').classList.toggle('hidden');$('av').setAttribute('aria-expanded',String(!o));$('np').classList.add('hidden')};
+act.dd=()=>{const o=$('dd').classList.toggle('hidden');$('av').setAttribute('aria-expanded',String(!o));$('np').classList.add('hidden');if(!$('dd').classList.contains('hidden')){const b=$('dd').querySelector('button');if(b)b.focus()}};
 document.addEventListener('click',e=>{
  if(!e.target.closest('[data-act=dd],#dd'))ddClose();
  if(!e.target.closest('[data-act=bell],#np'))$('np').classList.add('hidden');
@@ -2991,7 +2991,7 @@ $('np').setAttribute('role','region');$('np').setAttribute('aria-label','Notific
 new MutationObserver(()=>{document.title=($('title').textContent||'Portal')+' \u2013 Moreh Academy'}).observe($('title'),{childList:true,characterData:true,subtree:true});
 
 /* profile menu: focus the first item on open, arrow keys move between items */
-const _ddA11y=act.dd;act.dd=()=>{_ddA11y();if(!$('dd').classList.contains('hidden')){const b=$('dd').querySelector('button');if(b)b.focus()}};
+
 $('dd').addEventListener('keydown',e=>{if(e.key!=='ArrowDown'&&e.key!=='ArrowUp')return;e.preventDefault();const b=[...$('dd').querySelectorAll('button')],i=b.indexOf(document.activeElement);b[(i+(e.key==='ArrowDown'?1:-1)+b.length)%b.length].focus()});
 
 /* flyout closes when keyboard focus leaves the group */
