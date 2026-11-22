@@ -49,7 +49,7 @@ function flagSearch(token, q) {
 /** Holds of one learner. The internal reason is returned only to the Owner and to the office that raised it. */
 function flagList(token, studentId) {
   try {
-    const fu = flagUser_(token), id = String(studentId || ''), owner = fu.u.Clearance === 'Full';
+    const fu = flagUser_(token), id = String(studentId || ''), owner = fu.u.Clearance === 'isFull_(...)';
     return ok(flagRows_().filter(f => f.StudentID === id && (!fu.office || f.Office === fu.office)).map(f => ({
       FlagID:f.FlagID, Office:f.Office, Status:f.Status, Instruction:f.Instruction, RaisedBy:f.RaisedBy, RaisedAt:f.RaisedAt, ClearedBy:f.ClearedBy, ClearedAt:f.ClearedAt,
       Reason:(owner || fu.office === f.Office) ? f.Reason : '' })).sort((a, b) => b.RaisedAt.localeCompare(a.RaisedAt)));
@@ -121,7 +121,7 @@ function grantTemporary(token, studentId, until, reason) {
 /** Data for the Holds page (Owner / Encoder) and the Desk (office accounts). */
 function holdsOverview(token) {
   try {
-    const fu = flagUser_(token), owner = fu.u.Clearance === 'Full', rows = flagRows_(), lite = {}, act = {};
+    const fu = flagUser_(token), owner = fu.u.Clearance === 'isFull_(...)', rows = flagRows_(), lite = {}, act = {};
     studentsLite_().forEach(s => lite[s.StudentID] = s);
     rows.forEach(f => { if (f.Status === 'Active') (act[f.StudentID] || (act[f.StudentID] = [])).push(f.Office); });
     const flags = rows.filter(f => f.Status === 'Active' && (!fu.office || f.Office === fu.office)).map(f => { const s = lite[f.StudentID] || {};

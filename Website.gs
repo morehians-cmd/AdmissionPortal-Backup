@@ -1,25 +1,41 @@
-/* ---------- value helpers used by siteClean_ and the media library ----------
-   RECONSTRUCTED: the original definitions were missing from the merged project. Behaviour is inferred from
-   how they are called (limits, link/image schemes used by the seed and the Homepage). Review before deploying. */
-const SITE_SECTIONS = ['admission', 'about', 'programs', 'news'];   // sections whose order can be changed
-function wsS_(v, max) {            // trimmed plain text, control characters removed, length-limited
-  return String(v == null ? '' : v).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, max || 200);
-}
-function wsArr_(v, max) { return Array.isArray(v) ? v.slice(0, max || 12) : []; }
-function wsPick_(v, fallback, max) { return wsS_(v, max) || wsS_(fallback, max); }   // edited text, else the seed text
-function wsImg_(v) {               // '' | gallery:<page>:<id> | https URL
-  const s = wsS_(v, 600);
-  if (!s) return '';
-  if (/^gallery:[A-Za-z0-9_-]+:[A-Za-z0-9_-]{1,80}$/.test(s)) return s;
-  return /^https:\/\/[^\s"'<>()]+$/i.test(s) ? s : '';
-}
-function wsLink_(v) {              // '' | #anchor | route:<page> | https URL
-  const s = wsS_(v, 300);
-  if (!s) return '';
-  if (/^#[A-Za-z0-9_-]{1,60}$/.test(s) || /^route:[A-Za-z0-9\/_-]{1,100}$/.test(s)) return s;
-  return /^https:\/\/[^\s"'<>()]+$/i.test(s) ? s : '';
-}
-function wsMedia_(ref) { return siteMediaPublic_(ref); }   // event/announcement image reference -> public URL ('' if none)
+/**
+ * Website.gs — "Website Management": edit the public homepage from the portal.
+ *
+ * Homepage.html already calls getPublishedHomepage() at boot and passes the result to
+ * applyContent(), which reads a {sections:{...}} object. This file stores exactly that
+ * object in the existing Content sheet (Key = 'homepage_data', beside 'about_data'),
+ * so the homepage itself needs no change: when nothing is saved it keeps rendering its
+ * built-in DEFAULT_HOME, and as soon as the administrator saves, the saved copy wins.
+ *
+ * Shape (every key optional; applyContent() ignores what it does not use):
+ *   sections.masthead  { tagline, ids:[{name,short,logo,fb}] }
+ *   sections.hero      { title,name,subtitle,desc,intervalMs,enroll:{label,to},discover:{label,to},slides:[url] }
+ *   sections.values    { items:[{label,icon,on}] }
+ *   sections.admission { title,sub,steps:[{t,d,i}] }
+ *   sections.about     { heading,text,linkLabel,photo }
+ *   sections.programs  { title,items:[{name,desc,on}] }
+ *   sections.news      { title,items:[{title,date,summary,link}] }
+ *   sections.footer    { loc,phone,email,fb,yt }
+ *   sections.nav       { menus:[{ label,lead, subs:[{label,lead,icon}] }] }   (structure is fixed)
+ *   sections.display   { order:[key], hidden:[key] }
+ *
+ * SITE_SEED_ below mirrors the homepage's own defaults, so the admin form starts from the
+ * same text a visitor sees before anything is saved.
+ *
+ * The homepage's inner pages (About, Admissions, Academics, Campus Life, Forms, News and the
+ * footer pages) live in the same sheet under Key = 'pages_data'; see the inner-pages section.
+ */
+
+const SITE_KEY = 'homepage_data', SITE_CACHE_KEY = 'site_v1', SITE_MAX = 45000;
+const SITE_SECTIONS = ['admission', 'about', 'programs', 'news'];
+
+/* ---------- sanitising: never trust what the browser posts ---------- */
+const wsS_ = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, ' ').trim().slice(0, n);
+const wsLink_ = v => /^(https?:\/\/|mailto:|#|route:)/i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
+const wsImg_ = v => /^https?:\/\//i.test(String(v == null ? '' : v).trim()) ? String(v).trim().slice(0, 500) : '';
+const wsArr_ = (a, n) => Array.isArray(a) ? a.slice(0, n) : [];
+/* An absent field keeps its built-in text, so content saved before a card existed still opens. */
+const wsPick_ = (v, d, n) => v == null ? d : wsS_(v, n);
 
 function siteClean_(d) {
   d = d || {};
@@ -66,14 +82,14 @@ function siteClean_(d) {
     programs: {
       title: wsS_(pr.title, 120),
       items: wsArr_(pr.items, 12).map(x => ({
-        name: wsS_(x && x.name, 80), desc: wsS_(x && x.desc, 300), photo: wsImg_(x && x.photo), on: !(x && x.on === false)
+        name: wsS_(x && x.name, 80), desc: wsS_(x && x.desc, 300), on: !(x && x.on === false)
       })).filter(x => x.name)
     },
     news: {
       title: wsS_(nw.title, 120),
       items: wsArr_(nw.items, 12).map(x => ({
         title: wsS_(x && x.title, 120), date: wsS_(x && x.date, 40),
-        summary: wsS_(x && x.summary, 600), link: wsLink_(x && x.link), photo: wsImg_(x && x.photo)
+        summary: wsS_(x && x.summary, 600), link: wsLink_(x && x.link)
       })).filter(x => x.title)
     },
     footer: {
@@ -193,9 +209,9 @@ const SITE_SEED_ = {
         ['School Achievements', 'Celebrating our students and staff.', '🏅']] }
     ] },
     footer: {
-      loc: 'Ground Floor, Moreh Academy Learning Center 3, Reyes St. cor. Makintar St., Central Bicutan, Taguig City',
+      loc: 'Moreh Academy, Taguig City, Philippines',
       phone: 'Admissions: 0961 876 6886',
-      email: 'morehians@gmail.com',
+      email: 'registrar@morehacademy.com',
       fb: 'https://facebook.com/ilovemoreh',
       yt: 'https://youtube.com/'
     },
@@ -204,41 +220,7 @@ const SITE_SEED_ = {
 };
 
 /* ---------- storage ---------- */
-const SITE_KEY = 'homepage_data', SITE_CACHE_KEY = 'site_v1', SITE_MAX = 45000;
-const SITE_DRAFT_KEY_ = 'site_draft_data', PAGES_DRAFT_KEY_ = 'pages_draft_data';
-const SITE_PREVIOUS_KEY_ = 'site_previous_publish', PAGES_PREVIOUS_KEY_ = 'pages_previous_publish', WEBSITE_PUBLISH_META_KEY_ = 'website_previous_publish_meta';
-function websiteRaw_(key) {
-  const b=blockRow_(key);
-  return b.row ? String(b.sh.getRange(b.row,2).getValue()||'') : '';
-}
-function websitePutRaw_(key, raw) {
-  const b=blockRow_(key);
-  put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[key,String(raw||'')]]);
-}
-function websiteSnapshot_(liveKey, backupKey) {
-  const b=blockRow_(liveKey), raw=b.row?String(b.sh.getRange(b.row,2).getValue()||''):'';
-  websitePutRaw_(backupKey,JSON.stringify({exists:!!raw,raw:raw}));
-}
-function websiteRollbackMeta_() {
-  try { const x=JSON.parse(websiteRaw_(WEBSITE_PUBLISH_META_KEY_)||'{}'); return x&&typeof x==='object'?x:{}; } catch(_) { return {}; }
-}
 function siteRow_() { return blockRow_(SITE_KEY); }
-function siteDraftRow_() { return blockRow_(SITE_DRAFT_KEY_); }
-function pagesDraftRow_() { return blockRow_(PAGES_DRAFT_KEY_); }
-function websiteDraftRead_(key, kind) {
-  const b = blockRow_(key);
-  if (!b.row) return null;
-  try {
-    const raw = JSON.parse(String(b.sh.getRange(b.row, 2).getValue() || ''));
-    if (kind === 'site' && raw && raw.sections) return { updatedAt: String(raw.updatedAt || ''), updatedBy: String(raw.updatedBy || ''), sections: siteClean_(raw) };
-    if (kind === 'pages' && raw && raw.pages) {
-      const pages = {};
-      PAGES_ROUTES_.forEach(route => { if (Array.isArray(raw.pages[route]) && raw.pages[route].length) pages[route] = raw.pages[route]; });
-      return { updatedAt: String(raw.updatedAt || ''), updatedBy: String(raw.updatedBy || ''), pages: pages };
-    }
-  } catch (_) {}
-  return null;
-}
 
 function siteRead_() {
   const cache = CacheService.getScriptCache();
@@ -252,80 +234,12 @@ function siteRead_() {
   return out;
 }
 
-/** Build the homepage news feed from the Campus Bulletin source of truth.
- * Legacy homepage.news.items is retained for backwards compatibility, but once bulletin
- * posts exist they become the public homepage feed instead of requiring duplicate entry. */
-function siteAboutPreview_() {
-  try {
-    const a = aboutRead_();
-    const heading = (a.vision && a.vision.title) || (a.mission && a.mission.title) || '';
-    const text = (a.mission && a.mission.text) || (a.vision && a.vision.text) || '';
-    return { heading: heading, text: text, linkLabel: 'Learn More', photo: '' };
-  } catch (_) {
-    return null;
-  }
-}
-
-function siteNews_() {
-  try {
-    const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
-    const rows = evRows_().filter(e => e.EventDate >= today);
-    return rows
-      .sort((a, b) => (a.EventDate + a.EventTime).localeCompare(b.EventDate + b.EventTime))
-      .slice(0, 6)
-      .map(e => ({
-        title: e.Title,
-        date: e.EventDate,
-        summary: e.Details || (e.Category === 'Announcement' ? 'School announcement from Moreh Academy.' : 'Upcoming Moreh Academy event.'),
-        link: e.Category === 'Announcement' ? 'route:news/school-announcements' : 'route:news/upcoming-events', photo: wsMedia_(e.Image || e.image || e.Photo || e.photo || '')
-      }));
-  } catch (_) {
-    return [];
-  }
-}
-
 /** PUBLIC. Homepage.html calls this at boot and passes the result straight to applyContent(),
  *  so it must return the content itself — not an ok() wrapper. null = use the built-in defaults. */
-function getPublishedHomepage() {
-  try {
-    const d = siteRead_();
-    if (!d) return null;
-    const liveAbout = siteAboutPreview_();
-    if (liveAbout) { liveAbout.photo = (d.sections.about && d.sections.about.photo) || ''; d.sections.about = Object.assign({}, d.sections.about || {}, liveAbout); }
-    const liveNews = siteNews_();
-    if (liveNews.length) d.sections.news = Object.assign({}, d.sections.news || {}, { items: liveNews });
-    d.sections = siteResolveSectionMedia_(d.sections);
-    return d;
-  } catch (e) { return null; }
-}
+function getPublishedHomepage() { try { return siteRead_(); } catch (e) { return null; } }
 
-function siteMediaPublic_(ref) { const m=String(ref||'').match(/^gallery:([^:]+):(.+)$/); if(!m)return /^https?:\/\//i.test(String(ref||''))?String(ref):''; try{if(!galRead_(m[1]).list.some(x=>x.id===String(m[2])))return '';return photo_(String(m[2]))||'';}catch(_){return '';} }
-function siteResolveSectionMedia_(sections) { const s=sections||{}; if(s.masthead&&Array.isArray(s.masthead.ids))s.masthead.ids=s.masthead.ids.map(x=>Object.assign({},x,{logo:siteMediaPublic_(x&&x.logo)})); if(s.about&&s.about.photo)s.about.photo=siteMediaPublic_(s.about.photo); if(s.hero&&Array.isArray(s.hero.slides))s.hero.slides=s.hero.slides.map(siteMediaPublic_); if(s.programs&&Array.isArray(s.programs.items))s.programs.items=s.programs.items.map(x=>Object.assign({},x,{photo:siteMediaPublic_(x&&x.photo)})); if(s.news&&Array.isArray(s.news.items))s.news.items=s.news.items.map(x=>Object.assign({},x,{photo:siteMediaPublic_(x&&x.photo)})); return s; }
-
-/** Issue a short-lived, unguessable preview ticket to an authenticated owner. */
-function createWebsitePreviewTicket(token) {
-  try {
-    owner_(token);
-    const ticket = Utilities.getUuid(), cache = CacheService.getScriptCache();
-    cache.put('website_preview_' + ticket, String(token), 600);
-    return ok({ url:ScriptApp.getService().getUrl() + '?preview=draft&pt=' + encodeURIComponent(ticket) }, 'Preview link created. It expires in 10 minutes.');
-  } catch (e) { return fail(e); }
-}
-function websitePreviewOwner_(ticket) {
-  ticket = String(ticket || '');
-  if (!/^[A-Za-z0-9-]{36}$/.test(ticket)) throw new Error('Preview link is invalid or expired.');
-  const token = CacheService.getScriptCache().get('website_preview_' + ticket);
-  if (!token) throw new Error('Preview link has expired. Create a new preview link.');
-  return owner_(token);
-}
-
-/** Ticket-protected preview data. Public endpoints continue to read published storage only. */
-function getDraftHomepage(ticket) {
-  websitePreviewOwner_(ticket);
-  const d = websiteDraftRead_(SITE_DRAFT_KEY_, 'site') || siteRead_();
-  if (!d) return null;
-  return { updatedAt:d.updatedAt, updatedBy:d.updatedBy, sections:siteResolveSectionMedia_(d.sections) };
-}
+/** PUBLIC. The homepage's draft preview reads the same saved copy. */
+function getDraftHomepage() { return getPublishedHomepage(); }
 
 /* ---------- inner pages (About, Admissions, Academics, Campus Life, Forms, News) ----------
  * Same Content-sheet pattern as the homepage, under Key = 'pages_data'. Each value is the block
@@ -336,18 +250,44 @@ function getDraftHomepage(ticket) {
  *                                                *italic*, [label](url) and "- " bullets work)
  */
 
-/* Derive the page editor catalogue from the canonical server menu seed.
- * This avoids a second set of menu labels and card titles drifting out of sync. */
-const PAGE_MENU_IDS_ = ['about', 'admissions', 'academics', 'campus-life', 'forms', 'news'];
-const pageSlug_ = value => String(value || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const PAGE_MENU_ = SITE_SEED_.sections.nav.menus.map((m, i) => ({
-  id: PAGE_MENU_IDS_[i],
-  label: m.label,
-  subs: m.subs.map(s => [pageSlug_(s[0]), s[0]])
-})).concat([{
-  id: 'other', label: 'Other pages', noRoot: true,
-  subs: [['contact', 'Contact Information'], ['terms', 'Terms of Service']]
-}]);
+/* Mirrors Homepage.html's DEFAULT_HOME.nav: same labels, same order, same slugs (route ids).
+ * noRoot groups have no page of their own (Contact, Terms and Privacy are reached from the footer). */
+const PAGE_MENU_ = [
+  { id: 'about', label: 'About Us', subs: [
+    ['vision-mission-and-core-values', 'Vision, Mission & Core Values'],
+    ['history', 'History'],
+    ['school-leadership', 'School Leadership']] },
+  { id: 'admissions', label: 'Admissions', subs: [
+    ['enrollment-procedure', 'Enrollment Procedure'],
+    ['admission-requirements', 'Admission Requirements'],
+    ['scholarships', 'Scholarships'],
+    ['frequently-asked-questions', 'Frequently Asked Questions']] },
+  { id: 'academics', label: 'Academics', subs: [
+    ['kindergarten', 'Kindergarten'],
+    ['elementary', 'Elementary'],
+    ['junior-high-school', 'Junior High School'],
+    ['senior-high-school', 'Senior High School'],
+    ['college-program', 'College Program']] },
+  { id: 'campus-life', label: 'Campus Life', subs: [
+    ['student-organizations', 'Student Organizations'],
+    ['school-activities-and-events', 'School Activities & Events'],
+    ['sports-and-athletics', 'Sports & Athletics'],
+    ['clubs-and-societies', 'Clubs & Societies'],
+    ['campus-facilities-and-tour', 'Campus Facilities & Tour']] },
+  { id: 'forms', label: 'Downloadable Forms', subs: [
+    ['downloadable-forms', 'Downloadable Forms']] },
+  { id: 'news', label: 'News & Updates', subs: [
+    ['school-announcements', 'School Announcements'],
+    ['latest-news', 'Latest News'],
+    ['upcoming-events', 'Upcoming Events'],
+    ['enrollment-announcements', 'Enrollment Announcements'],
+    ['school-achievements', 'School Achievements']] },
+  /* No 'privacy' here on purpose: the website's Privacy page shows the Data Privacy Policy the
+     portal already stores (getPublishedPolicy), so there is only ever one copy of it. */
+  { id: 'other', label: 'Other pages', noRoot: true, subs: [
+    ['contact', 'Contact Information'],
+    ['terms', 'Terms of Service']] }
+];
 const PAGES_KEY = 'pages_data', PAGES_CACHE_KEY = 'pages_v1', PAGE_TEXT_MAX = 6000, PAGES_MAX = 45000;
 /* A menu page's route is "<menu>/<slug>", exactly what Homepage.html's links and cur_route() use. */
 const pageRoute_ = (g, s) => g.noRoot ? s[0] : g.id + '/' + s[0];
@@ -362,7 +302,7 @@ function pagesBlocks_(t) {
   let para = [];
   const flush = () => { if (para.length) { out.push({ type: 'p', text: para.join('\n') }); para = []; } };
   lines.forEach(line => {
-    const h = /^\s*#{1,3}\s+(.+)$/.exec(line), im = /^\s*!\[([^\]]*)\]\((https:\/\/[^)\s]+|gallery:[A-Za-z0-9_-]+:[A-Za-z0-9_-]{1,80})\)\s*$/.exec(line);
+    const h = /^\s*#{1,3}\s+(.+)$/.exec(line), im = /^\s*!\[([^\]]*)\]\((https:\/\/[^)\s]+)\)\s*$/.exec(line);
     if (h) { flush(); out.push({ type: 'h2', text: h[1].trim() }); }
     else if (im) { flush(); out.push({ type: 'img', url: im[2], alt: im[1] }); }
     else para.push(line);
@@ -398,18 +338,12 @@ function pagesRead_() {
   return out;
 }
 
-/** PUBLIC. Homepage.html stores the result at HOME.pages[route]; controlled Gallery references are resolved before delivery. */
-function siteResolvePageMedia_(blocks){return (Array.isArray(blocks)?blocks:[]).map(b=>{if(!b)return b;const x=Object.assign({},b);if(x.type==='img'&&x.url)x.url=siteMediaPublic_(x.url);return x;});}
+/** PUBLIC. Homepage.html stores the result at HOME.pages[route]; null = nothing saved for that page.
+ *  Like getPublishedHomepage() this returns the content itself, not an ok() wrapper. */
 function getPublishedPage(route) {
-  try { const d = pagesRead_(), p = d && d.pages[String(route || '')]; return p && p.length ? { blocks: siteResolvePageMedia_(p) } : null; } catch (e) { return null; }
+  try { const d = pagesRead_(), p = d && d.pages[String(route || '')]; return p && p.length ? { blocks: p } : null; } catch (e) { return null; }
 }
-/** Ticket-protected inner-page preview. */
-function getDraftPage(route, ticket) {
-  websitePreviewOwner_(ticket);
-  const d = websiteDraftRead_(PAGES_DRAFT_KEY_, 'pages') || pagesRead_();
-  const p = d && d.pages[String(route || '')];
-  return p && p.length ? { blocks:siteResolvePageMedia_(p) } : null;
-}
+function getDraftPage(route) { return getPublishedPage(route); }
 
 /** PUBLIC. The website's Privacy page. It renders the Data Privacy Policy the portal already
  *  stores in Content!A2 (edited in the portal, sanitized by cleanPolicy_), so the two can never
@@ -420,175 +354,108 @@ function getPublishedPolicy() {
 
 /* ---------- administrator endpoints ---------- */
 /** ADMINISTRATOR / SYSTEM MANAGER. The current content (or the built-in defaults before the first save). */
-/** ADMINISTRATOR / SYSTEM MANAGER. Inventory existing website image assets without creating a second media store. */
-function mediaMetaRow_(){return blockRow_('media_library')}
-
-function mediaMetaRead_(){
-  const b=mediaMetaRow_(); if(!b.row) return {};
-  try{const raw=JSON.parse(String(b.sh.getRange(b.row,2).getValue()||'{}'));return raw&&raw.items&&typeof raw.items==='object'?raw.items:{}}catch(_){return {}}
-}
-
-function mediaMetaWrite_(items, ou){
-  const b=mediaMetaRow_(), json=JSON.stringify({updatedAt:new Date().toISOString(),updatedBy:ou.Username,items:items||{}});
-  if(json.length>30000) throw new Error('Media metadata is too large to save.');
-  put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[['media_library',json]]);
-}
-
-function siteMediaUsage_(){
-  const use={};
-  const add=(id,label)=>{if(!id||!label)return;(use[id]||(use[id]=[])).indexOf(label)<0&&use[id].push(label)};
-  const site=siteRead_(), sections=site?site.sections:siteClean_(SITE_SEED_);
-  const hero=Array.isArray(sections.hero&&sections.hero.slides)?sections.hero.slides.filter(Boolean):[];
-  hero.forEach((url,i)=>add('hero-'+(i+1),'Homepage Hero'+(i+1?' · Slide '+(i+1):'')));
-  if(sections.about&&/^gallery:/i.test(String(sections.about.photo||''))){const m=String(sections.about.photo).match(/^gallery:([^:]+):(.+)$/);if(m)add('gallery-'+m[1]+'-'+m[2],'Homepage About');}
-  try{const pages=pagesRead_();Object.keys((pages&&pages.pages)||{}).forEach(route=>{(pages.pages[route]||[]).forEach(b=>{if(b&&b.type==='img'&&/^gallery:/i.test(String(b.url||''))){const m=String(b.url).match(/^gallery:([^:]+):(.+)$/);if(m)add('gallery-'+m[1]+'-'+m[2],'Inner Page · '+route);}});});}catch(_){}
-  try{GAL_PAGES.forEach(page=>{galRead_(page).list.forEach(p=>add('gallery-'+page+'-'+p.id,page==='facilities'?'Facilities Gallery':'Cluster Guide Gallery'));});}catch(_){}
-  return use;
-}
-
-
-function mediaInventory_(){
-  const site=siteRead_(), sections=site?site.sections:siteClean_(SITE_SEED_), meta=mediaMetaRead_(), usage=siteMediaUsage_(), out=[];
-  const hero=Array.isArray(sections.hero&&sections.hero.slides)?sections.hero.slides.filter(Boolean):[];
-  hero.forEach((url,i)=>{const id='hero-'+(i+1),m=meta[id]||{};out.push({id:id,type:'image',title:m.title||'Homepage Hero '+(i+1),alt:m.alt||'Moreh Academy homepage hero image '+(i+1),caption:m.caption||'',url:String(url),source:'Homepage Hero',page:'homepage',usedOn:usage[id]||[],editable:true})});
-  (sections.masthead&&Array.isArray(sections.masthead.ids)?sections.masthead.ids:[]).forEach((x,i)=>{if(x&&x.logo){const ref=String(x.logo),id=/^gallery:/i.test(ref)?'gallery-'+ref.split(':')[1]+'-'+ref.split(':').slice(2).join(':'):'identity-'+(i+1),m=meta[id]||{};out.push({id:id,type:'image',title:m.title||((x.name||'School')+' logo'),alt:m.alt||((x.name||'School')+' logo'),caption:m.caption||'',url:/^https?:\/\//i.test(ref)?ref:'',source:'School Identity',page:'homepage',refId:/^gallery:/i.test(ref)?ref.split(':').slice(2).join(':'):'',usedOn:usage[id]||[],editable:true})}});
-  if(sections.about&&sections.about.photo){const ref=String(sections.about.photo),id=/^gallery:/i.test(ref)?'gallery-'+ref.split(':')[1]+'-'+ref.split(':').slice(2).join(':'):'about-1',m=meta[id]||{};out.push({id:id,type:'image',title:m.title||'Homepage About image',alt:m.alt||'Moreh Academy students',caption:m.caption||'',url:/^https?:\/\//i.test(ref)?ref:'',source:'Homepage About',page:'homepage',refId:/^gallery:/i.test(ref)?ref.split(':').slice(2).join(':'):'',usedOn:usage[id]||[],editable:true})}
-  GAL_PAGES.forEach(page=>{try{galRead_(page).list.forEach(p=>{const id='gallery-'+page+'-'+p.id,m=meta[id]||{};out.push({id:id,type:'image',title:m.title||p.cap||'Untitled photo',alt:m.alt||p.cap||'Moreh Academy '+page+' photo',caption:m.caption||p.cap||'',url:'',source:page==='facilities'?'Facilities':'Cluster Guide',page:page,refId:p.id,usedOn:usage[id]||[],editable:true})})}catch(_){} });
-  return {items:out};
-}
-
-function getMediaLibraryAdmin(token){try{owner_(token);return ok(mediaInventory_(),'Media library loaded.')}catch(e){return fail(e)}}
-
-function saveMediaMetaAdmin(token,id,data){
-  try{const ou=owner_(token);id=wsS_(id,160);if(!id)throw new Error('Media ID is required.');const items=mediaMetaRead_();items[id]={title:wsS_(data&&data.title,120),caption:wsS_(data&&data.caption,240),alt:wsS_(data&&data.alt,180)};mediaMetaWrite_(items,ou);audit_(ou,'website.media_meta',id,'');return ok({id:id,meta:items[id]},'Media details saved.')}catch(e){return fail(e)}
-}
-
-function addMediaLibraryPhoto(token,b64,title,caption,alt){
-  try{owner_(token);const r=addGalleryPhoto(token,'facilities',b64,caption||title||'');if(!r||!r.success)return r||fail('Could not add the photo.');const id='gallery-facilities-'+r.data.id,items=mediaMetaRead_();items[id]={title:wsS_(title,120)||wsS_(caption,240)||'Untitled photo',caption:wsS_(caption,240),alt:wsS_(alt,180)||wsS_(caption,240)||'Moreh Academy facilities photo'};const ou=owner_(token);mediaMetaWrite_(items,ou);audit_(ou,'website.media_upload',id,'');return ok({id:id,photo:r.data.id,meta:items[id],list:r.data.list},'Photo added to the Facilities gallery.')}catch(e){return fail(e)}
-}
 function getSiteAdmin(token) {
   try {
     owner_(token);
-    const published = siteRead_(), draft = websiteDraftRead_(SITE_DRAFT_KEY_, 'site'), current = draft || published;
-    return ok({ home:ScriptApp.getService().getUrl(), saved:!!published, draftSaved:!!draft,
-      updatedAt:current?current.updatedAt:'', updatedBy:current?current.updatedBy:'',
-      publishedAt:published?published.updatedAt:'', publishedBy:published?published.updatedBy:'', rollbackAvailable:!!(websiteRollbackMeta_().site||websiteRollbackMeta_().pages),
-      sections:current?current.sections:siteClean_(SITE_SEED_) });
-  } catch (e) { return fail(e); }
-}
-
-/** OWNER ONLY. Save a private draft; public visitors continue seeing the published copy. */
-function saveSiteAdmin(token, sections) {
-  const lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(20000);
-    const ou = owner_(token), clean = siteClean_(sections), updatedAt = new Date().toISOString();
-    const json = JSON.stringify({ updatedAt:updatedAt, updatedBy:ou.Username, sections:clean });
-    if (json.length > SITE_MAX) throw new Error('The homepage content is too long to save. Shorten some text or remove a photo link.');
-    const b = siteDraftRow_();
-    put_(b.sh, b.row || (b.sh.getLastRow()+1), 1, [[SITE_DRAFT_KEY_, json]]);
-    audit_(ou, 'website.draft.save', SITE_DRAFT_KEY_, '');
-    return ok({ saved:true, draftSaved:true, updatedAt:updatedAt, updatedBy:ou.Username, sections:clean }, 'Homepage draft saved. The public website is unchanged.');
-  } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
-}
-
-function getPagesAdmin(token) {
-  try {
-    owner_(token);
-    const published = pagesRead_(), draft = websiteDraftRead_(PAGES_DRAFT_KEY_, 'pages'), d = draft || published;
-    const saved = (d && d.pages) || {}, pages = pagesEmpty_();
-    PAGES_ROUTES_.forEach(r => { pages[r] = pagesText_(saved[r]); });
-    const sd = websiteDraftRead_(SITE_DRAFT_KEY_, 'site') || siteRead_(), nv = sd && sd.sections && sd.sections.nav && sd.sections.nav.menus;
-    return ok({ saved:!!published, draftSaved:!!draft, updatedAt:d?d.updatedAt:'', updatedBy:d?d.updatedBy:'',
-      publishedAt:published?published.updatedAt:'', publishedBy:published?published.updatedBy:'', rollbackAvailable:!!(websiteRollbackMeta_().site||websiteRollbackMeta_().pages), pages:pages,
-      catalogue:PAGE_MENU_.map((g,gi)=>{ const m=nv&&nv[gi]; return {
-        id:g.id,label:(m&&m.label)||g.label,noRoot:!!g.noRoot,
-        subs:g.subs.map((s,si)=>({r:pageRoute_(g,s),label:((m&&m.subs&&m.subs[si])||{}).label||s[1]}))
-      }; })
+    const d = siteRead_();
+    return ok({
+      home: ScriptApp.getService().getUrl(),
+      saved: !!d,
+      updatedAt: d ? d.updatedAt : '',
+      updatedBy: d ? d.updatedBy : '',
+      sections: d ? d.sections : siteClean_(SITE_SEED_)
     });
   } catch (e) { return fail(e); }
 }
 
-/** OWNER ONLY. Replaces the complete inner-page draft; published pages are untouched. */
+/** ADMINISTRATOR / SYSTEM MANAGER. Saves and publishes immediately (the homepage reads on next load). */
+function saveSiteAdmin(token, sections) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(20000);
+    const ou = owner_(token);
+    const clean = siteClean_(sections);
+    const updatedAt = new Date().toISOString();
+    const json = JSON.stringify({ updatedAt: updatedAt, updatedBy: ou.Username, sections: clean });
+    if (json.length > SITE_MAX) throw new Error('The homepage content is too long to save. Shorten some text or remove a photo link.');
+    const b = siteRow_();
+    put_(b.sh, b.row || (b.sh.getLastRow() + 1), 1, [[SITE_KEY, json]]);
+    CacheService.getScriptCache().remove(SITE_CACHE_KEY);
+    audit_(ou, 'website.save', SITE_KEY, '');
+    return ok({ saved: true, updatedAt: updatedAt, updatedBy: ou.Username, sections: clean }, 'Website saved. The homepage now shows this content.');
+  } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
+}
+
+/** ADMINISTRATOR / SYSTEM MANAGER. Every inner page's text, plus the page list for the picker. */
+function getPagesAdmin(token) {
+  try {
+    owner_(token);
+    const d = pagesRead_(), saved = (d && d.pages) || {}, pages = pagesEmpty_();
+    PAGES_ROUTES_.forEach(r => { pages[r] = pagesText_(saved[r]); });
+    const sd = siteRead_(), nv = sd && sd.sections && sd.sections.nav && sd.sections.nav.menus;
+    return ok({
+      saved: !!d, updatedAt: d ? d.updatedAt : '', updatedBy: d ? d.updatedBy : '',
+      pages: pages,
+      catalogue: PAGE_MENU_.map((g, gi) => {
+        /* Menu and card titles are editable on the homepage card; the picker follows them.
+           PAGE_MENU_ and SITE_SEED_.nav list the same six menus in the same order. */
+        const m = nv && nv[gi];
+        return {
+          id: g.id, label: (m && m.label) || g.label, noRoot: !!g.noRoot,
+          subs: g.subs.map((s, si) => ({ r: pageRoute_(g, s), label: ((m && m.subs && m.subs[si]) || {}).label || s[1] }))
+        };
+      })
+    });
+  } catch (e) { return fail(e); }
+}
+
+/** ADMINISTRATOR / SYSTEM MANAGER. Replaces every inner page; an emptied page removes its content. */
 function savePagesAdmin(token, pages) {
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(20000);
     const ou = owner_(token), clean = {};
-    PAGES_ROUTES_.forEach(r => { const txt=wsS_(pages&&pages[r],PAGE_TEXT_MAX); if(!txt)return; const blocks=pagesBlocks_(txt); if(blocks.length)clean[r]=blocks; });
-    const updatedAt=new Date().toISOString(), json=JSON.stringify({updatedAt:updatedAt,updatedBy:ou.Username,pages:clean});
-    if(json.length>PAGES_MAX)throw new Error('The page content is too long to save. Shorten some pages.');
-    const b=pagesDraftRow_(); put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[PAGES_DRAFT_KEY_,json]]);
-    audit_(ou,'website.pages.draft',PAGES_DRAFT_KEY_,'');
-    const out=pagesEmpty_(); PAGES_ROUTES_.forEach(r=>{out[r]=pagesText_(clean[r]);});
-    return ok({saved:!!Object.keys(clean).length,draftSaved:true,updatedAt:updatedAt,updatedBy:ou.Username,pages:out},'Inner-page draft saved. The public website is unchanged.');
-  } catch(e) { return fail(e); } finally { try { lock.releaseLock(); } catch(_) {} }
+    PAGES_ROUTES_.forEach(r => {
+      const txt = wsS_(pages && pages[r], PAGE_TEXT_MAX);
+      if (!txt) return;
+      const blocks = pagesBlocks_(txt);
+      if (blocks.length) clean[r] = blocks;
+    });
+    const updatedAt = new Date().toISOString();
+    const json = JSON.stringify({ updatedAt: updatedAt, updatedBy: ou.Username, pages: clean });
+    if (json.length > PAGES_MAX) throw new Error('The page content is too long to save. Shorten some pages.');
+    const b = pagesRow_();
+    put_(b.sh, b.row || (b.sh.getLastRow() + 1), 1, [[PAGES_KEY, json]]);
+    CacheService.getScriptCache().remove(PAGES_CACHE_KEY);
+    audit_(ou, 'website.pages', PAGES_KEY, '');
+    const out = pagesEmpty_();
+    PAGES_ROUTES_.forEach(r => { out[r] = pagesText_(clean[r]); });
+    return ok({ saved: !!Object.keys(clean).length, updatedAt: updatedAt, updatedBy: ou.Username, pages: out }, 'Inner pages saved. The website now shows this content.');
+  } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
 }
 
-/** OWNER ONLY. Publishes homepage and inner-page drafts together. */
-function publishWebsiteAdmin(token) {
-  const lock=LockService.getScriptLock();
-  try {
-    lock.waitLock(20000);
-    const ou=owner_(token), sd=websiteDraftRead_(SITE_DRAFT_KEY_,'site'), pd=websiteDraftRead_(PAGES_DRAFT_KEY_,'pages');
-    if(!sd&&!pd)throw new Error('There are no saved website drafts to publish.');
-    const now=new Date().toISOString();
-    const siteJson=sd?JSON.stringify({updatedAt:now,updatedBy:ou.Username,sections:sd.sections}):'';
-    const pagesJson=pd?JSON.stringify({updatedAt:now,updatedBy:ou.Username,pages:pd.pages}):'';
-    if(siteJson&&siteJson.length>SITE_MAX)throw new Error('The homepage content is too long to publish.');
-    if(pagesJson&&pagesJson.length>PAGES_MAX)throw new Error('The inner-page content is too long to publish.');
-    if(sd){websiteSnapshot_(SITE_KEY,SITE_PREVIOUS_KEY_);const b=siteRow_();put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[SITE_KEY,siteJson]]);}
-    if(pd){websiteSnapshot_(PAGES_KEY,PAGES_PREVIOUS_KEY_);const b=pagesRow_();put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[PAGES_KEY,pagesJson]]);}
-    websitePutRaw_(WEBSITE_PUBLISH_META_KEY_,JSON.stringify({site:!!sd,pages:!!pd,publishedAt:now,publishedBy:ou.Username}));
-    CacheService.getScriptCache().removeAll([SITE_CACHE_KEY,PAGES_CACHE_KEY]);
-    audit_(ou,'website.publish','homepage+pages','');
-    return ok({publishedAt:now,publishedBy:ou.Username,homepage:!!sd,pages:!!pd},'Website drafts published. Visitors will now see the updated content.');
-  } catch(e) { return fail(e); } finally { try { lock.releaseLock(); } catch(_) {} }
-}
-
-/** OWNER ONLY. Restores the content immediately preceding the most recent publish operation. */
-function rollbackWebsiteAdmin(token) {
-  const lock=LockService.getScriptLock();
-  try {
-    lock.waitLock(20000);
-    const ou=owner_(token), meta=websiteRollbackMeta_();
-    if(!meta.site&&!meta.pages)throw new Error('There is no previous website version available to restore.');
-    const restore=(backupKey,liveKey)=>{
-      let snap={}; try{snap=JSON.parse(websiteRaw_(backupKey)||'{}')}catch(_){}
-      if(!snap||typeof snap.exists!=='boolean')throw new Error('The previous website snapshot is invalid.');
-      const b=blockRow_(liveKey);
-      if(snap.exists)put_(b.sh,b.row||(b.sh.getLastRow()+1),1,[[liveKey,String(snap.raw||'')]]);
-      else if(b.row)put_(b.sh,b.row,2,[['']]);
-    };
-    if(meta.site)restore(SITE_PREVIOUS_KEY_,SITE_KEY);
-    if(meta.pages)restore(PAGES_PREVIOUS_KEY_,PAGES_KEY);
-    websitePutRaw_(WEBSITE_PUBLISH_META_KEY_,JSON.stringify({site:false,pages:false,rolledBackAt:new Date().toISOString(),rolledBackBy:ou.Username}));
-    CacheService.getScriptCache().removeAll([SITE_CACHE_KEY,PAGES_CACHE_KEY]);
-    audit_(ou,'website.rollback','homepage+pages','');
-    return ok({rolledBack:true,site:!!meta.site,pages:!!meta.pages},'The previous published website version has been restored.');
-  } catch(e) { return fail(e); } finally { try { lock.releaseLock(); } catch(_) {} }
-}
-
-/** Discard only the homepage draft. */
-function resetSiteAdmin(token) {
-  const lock=LockService.getScriptLock();
-  try {
-    lock.waitLock(20000);
-    const ou=owner_(token),b=siteDraftRow_(); if(b.row)put_(b.sh,b.row,2,[['']]);
-    audit_(ou,'website.draft.discard',SITE_DRAFT_KEY_,'');
-    const d=siteRead_();
-    return ok({saved:!!d,draftSaved:false,updatedAt:d?d.updatedAt:'',updatedBy:d?d.updatedBy:'',sections:d?d.sections:siteClean_(SITE_SEED_)},'Homepage draft discarded. The published website was not changed.');
-  } catch(e) { return fail(e); } finally { try { lock.releaseLock(); } catch(_) {} }
-}
-
-/** Discard only the inner-page draft. */
+/** ADMINISTRATOR / SYSTEM MANAGER. Removes the saved pages so they fall back to their built-in text. */
 function resetPagesAdmin(token) {
-  const lock=LockService.getScriptLock();
+  const lock = LockService.getScriptLock();
   try {
     lock.waitLock(20000);
-    const ou=owner_(token),b=pagesDraftRow_(); if(b.row)put_(b.sh,b.row,2,[['']]);
-    audit_(ou,'website.pages.draft.discard',PAGES_DRAFT_KEY_,'');
-    const d=pagesRead_(),out=pagesEmpty_(); PAGES_ROUTES_.forEach(r=>{out[r]=pagesText_(d&&d.pages&&d.pages[r]);});
-    return ok({saved:!!d,draftSaved:false,updatedAt:d?d.updatedAt:'',updatedBy:d?d.updatedBy:'',pages:out},'Inner-page draft discarded. Published pages were not changed.');
-  } catch(e) { return fail(e); } finally { try { lock.releaseLock(); } catch(_) {} }
+    const ou = owner_(token), b = pagesRow_();
+    if (b.row) put_(b.sh, b.row, 2, [['']]);
+    CacheService.getScriptCache().remove(PAGES_CACHE_KEY);
+    audit_(ou, 'website.pages.reset', PAGES_KEY, '');
+    return ok({ saved: false, updatedAt: '', updatedBy: '', pages: pagesEmpty_() }, 'Inner pages reset to their built-in text.');
+  } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
+}
+
+/** ADMINISTRATOR / SYSTEM MANAGER. Removes the saved copy so the homepage falls back to its built-in content. */
+function resetSiteAdmin(token) {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(20000);
+    const ou = owner_(token), b = siteRow_();
+    if (b.row) put_(b.sh, b.row, 2, [['']]);
+    CacheService.getScriptCache().remove(SITE_CACHE_KEY);
+    audit_(ou, 'website.reset', SITE_KEY, '');
+    return ok({ saved: false, updatedAt: '', updatedBy: '', sections: siteClean_(SITE_SEED_) }, 'Website reset to the built-in content.');
+  } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
 }

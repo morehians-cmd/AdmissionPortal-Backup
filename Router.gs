@@ -40,6 +40,3 @@ function include(f) {
   if (INCLUDE_ALLOWED_.indexOf(String(f)) < 0) throw new Error('Unknown template partial.');
   return HtmlService.createHtmlOutputFromFile(String(f)).getContent();
 }
-
-/** Used by the portal's Home link. */
-function getHomeUrl() { return ScriptApp.getService().getUrl(); }

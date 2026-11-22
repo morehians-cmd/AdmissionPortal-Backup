@@ -1225,8 +1225,7 @@ html[data-theme=dark] .shchip.sh-pending{
 const $=id=>document.getElementById(id),S={tabs:[],cur:'search'};
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ic=d=>`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
-const I={home:ic('M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z'),adm:ic('M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6'),rep:ic('M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h8'),me:ic('M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'),out:ic('M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9'),search:ic('M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3'),x:ic('M18 6L6 18M6 6l12 12'),
-web:ic('M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z')};
+const I={home:ic('M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z'),adm:ic('M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6'),rep:ic('M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h8'),me:ic('M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'),out:ic('M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9'),search:ic('M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3'),x:ic('M18 6L6 18M6 6l12 12'),web:ic('M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z')};
 function toast(m,k=true){const t=$('toast');t.textContent=m;t.style.background=k==='warn'?'#b86e00':k?'#198754':'#c0392b';t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),4000)}
 function call(fn,a,cb){$('load').classList.remove('hidden');google.script.run.withSuccessHandler(r=>{$('load').classList.add('hidden');if(!r.success){toast(r.error,false);if(/Session expired/.test(r.error))setTimeout(()=>location.reload(),1500);return}cb(r)}).withFailureHandler(e=>{$('load').classList.add('hidden');toast(e.message,false)})[fn](...a)}
 const T=()=>S.token,A=()=>S.user.Role==='admin',head=(t,s)=>{$('title').textContent=t;$('sub').textContent=s||''};
@@ -2473,7 +2472,7 @@ const WS_NAMES={admission:'Admission steps',about:'About Moreh Academy preview',
   slides:{p:'hero.slides',n:'Slide',make:()=>''},
   values:{p:'values.items',n:'Value',make:()=>({label:'',icon:'★',on:true})},
   steps:{p:'admission.steps',n:'Step',make:()=>({t:'',d:'',i:'•'})},
-  programs:{p:'programs.items',n:'Program',make:()=>({name:'',desc:'',photo:'',on:true})},
+  programs:{p:'programs.items',n:'Program',make:()=>({name:'',desc:'',on:true})},
   news:{p:'news.items',n:'Item',make:()=>({title:'',date:'',summary:'',link:''})}};
 S.site=null;S.siteMeta=null;
 const wspGet=(o,p)=>p.split('.').reduce((v,k)=>v==null?undefined:v[k],o);
@@ -2495,12 +2494,12 @@ function pgsCard(){
   <p style="color:var(--mut);margin-top:0">The pages in the homepage menu below the sections above. A page with nothing saved shows its built-in cards and “Content coming soon”.</p>
   <div class="f"><label for="pgSel">Page</label><select id="pgSel">${groups}</select></div>
   <div class="f"><label for="pgTxt">Content</label><textarea id="pgTxt" rows="14" maxlength="6000" placeholder="Write this page here.&#10;&#10;## A heading&#10;A paragraph with **bold**, *italic* and [a link](https://example.com).&#10;- a bullet&#10;&#10;![Photo caption](https://example.com/photo.jpg)">${esc(txt)}</textarea></div>
-  <p style="color:var(--mut);font-size:13px;margin-top:6px">Start a line with <b>##</b> for a heading, <b>-</b> for a bullet and <b>![alt](https://…)</b> or a Media Library reference for a photo. Blank lines separate paragraphs.</p>
-  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="pgsave">Save page drafts</button><button class="btn alt" data-act="pgreload">Discard changes</button><button class="btn red" data-act="pgreset">Discard page drafts</button></div>
+  <p style="color:var(--mut);font-size:13px;margin-top:6px">Start a line with <b>##</b> for a heading, <b>-</b> for a bullet and <b>![alt](https://…)</b> for a photo. Blank lines separate paragraphs.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="pgsave">Save pages</button><button class="btn alt" data-act="pgreload">Discard changes</button><button class="btn red" data-act="pgreset">Reset all pages</button></div>
   ${g.meta&&g.meta.updatedAt?`<p style="color:var(--mut);font-size:13px;margin-bottom:0">Last saved ${esc(new Date(g.meta.updatedAt).toLocaleString())} by ${esc(g.meta.updatedBy||'—')}.</p>`:''}</div>`;
 }
 function websitePage(){
- head('Website Management','Edit drafts, review the published version, then publish when ready.');
+ head('Website Management','Edit the public homepage and its inner pages. Saved changes go live immediately.');
  call('getSiteAdmin',[T()],r=>{
   S.site=r.data.sections;S.siteMeta=r.data;
   call('getPagesAdmin',[T()],p=>{
@@ -2510,44 +2509,27 @@ function websitePage(){
   },m=>{S.pg=null;wsRender();toast(m)});
  });
 }
-function wsRenderLegacy(){
+function wsRender(){
  const d=S.site,m=S.siteMeta||{},home=m.home||'';
  $('view').innerHTML=[
-
+  `<div class="card"><div class="ch"><h3>Homepage content</h3><span class="chip ${m.saved?'ok':'warn'}">${m.saved?'Saved copy is live':'Built-in defaults'}</span></div>
+   <p style="color:var(--mut);margin-top:0">This edits the public homepage${home?' at <b>'+esc(home)+'</b>':''}. It is stored in the Content sheet; nothing else in the portal changes.</p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="wssave">Save &amp; publish</button><button class="btn alt" data-act="wsreload">Discard changes</button>${home?'<button class="btn alt" data-act="wsview">Open homepage</button>':''}<button class="btn red" data-act="wsreset">Reset to defaults</button></div>
+   ${m.updatedAt?`<p style="color:var(--mut);font-size:13px;margin-bottom:0">Last saved ${esc(new Date(m.updatedAt).toLocaleString())} by ${esc(m.updatedBy||'—')}.</p>`:''}</div>`,
   `<div class="card"><div class="ch"><h3>School identity</h3></div><div class="g">${wf('Tagline','masthead.tagline',d.masthead.tagline)}</div></div>`,
   wcard('ids','Schools in the top bar',(d.masthead.ids||[]).map((x,i)=>wrow('ids',i,WS_LISTS.ids.n,
-   wf('School name','masthead.ids.'+i+'.name',x.name)+wf('Short name (2–4 letters)','masthead.ids.'+i+'.short',x.short)+wf('Logo image reference','masthead.ids.'+i+'.logo',x.logo)+`<div style="margin-top:8px"><button class="btn alt" type="button" data-act="wsselectlogo" data-v="masthead.ids.${i}.logo">Select from Media Library</button></div>`+wf('Facebook page URL','masthead.ids.'+i+'.fb',x.fb))).join(''),'The logo is optional; the short name is shown when there is none.'),
+   wf('School name','masthead.ids.'+i+'.name',x.name)+wf('Short name (2–4 letters)','masthead.ids.'+i+'.short',x.short)+wf('Logo image URL','masthead.ids.'+i+'.logo',x.logo)+wf('Facebook page URL','masthead.ids.'+i+'.fb',x.fb))).join(''),'The logo is optional; the short name is shown when there is none.'),
   `<div class="card"><div class="ch"><h3>Hero (top of the homepage)</h3></div><div class="g">${wf('Small line above the name','hero.title',d.hero.title)}${wf('School name (large)','hero.name',d.hero.name)}${wf('Subtitle','hero.subtitle',d.hero.subtitle)}${wt('Description','hero.desc',d.hero.desc)}${wf('Main button label','hero.enroll.label',d.hero.enroll.label)}${wf('Main button link (#create, route:about, https://…)','hero.enroll.to',d.hero.enroll.to)}${wf('Second button label','hero.discover.label',d.hero.discover.label)}${wf('Second button link','hero.discover.to',d.hero.discover.to)}${wf('Slide interval (milliseconds)','hero.intervalMs',d.hero.intervalMs,'number')}</div></div>`,
-  wcard('slides','Hero slides',(d.hero.slides||[]).map((x,i)=>wrow('slides',i,WS_LISTS.slides.n,
-  wf('Image URL (empty = coloured background)','hero.slides.'+i,x)+
-  '<div style="margin-top:8px"><button class="btn alt" type="button" data-act="wsselecthero" data-v="hero.slides.'+i+'">Select from Media Library</button></div>'
- )).join(''),'Use the Media Library to choose an existing image. The URL field remains available for backward compatibility.'),
-  `<div class="card" id="ws-media-library"><div class="ch"><h3>Media Library</h3><span class="chip ok">Existing assets</span></div>
-   <p style="color:var(--mut);margin-top:0">A central view of the images already used by the public website. This first version reuses the existing Gallery and homepage hero records, so nothing is duplicated or moved.</p>
-   <div id="wsMediaBody" style="min-height:70px"><p style="color:var(--mut);margin-bottom:0">Loading media inventory…</p></div>
-  </div>`,
+  wcard('slides','Hero slides',(d.hero.slides||[]).map((x,i)=>wrow('slides',i,WS_LISTS.slides.n,wf('Image URL (empty = coloured background)','hero.slides.'+i,x))).join(''),'An empty slide keeps the built-in blue and orange background.'),
   wcard('values','Our values strip',(d.values.items||[]).map((x,i)=>wrow('values',i,WS_LISTS.values.n,wf('Label','values.items.'+i+'.label',x.label)+wf('Icon (emoji)','values.items.'+i+'.icon',x.icon)+wc('Show','values.items.'+i+'.on',x.on))).join('')),
   `<div class="card"><div class="ch"><h3>Admission process</h3></div><div class="g">${wf('Section title','admission.title',d.admission.title)}${wf('Section subtitle','admission.sub',d.admission.sub)}</div></div>`,
   wcard('steps','Admission steps',(d.admission.steps||[]).map((x,i)=>wrow('steps',i,WS_LISTS.steps.n,wf('Step title','admission.steps.'+i+'.t',x.t)+wt('Description','admission.steps.'+i+'.d',x.d)+wf('Icon (emoji)','admission.steps.'+i+'.i',x.i))).join(''),'They are numbered automatically, in the order shown here.'),
-  `<div class="card"><div class="ch"><h3>About preview</h3><span class="chip ok">About Moreh Academy</span></div>
-   <div class="g">${wf('Homepage heading','about.heading',d.about.heading)}${wt('Homepage text','about.text',d.about.text)}</div>
-   <div style="margin-top:12px;padding:14px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)">
-    <b style="color:var(--navy)">Single source of truth</b>
-    <p style="margin:5px 0 10px;color:var(--mut)">The homepage About preview is now populated from the main About Moreh Academy page. Edit the institutional About page instead of maintaining a second copy here.</p>
-    <button class="btn alt" data-act="wsabout">Open About Moreh Academy</button>
-   </div>
-  </div>`,
+  `<div class="card"><div class="ch"><h3>About preview</h3></div><div class="g">${wf('Heading','about.heading',d.about.heading)}${wt('Paragraph','about.text',d.about.text)}${wf('Link label','about.linkLabel',d.about.linkLabel)}${wf('Photo URL','about.photo',d.about.photo)}</div></div>`,
   `<div class="card"><div class="ch"><h3>Academic programs</h3></div><div class="g">${wf('Section title','programs.title',d.programs.title)}</div></div>`,
-  wcard('programs','Program cards',(d.programs.items||[]).map((x,i)=>wrow('programs',i,WS_LISTS.programs.n,wf('Program','programs.items.'+i+'.name',x.name)+wt('Description','programs.items.'+i+'.desc',x.desc)+wf('Image reference','programs.items.'+i+'.photo',x.photo)+`<div style="margin-top:8px"><button class="btn alt" type="button" data-act="wsselectprogram" data-v="programs.items.${i}.photo">Select from Media Library</button></div>`+wc('Show','programs.items.'+i+'.on',x.on))).join('')),
-  `<div class="card"><div class="ch"><h3>News &amp; announcements</h3><span class="chip ok">Campus Bulletin</span></div>
-   <div class="g">${wf('Section title','news.title',d.news.title)}</div>
-   <div style="margin-top:12px;padding:14px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)">
-    <b style="color:var(--navy)">Single source of truth</b>
-    <p style="margin:5px 0 10px;color:var(--mut)">Homepage news is now supplied from Campus Bulletin. Create and edit announcements and events there instead of entering the same post twice.</p>
-    <button class="btn alt" data-act="wsbulletin">Open Campus Bulletin</button>
-   </div>
-  </div>`,
-  `<div class="card"><div class="ch"><h3>Footer &amp; contact</h3><span class="chip ok">Public site</span></div>\n   <div class="g">${wf('Address','footer.loc',d.footer.loc)}${wf('Phone','footer.phone',d.footer.phone)}${wf('Email','footer.email',d.footer.email)}${wf('Facebook URL','footer.fb',d.footer.fb)}${wf('YouTube URL','footer.yt',d.footer.yt)}</div>\n   <div style="margin-top:12px;padding:14px;border:1px dashed var(--line);border-radius:12px;background:var(--soft)">\n    <b style="color:var(--navy)">Contact details aligned</b>\n    <p style="margin:5px 0 0;color:var(--mut)">The website footer now starts with the same public admissions contact details already used by the portal. Keep this information consistent when updating the school’s public contact details.</p>\n   </div>\n  </div>`,
+  wcard('programs','Program cards',(d.programs.items||[]).map((x,i)=>wrow('programs',i,WS_LISTS.programs.n,wf('Program','programs.items.'+i+'.name',x.name)+wt('Description','programs.items.'+i+'.desc',x.desc)+wc('Show','programs.items.'+i+'.on',x.on))).join('')),
+  `<div class="card"><div class="ch"><h3>News &amp; announcements</h3></div><div class="g">${wf('Section title','news.title',d.news.title)}</div></div>`,
+  wcard('news','Announcements',(d.news.items||[]).map((x,i)=>wrow('news',i,WS_LISTS.news.n,wf('Title','news.items.'+i+'.title',x.title)+wf('Date (e.g. 12 Aug 2026)','news.items.'+i+'.date',x.date)+wt('Summary','news.items.'+i+'.summary',x.summary)+wf('Read-more link','news.items.'+i+'.link',x.link))).join(''),'With no announcements the homepage shows a short “No announcements yet” card.'),
+  `<div class="card"><div class="ch"><h3>Footer &amp; contact</h3></div><div class="g">${wf('Address','footer.loc',d.footer.loc)}${wf('Phone','footer.phone',d.footer.phone)}${wf('Email','footer.email',d.footer.email)}${wf('Facebook URL','footer.fb',d.footer.fb)}${wf('YouTube URL','footer.yt',d.footer.yt)}</div></div>`,
   `<div class="card"><div class="ch"><h3>Section order &amp; visibility</h3></div><div class="g" style="grid-template-columns:1fr">${(d.display.order||[]).map((k,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)"><b style="flex:1">${esc(WS_NAMES[k]||k)}</b><button class="btn alt" data-act="wsmove" data-v="order:${i}:-1" aria-label="Move up">↑</button><button class="btn alt" data-act="wsmove" data-v="order:${i}:1" aria-label="Move down">↓</button><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-act="wstoggle" data-v="${k}" ${((d.display.hidden||[]).indexOf(k)<0)?'checked':''}> Show</label></div>`).join('')}<label style="display:flex;gap:8px;align-items:center;padding:10px 0"><input type="checkbox" data-act="wstoggle" data-v="values" ${((d.display.hidden||[]).indexOf('values')<0)?'checked':''}> Show the “Our values” strip above the sections</label></div></div>`,
   `<div class="card"><div class="ch"><h3>Menu &amp; page cards</h3></div>
    <p style="color:var(--mut);margin-top:0">The six menus in the top bar and the cards on each group page. Renaming a card keeps its address and its saved content.</p>
@@ -2560,130 +2542,6 @@ function wsRenderLegacy(){
  ].join('');
  wsBind();
 }
-
-/* ===== Website Management Center shell =====
- * Keeps the existing field editor intact, but adds a clearer CMS-style control
- * surface above it: status, quick actions, publishing metadata and management
- * guidance. Existing save/reset/page actions remain unchanged.
- */
-function wsRender(){
-  wsRenderLegacy();
-  const v=$('view');
-  if(!v) return;
-  delete v.dataset.wsShell;
-  v.dataset.wsShell='1';
-  const m=S.siteMeta||{}, d=S.site||{};
-  const counts={
-    schools:Array.isArray(d.masthead&&d.masthead.ids)?d.masthead.ids.length:0,
-    slides:Array.isArray(d.hero&&d.hero.slides)?d.hero.slides.filter(Boolean).length:0,
-    values:Array.isArray(d.values&&d.values.items)?d.values.items.filter(x=>x&&x.on!==false).length:0,
-    programs:Array.isArray(d.programs&&d.programs.items)?d.programs.items.filter(x=>x&&x.on!==false).length:0,
-    news:Array.isArray(d.news&&d.news.items)?d.news.items.length:0,
-    pages:S.pg&&S.pg.text?Object.values(S.pg.text).filter(x=>String(x||'').trim()).length:0
-  };
-  const stamp=m.updatedAt?new Date(m.updatedAt).toLocaleString():'Not published yet';
-  const status=(m.draftSaved?'<span class="chip warn">Draft changes</span>':'')+(m.saved?'<span class="chip ok">Published</span>':'<span class="chip warn">Using built-in defaults</span>');
-  const home=m.home||'';
-  const shell=document.createElement('div');
-  shell.className='card';
-  shell.style.cssText='margin-bottom:16px;border-top:4px solid var(--blue);padding:20px';
-  shell.innerHTML=
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">'+
-      '<div style="min-width:240px;flex:1">'+
-        '<div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:4px">Website Management Center</div>'+
-        '<h2 style="margin:0;color:var(--navy);font-size:26px">Public Website</h2>'+
-        '<p style="margin:6px 0 0;color:var(--mut)">Manage homepage content, navigation, inner pages and public-facing information from one place.</p>'+
-      '</div>'+
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'+
-        status+
-        (home?'<button class="btn alt" data-act="wsview">Open website</button>':'')+
-        '<button class="btn alt" data-act="wssave">Save draft</button>'+ '<button class="btn alt" data-act="wspreview">Preview draft</button>'+ '<button class="btn" data-act="wspublish">Publish website</button>'+ (m.rollbackAvailable?'<button class="btn red" data-act="wsrollback">Rollback last publish</button>':'')+ 
-      '</div>'+
-    '</div>'+
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin-top:18px">'+
-      [['Homepage','Live'],['Schools',counts.schools],['Hero images',counts.slides],['Values',counts.values],['Programs',counts.programs],['News items',counts.news],['Inner pages',counts.pages]].map(x=>
-        '<div style="border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:var(--soft)">'+
-          '<div style="font-size:12px;color:var(--mut)">'+esc(x[0])+'</div><b style="display:block;margin-top:2px;color:var(--navy)">'+esc(String(x[1]))+'</b>'+
-        '</div>').join('')+
-    '</div>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">'+
-      [['School identity','School identity'],['Hero & media','Hero (top of the homepage)'],['Media Library','Media Library'],['Admissions','Admission process'],['Programs','Academic programs'],['Navigation','Menu & page cards'],['Inner pages','Inner pages']].map(x=>
-        '<button class="btn alt" style="font-size:12px;padding:7px 11px" data-act="wsjump" data-v="'+esc(x[1])+'">'+esc(x[0])+'</button>').join('')+
-    '</div>'+
-    '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut)">'+
-      '<span>Last published: <b style="color:var(--txt)">'+esc(m.publishedAt?new Date(m.publishedAt).toLocaleString():stamp)+'</b>'+(m.publishedBy?' · '+esc(m.publishedBy):'')+'</span>'+ 
-      '<span>Saving creates a private draft. Only Publish website changes the public site.</span>'+ 
-    '</div>';
-  v.insertBefore(shell,v.firstChild);
-  wsMediaLoad();
-}
-
-act.wsjump=label=>{
-  const cards=[...document.querySelectorAll('#view .card')];
-  const hit=cards.find(card=>String(card.querySelector('h3')&&card.querySelector('h3').textContent||'').trim()===String(label).trim());
-  if(hit){hit.scrollIntoView({behavior:'smooth',block:'start'});const h=hit.querySelector('h3');if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}}
-};
-(function(){const s=document.createElement('style');s.textContent=`.wshgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.wshitem{display:flex;gap:10px;align-items:center;text-align:left;padding:9px;border:1px solid var(--line);border-radius:11px;background:var(--surface,#fff);cursor:pointer;color:var(--txt)}.wshitem:hover{border-color:var(--blue);transform:translateY(-1px)}.wshthumb{width:72px;height:54px;flex:none;border-radius:8px;background:var(--soft) center/cover no-repeat}.wshitem b,.wshitem small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wshitem b{font-size:12.5px;color:var(--navy)}.wshitem small{font-size:11px;color:var(--mut);margin-top:3px}.wsmfilters{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:8px;margin:10px 0}.wsmfilters input,.wsmfilters select{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface,#fff);color:var(--txt)}.wsmgrid{display:grid;gap:8px}.wsmrow{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--surface,#fff)}.wsmthumb{width:64px;height:52px;border-radius:8px;background-position:center;background-size:cover;background-repeat:no-repeat;flex:none}.wsmdata{min-width:0;flex:1}.wsmdata b,.wsmdata span,.wsmdata small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.wsmdata span{font-size:12px;color:var(--mut);margin-top:2px}.wsmdata small{font-size:11.5px;color:var(--mut);margin-top:4px}.wsmact{flex:none}.wsmtop{display:flex;justify-content:space-between;align-items:center;gap:12px}.wsmtop span{display:block;color:var(--mut);font-size:12px;margin-top:3px}@media(max-width:620px){.wsmfilters{grid-template-columns:1fr}.wsmrow{align-items:flex-start}.wsmact .btn{padding:7px 9px}.wsmthumb{width:54px;height:48px}}`;document.head.appendChild(s)})();
-function wsMediaLoad(){
- const el=$('wsMediaBody'); if(!el)return;
- call('getMediaLibraryAdmin',[T()],r=>{
-  const d=r.data||{},items=Array.isArray(d.items)?d.items:[],state={q:'',source:'All'};
-  const sources=['All',...Array.from(new Set(items.map(x=>x.source).filter(Boolean)))];
-  const render=()=>{
-   const q=state.q.toLowerCase(),vis=items.filter(x=>(state.source==='All'||x.source===state.source)&&(!q||[x.title,x.caption,x.alt,x.source,x.page].join(' ').toLowerCase().includes(q)));
-   const opts=sources.map(s=>'<option '+(s===state.source?'selected':'')+'>'+esc(s)+'</option>').join('');
-   const rows=vis.map(x=>{
-    const thumb=x.url?"background-image:url('"+esc(x.url)+"')":'background:var(--soft)';
-    return '<div class="wsmrow" data-mid="'+esc(x.id)+'"><div class="wsmthumb" style="'+thumb+'"></div><div class="wsmdata"><b>'+esc(x.title||'Untitled media')+'</b><span>'+esc(x.source||'Website media')+(x.page?' · '+esc(x.page):'')+'</span><small>'+esc(x.alt||'No alt text set')+'</small>'+(x.usedOn&&x.usedOn.length?'<small><b style="display:inline;color:var(--navy)">Used on:</b> '+esc(x.usedOn.join(' · '))+'</small>':'<small style="font-style:italic">Not currently assigned to a page.</small>')+'</div><div class="wsmact"><button class="btn alt" data-act="wsmedit" data-v="'+esc(x.id)+'">Edit</button></div></div>';
-   }).join('');
-   el.innerHTML='<div class="wsmtop"><div><b>Website Media</b><span>'+vis.length+' of '+items.length+' assets</span></div><button class="btn" data-act="wsmediaadd">+ Add photo</button></div><div class="wsmfilters"><input id="wsmq" placeholder="Search media…" value="'+esc(state.q)+'"><select id="wsms">'+opts+'</select></div><div class="wsmgrid">'+(rows||'<div class="aemp">No media matches your filter.</div>')+'</div><p style="font-size:12px;color:var(--mut);margin:10px 0 0">Media stays in the existing Gallery/Drive storage. Metadata is managed centrally here.</p>';
-   const qel=$('wsmq'),sel=$('wsms');if(qel){qel.oninput=()=>{state.q=qel.value;render()};qel.onkeydown=e=>{if(e.key==='Escape'){state.q='';render()}}}if(sel)sel.onchange=()=>{state.source=sel.value;render()};
-  };render();window.__WS_MEDIA__={items,render};
- },m=>{el.innerHTML='<p style="color:#b3261e;margin-bottom:0">'+esc(m||'Could not load media library.')+'</p>';});
-}
-function wsMediaFind(id){const s=window.__WS_MEDIA__;return s&&s.items.find(x=>x.id===id)}
-act.wsmedit=id=>{
- const x=wsMediaFind(id);if(!x)return;const m=document.createElement('div');m.className='mod';m.id='wsmm';m.dataset.id=id;
- m.innerHTML='<div style="max-width:560px;width:100%"><div class="bd"><h3 style="color:var(--navy);margin-bottom:6px">Edit media</h3><p style="color:var(--mut);font-size:13px;margin-top:0">'+esc(x.source||'Website media')+(x.page?' · '+esc(x.page):'')+'</p><div class="f"><label>Title</label><input id="wsmmt" value="'+esc(x.title||'')+'" style="text-transform:none"></div><div class="f"><label>Alt text</label><input id="wsmma" value="'+esc(x.alt||'')+'" style="text-transform:none"></div><div class="f"><label>Caption</label><textarea id="wsmmc" rows="3" style="text-transform:none">'+esc(x.caption||'')+'</textarea></div></div><div class="ft"><button class="btn alt" data-act="wsmmx">Cancel</button><button class="btn" data-act="wsmmgo">Save details</button></div></div>';
- document.body.appendChild(m);$('wsmmt').focus();
-}
-act.wsmmx=()=>{const m=$('wsmm');if(m)m.remove()};
-act.wsmmgo=()=>{const m=$('wsmm'),x=wsMediaFind(m&&m.dataset.id||'');if(!m||!x)return;call('saveMediaMetaAdmin',[T(),x.id,{title:$('wsmmt').value,alt:$('wsmma').value,caption:$('wsmmc').value}],r=>{m.remove();toast(r.message);wsMediaLoad()})};
-act.wsmediaadd=()=>{const f=document.createElement('input');f.type='file';f.accept='image/jpeg,image/png,image/webp';f.onchange=()=>{const file=f.files&&f.files[0];if(!file)return;const im=new Image();im.onerror=()=>toast('That file could not be read as an image.',false);im.onload=()=>{const k=Math.min(1,1000/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);const cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0,cv.width,cv.height);const url=cv.toDataURL('image/jpeg',.8);if(url.length>2100000)return toast('Photo is still too large after resizing. Try a smaller image.',false);const title=prompt('Media title:','Moreh Academy Facilities Photo');if(title===null)return;const alt=prompt('Alt text:',title);if(alt===null)return;const cap=prompt('Caption (optional):','');if(cap===null)return;call('addMediaLibraryPhoto',[T(),url,title,cap,alt],r=>{toast(r.message);wsMediaLoad()})};im.src=URL.createObjectURL(file)};f.click()};
-function wsHeroApply(path,url){wspSet(S.site,path,url||'');wsRender()}
-function wsMediaPicker(title,done){
- const s=window.__WS_MEDIA__;if(!s||!s.items){toast('Media Library is still loading. Try again in a moment.',false);return}
- const imgs=s.items.filter(x=>x.type==='image');
- const m=document.createElement('div');m.className='mod';m.id='wshm';
- const rows=imgs.map(x=>{
-  const bg=x.url?'background-image:url(&quot;'+esc(x.url)+'&quot;)':'background:var(--soft)',ref=x.url?'':' · stored in Gallery';
-  return '<button type="button" class="wshitem" data-mid="'+esc(x.id)+'"><span class="wshthumb" style="'+bg+'"></span><span><b>'+esc(x.title||'Untitled media')+'</b><small>'+esc(x.source||'Website media')+esc(ref)+'</small></span></button>';
- }).join('');
- m.innerHTML='<div style="max-width:680px;width:100%"><div class="bd"><h3 style="color:var(--navy);margin-bottom:5px">'+esc(title)+'</h3><p style="color:var(--mut);font-size:13px;margin-top:0">Choose an existing image from the centralized Media Library. Gallery photos remain in protected Gallery storage and are referenced by ID.</p><div class="wshgrid">'+(rows||'<div class="aemp">No images are available yet.</div>')+'</div></div><div class="ft"><button class="btn alt" data-act="wshx">Cancel</button></div></div>';
- document.body.appendChild(m);
- m.querySelectorAll('[data-mid]').forEach(b=>b.onclick=()=>{
-  const x=wsMediaFind(b.dataset.mid);if(!x)return;
-  if(x.url){done({ref:x.url,title:x.title||'Moreh Academy image'});m.remove();return}
-  if(x.page&&x.refId){
-   b.disabled=true;b.innerHTML='<span class="wshthumb" style="background:var(--soft)"></span><span><b>Loading image…</b><small>Please wait</small></span>';
-   call('getGalleryPhoto',[T(),x.page,x.refId],r=>{
-    if(r&&r.success&&r.data){done({ref:'gallery:'+x.page+':'+x.refId,title:x.title||'Moreh Academy image'});m.remove()}
-    else {b.disabled=false;toast(r&&r.message||'Could not load that gallery photo.',false)}
-   });
-  }
- });
-}
-act.wsselecthero=path=>wsMediaPicker('Select Hero Media',m=>wsHeroApply(path,m.ref));
-act.wsselectprogram=path=>wsMediaPicker('Select Program Media',m=>{wspSet(S.site,path,m.ref);wsRender()});
-act.wsselectlogo=path=>wsMediaPicker('Select School Logo',m=>{wspSet(S.site,path,m.ref);wsRender()});
-act.pgmedia=()=>wsMediaPicker('Insert Page Media',m=>{
- const ta=$('pgTxt');if(!ta||!S.pg)return;
- const route=S.pg.route,old=ta.value||'',alt=m.title||'Moreh Academy image',ins='!['+alt.replace(/\]/g,'')+']('+m.ref+')';
- const pos=ta.selectionStart==null?old.length:ta.selectionStart;
- S.pg.text[route]=old.slice(0,pos)+ins+old.slice(pos);
- ta.value=S.pg.text[route];ta.focus();ta.selectionStart=ta.selectionEnd=pos+ins.length;
-});
-act.wshx=()=>{const m=$('wshm');if(m)m.remove()};
 function wsBind(){const v=$('view');v.querySelectorAll('[data-sp]').forEach(el=>{const h=()=>{wspSet(S.site,el.dataset.sp,el.type==='checkbox'?el.checked:el.value)};el.oninput=h;el.onchange=h});
  const sel=$('pgSel'),ta=$('pgTxt');
  if(sel&&S.pg)sel.onchange=()=>{S.pg.route=sel.value;wsRender()};
@@ -2693,18 +2551,13 @@ act.wsadd=k=>{const L=WS_LISTS[k];if(!L)return;const a=wspGet(S.site,L.p);if(!Ar
 act.wsdel=v=>{const p=String(v).split(':'),L=WS_LISTS[p[0]];if(!L)return;const a=wspGet(S.site,L.p);if(!Array.isArray(a))return;a.splice(+p[1],1);wsRender()};
 act.wsmove=v=>{const p=String(v).split(':'),k=p[0],i=+p[1],step=+p[2],a=k==='order'?S.site.display.order:wspGet(S.site,WS_LISTS[k].p);if(!Array.isArray(a))return;const j=i+step;if(j<0||j>=a.length)return;const t=a[i];a[i]=a[j];a[j]=t;wsRender()};
 act.wstoggle=k=>{const dp=S.site.display,h=dp.hidden||(dp.hidden=[]),i=h.indexOf(k);if(i<0)h.push(k);else h.splice(i,1);wsRender()};
-act.wssave=()=>call('saveSiteAdmin',[T(),S.site],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);websitePage()});
-act.wspublish=()=>{if(!confirm('Publish the saved homepage and inner-page drafts to the public website?'))return;call('publishWebsiteAdmin',[T()],r=>{toast(r.message);websitePage()})};
-act.wspreview=()=>{const win=window.open('about:blank','_blank');call('createWebsitePreviewTicket',[T()],r=>{if(win)win.location.href=r.data.url;else toast('Allow pop-ups to open the preview.',false)})};
-act.wsrollback=()=>{if(!confirm('Restore the version that was live immediately before the last publish? This will replace the current published content.'))return;call('rollbackWebsiteAdmin',[T()],r=>{toast(r.message);websitePage()})};
+act.wssave=()=>call('saveSiteAdmin',[T(),S.site],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()});
 act.wsreload=()=>{if(confirm('Discard unsaved changes?'))websitePage()};
 act.wsview=()=>{if(S.siteMeta&&S.siteMeta.home)window.open(S.siteMeta.home,'_blank','noopener')};
-act.wsbulletin=()=>{try{document.querySelector('[data-act="nav"][data-v="ev"]')?.click()}catch(_){} };
-act.wsabout=()=>{try{document.querySelector('[data-act="nav"][data-v="cp"]')?.click()}catch(_){} };
-act.wsreset=()=>{if(!confirm('Discard the homepage draft and reload the latest published version? The public website will not change.'))return;call('resetSiteAdmin',[T()],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);websitePage()})};
-act.pgsave=()=>{if(!S.pg)return;call('savePagesAdmin',[T(),S.pg.text],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);websitePage()})};
+act.wsreset=()=>{if(!confirm('Return the homepage to its built-in content? The saved copy is removed and the built-in text is shown again.'))return;call('resetSiteAdmin',[T()],r=>{S.site=r.data.sections;S.siteMeta=Object.assign({},S.siteMeta,r.data);toast(r.message);wsRender()})};
+act.pgsave=()=>{if(!S.pg)return;call('savePagesAdmin',[T(),S.pg.text],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
 act.pgreload=()=>{if(confirm('Discard unsaved page changes?'))websitePage()};
-act.pgreset=()=>{if(!S.pg)return;if(!confirm('Discard all inner-page drafts and reload the latest published pages?'))return;call('resetPagesAdmin',[T()],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);websitePage()})};
+act.pgreset=()=>{if(!S.pg)return;if(!confirm('Remove the saved copy of every inner page? They go back to their built-in text.'))return;call('resetPagesAdmin',[T()],r=>{S.pg.meta=Object.assign({},S.pg.meta,r.data);S.pg.text=r.data.pages;toast(r.message);wsRender()})};
 
 /* ===== Scoop-style sidebar: replaces navBtn, renderNav and act.ngtoggle ===== */
 // Optional badges. Key = menu id or group name. c = r (red) | y (yellow) | g (green)
@@ -2917,7 +2770,7 @@ $('gs').addEventListener('keydown',e=>{
 
 /* profile dropdown: aria, outside click, Escape */
 const ddClose=()=>{$('dd').classList.add('hidden');$('av').setAttribute('aria-expanded','false')};
-act.dd=()=>{const o=$('dd').classList.toggle('hidden');$('av').setAttribute('aria-expanded',String(!o));$('np').classList.add('hidden');if(!$('dd').classList.contains('hidden')){const b=$('dd').querySelector('button');if(b)b.focus()}};
+act.dd=()=>{const o=$('dd').classList.toggle('hidden');$('av').setAttribute('aria-expanded',String(!o));$('np').classList.add('hidden')};
 document.addEventListener('click',e=>{
  if(!e.target.closest('[data-act=dd],#dd'))ddClose();
  if(!e.target.closest('[data-act=bell],#np'))$('np').classList.add('hidden');
@@ -4905,10 +4758,6 @@ function thMake(cls){const b=document.createElement('button');b.type='button';b.
 /* top bar (after sign-in) + a menu item for phones */
 const _topInitTh=topInit;
 topInit=function(){_topInitTh();
- {const tr0=document.querySelector('.top .tr');
-  if(tr0&&!$('tdate')){const d=document.createElement('span');d.id='tdate';d.className='tdate';
-   d.innerHTML=I.cal+new Date().toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});
-   tr0.insertBefore(d,tr0.firstChild)}}
  const tr=document.querySelector('.top .tr');if(tr&&!tr.querySelector('.theme-switch'))tr.insertBefore(thMake(),tr.firstChild);
  const dd=$('dd');if(dd&&!dd.querySelector('[data-act=thtoggle]')){const l=dd.querySelector('.ddl');if(l)l.insertAdjacentHTML('beforebegin','<button role="menuitem" data-act="thtoggle">'+I.star+'<span id="thl"></span></button>')}
  MRH_THEME.sync();thLabel()};
