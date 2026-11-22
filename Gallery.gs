@@ -42,6 +42,14 @@ function getGalleryPhoto(token, page, id) {
   } catch (e) { return fail(e); }
 }
 
+/** PUBLIC WEBSITE. Returns only photos explicitly registered in a public gallery page. */
+function getPublicGalleryPhoto(page, id) {
+  try {
+    if (!galRead_(page).list.some(x => x.id === String(id))) throw new Error('Photo not found.');
+    return ok(photo_(String(id)));
+  } catch (e) { return fail(e); }
+}
+
 /** OWNER ONLY. dataUrl must be a JPEG data URI (the browser resizes and converts before sending). */
 function addGalleryPhoto(token, page, dataUrl, caption) {
   const lock = LockService.getScriptLock(); let fid = '', saved = false;
