@@ -4,7 +4,7 @@
  *  Speed (caches, lookups) | SignInGuard (trusted devices, mail buckets) | Housekeeping (script property cleanup) | Retention (disposal jobs)
  *  Keep your existing SALT value. Add new columns only at the END of FIELDS / UCOLS. Deploy a NEW version after every change. */
 const SALT = 'M0r3#@cad3m4';
-const PHOTO_FOLDER_ID = '18YcLeZCXpbO4-UIGov6PRlEV1CpZMHxb';
+const PHOTO_FOLDER_ID = '1jEmRsASlU0J-qvqOqj9ftADoxZPI49rq';
 // Optional: public image URL of the blank letterhead (A4 portrait). Leave '' to use the built-in drawn letterhead.
 const LETTERHEAD_URL = '';
 const SCHOOL = 'MOREH ACADEMY', HEAD_NAME = 'JOSE JAY I. CABARDO', HEAD_TITLE = 'Head, Admissions Office', FEE = 1000;
@@ -444,30 +444,6 @@ function report(token, type, arg) {
     };
     if (!Object.prototype.hasOwnProperty.call(R, type)) throw new Error('Unknown report.');
     const out = R[type](); out.asof = asof; return ok(out);
-  } catch(e) { return fail(e); }
-}
-
-
-/** PUBLIC: step 1 of password reset. Emails a 6-digit code; does NOT change the password. Always returns the same message. */
-function forgotPassword(identifier) {
-  try {
-    const key = String(identifier||'').trim().toLowerCase(); if (!key) throw new Error('Enter your username or registered email.');
-    const cache = CacheService.getScriptCache();
-    if (cache.get('fp_'+key)) throw new Error('A code was requested recently. Please wait 5 minutes, or use the code already sent to your email.');
-    cache.put('fp_'+key, '1', 300);
-    const u = rows_('U').find(x => x.Username===key || (x.Email||'').toLowerCase()===key);
-    if (u) {
-      const s = rows_('S').find(x => x.StudentID===u.StudentID) || {};
-      const to = u.Email || s.Email || (u.Username.indexOf('@')>0 ? u.Username : '');
-      if (to) {
-        if (!pubMailOk_()) throw new Error('The service is busy. Please try again later.');
-        const code = String(parseInt(Utilities.getUuid().replace(/-/g,'').slice(0,8),16) % 1000000).padStart(6,'0');
-        cache.put('rc_'+u.Username, JSON.stringify({ h:rcHash_(code), n:0, exp:Date.now()+900000 }), 900);
-        try { MailApp.sendEmail({ to:to, name:'Moreh Academy Admissions', subject:'Moreh Academy portal: password reset code',
-          body:'Your password reset code is: '+code+'\n\nIt expires in 15 minutes. Your current password has NOT been changed.\nIf you did not request this, ignore this email.' }); } catch(_) {}
-      }
-    }
-    return ok(null, 'If the account exists, a 6-digit code has been sent to its registered email. It expires in 15 minutes.');
   } catch(e) { return fail(e); }
 }
 

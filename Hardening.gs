@@ -14,13 +14,8 @@
  NOTE ON CAPTCHA: reCAPTCHA / Turnstile do not work reliably inside an Apps Script web app (it runs in a sandboxed iframe),
  so this bundle uses e-mail verification + the daily mail cap + per-address throttling instead.
 
- HOW TO APPLY
-   A. Add this file. In Code.gs DELETE the old versions of:
-        registerAccount, getPolicy, savePolicy, setStatus, deleteStudent, createLogin, deleteEvent
-      (these replace them, and already include the audit/alert lines from the Protection bundle, so skip those older edits
-       for these functions).
-   B. Do the small edits in PART 3 and the Index.html edits in PART 4.
-   C. Deploy a new version and run the tests listed in the reply.
+ STATUS: applied. The older registerAccount, getPolicy, savePolicy, setStatus, deleteStudent, createLogin and deleteEvent
+ versions are no longer in Code.gs. After any change, deploy a new version.
 *****************************************************************************/
 
 const NAME_RE = /^[A-Z\u00C0-\u00DD][A-Z\u00C0-\u00DD .'\-]{0,59}$/;     // used after upper-casing
@@ -210,4 +205,3 @@ function deleteEvent(token, id) {
     sh.deleteRow(i + 2); audit_(ou, 'event.delete', String(id), ''); return ok(null, 'Event deleted');
   } catch (e) { return fail(e); } finally { try { lock.releaseLock(); } catch (_) {} }
 }
-

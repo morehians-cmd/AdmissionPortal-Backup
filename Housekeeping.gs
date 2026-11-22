@@ -46,3 +46,24 @@ function purgeProps_() {
 }
 /** OWNER ONLY. Manual run + report. */
 function purgeStudentProps() { ownerOnly_(); Logger.log('Removed ' + purgeProps_() + ' key(s).'); propsUsage(); }
+
+/** OWNER ONLY. Run ONCE. Brings the header row of "Deleted Students" up to date with ['DeletedAt','DeletedBy'] + COLS.
+    Older sheets stop at StatusChangedAt, so rows archived after the newer fields were added had values with no header.
+    The existing header must be an exact starting part of the new one, otherwise nothing is changed. No row data is moved or deleted. */
+function fixDeletedStudentsHeader() {
+  ownerOnly_();
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Deleted Students');
+  if (!sh) { Logger.log('No "Deleted Students" sheet yet. Nothing to fix.'); return; }
+  const head = ['DeletedAt', 'DeletedBy'].concat(COLS);
+  const cur = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(), 1)).getValues()[0].map(v => String(v || '').trim());
+  while (cur.length && !cur[cur.length - 1]) cur.pop();
+  for (let i = 0; i < cur.length; i++) {
+    if (cur[i] !== head[i]) throw new Error('Header mismatch at column ' + (i + 1) + ' ("' + cur[i] + '" vs "' + head[i] + '"). Nothing was changed.');
+  }
+  if (cur.length === head.length) { Logger.log('Header already up to date (' + head.length + ' columns).'); return; }
+  if (sh.getMaxColumns() < head.length) sh.insertColumnsAfter(sh.getMaxColumns(), head.length - sh.getMaxColumns());
+  sh.getRange(1, 1, 1, head.length).setValues([head]).setFontWeight('bold');
+  sh.getRange(1, cur.length + 1, sh.getMaxRows(), head.length - cur.length).setNumberFormat('@');
+  sh.setFrozenRows(1);
+  Logger.log('Header extended from ' + cur.length + ' to ' + head.length + ' columns.');
+}

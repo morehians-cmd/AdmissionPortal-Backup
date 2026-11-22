@@ -1,7 +1,7 @@
 /*****************************************************************************
- MOREH ACADEMY PORTAL - SIGN-IN GUARD (new file "SignInGuard")
+ MOREH ACADEMY PORTAL - SIGN-IN GUARD
  Trusted devices, per-device throttle, separate public-mail buckets, reset counting that attackers cannot trigger.
- DELETE the old versions of: login, loginPayload_ (Protection), pubMailOk_ (Protection), resetGate_ (MailSwitch).
+ This file owns: login, loginPayload_, pubMailOk_, resetGate_ (the older copies were removed from Protection / MailSwitch).
 *****************************************************************************/
 const DEV_RE = /^[A-Za-z0-9]{16,40}$/;
 

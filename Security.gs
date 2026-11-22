@@ -1,5 +1,5 @@
 /*****************************************************************************
- MOREH ACADEMY PORTAL - SECURITY PATCH SET (for Code.gs v2.1 + Index.html)
+ MOREH ACADEMY PORTAL - SECURITY PATCH SET 
 
  WHAT THIS COVERS
    1. Default admin / public setup()+tmpAuth()      -> owner-only, random password
@@ -7,18 +7,13 @@
    3. Spreadsheet formula injection                 -> text format on EVERY write, input checks, CSV neutralising
    4. Session versioning                            -> revoke sessions on credential change, sliding TTL, forced password change
 
- HOW TO APPLY (order matters)
-   A. In Code.gs: DELETE the old  setup, tmpAuth, hash_, addUser_, who_, pub_, login,
-      saveMyProfile, resetPassword, resetStaffPassword, removeStaff  and the old  UCOLS  line.
-      Paste PART 1 and PART 2 below in their place.
-   B. Apply the small EDITS in PART 3 (find/replace in the existing functions).
-   C. Apply the client edits in PART 4 (Index.html).
-   D. In the Apps Script editor run, in this order:
+ ONE-TIME SETUP (the code edits below are already applied in this project; only the editor runs remain)
+   1. In the Apps Script editor run, in this order:
         1) initSecurity      (creates the secret pepper; approve any new permission prompt)
         2) auditSecurity     (read the log: default password, formula cells, legacy hash count)
         3) ownerResetAdmin   (only if audit reports the default admin password)
         4) authorizeAll      (replaces tmpAuth; then it is safe to leave in)
-   E. Deploy > Manage deployments > New version.  Everyone is signed out once.
+   2. Deploy > Manage deployments > New version.  Everyone is signed out once.
       Old SHA-256 hashes upgrade automatically the next time each user signs in.
       When auditSecurity reports "legacy hashes: 0", delete SALT and legacyHash_.
 
