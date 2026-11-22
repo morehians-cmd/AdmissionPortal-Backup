@@ -2313,10 +2313,18 @@ function stuProfile(keep){head('Student Profile','Review and update your informa
   show()})}
 
 /** Sign-out: idle timeout keeps the draft; a manual sign-out clears it (shared computers). */
+// Sign-out combines draft handling and refresh-session cleanup in one wrapper.
 const _out=act.out;
-act.out=()=>{if(S.idleOut)draftSave();
- else if(S.user&&!A()&&S.token){if(draftExists()&&!confirm('You have an unsaved draft. If you sign out now it will be discarded. Sign out anyway?'))return;draftClear()}
- S.idleOut=false;_out()};
+act.out=()=>{
+ if(S.idleOut)draftSave();
+ else if(S.user&&!A()&&S.token){
+  if(draftExists()&&!confirm('You have an unsaved draft. If you sign out now it will be discarded. Sign out anyway?'))return;
+  draftClear();
+ }
+ S.idleOut=false;
+ _out();
+ if(!S.token){try{sessionStorage.removeItem('mrh_t')}catch(e){}}
+};
 
 /** REPLACES idleReset: staff 5 min, students 15 min. */
 function idleReset(){if(!S.token||$('idm'))return;clearTimeout(IDLE);clearTimeout(WARN);
@@ -2327,9 +2335,7 @@ function keepAlive(){if(!S.user||A()||!S.token||!S.t||!S.t.edit||Date.now()-LP<6
  google.script.run.withSuccessHandler(r=>{if(r&&!r.success&&/Session expired/.test(r.error)){draftSave();toast('Your session expired. Your draft is saved on this device. Refresh the page and sign in again.','warn')}}).withFailureHandler(()=>{}).ping(S.token)}
 
  /* ===== Stay signed in on refresh ===== */
-// Sign-out (button or idle timeout) must also forget the stored token.
-const _outKeep=act.out;
-act.out=()=>{_outKeep();if(!S.token){try{sessionStorage.removeItem('mrh_t')}catch(e){}}};
+
 
 // On page load: if a token is stored, resume that session instead of showing the login form.
 (function(){let t=null;try{t=sessionStorage.getItem('mrh_t')}catch(e){}
