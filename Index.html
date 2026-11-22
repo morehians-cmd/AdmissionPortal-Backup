@@ -2177,7 +2177,15 @@ function feeRender(){const F=S.fees,tiers=[...new Set(F.rows.map(x=>x.Tier))];S.
  const hero=`<div class="shero"><div class="sht"><div><h2>${stu?'Your Tuition Fees':'Schedule of Fees'}</h2><p>${stu?'Choose how you would like to pay. Every plan below covers the same school year.':'Select a grade level to view its payment plans. Fees are read from your Google Sheet and changes show here right away.'}</p><div class="shch">${chips}</div></div>${F.url?`<a class="shbtn" href="${esc(F.url)}" target="_blank" rel="noopener">${I.rep} Edit fee sheet</a>`:''}</div><div class="shk">${kc}</div></div>`;
  const promoCard=promos.length?`<div class="card"><div class="ch"><h3>Promos &amp; Discounts</h3></div>${promos.map(p=>`<div class="fpm"><div class="fpmt"><span class="ao c3">${SICO.gift}</span><b>${esc(p.Title)}</b></div>${lines(p.Details).map(x=>`<div class="sci"><i>${SICO.chk}</i><div>${esc(x)}</div></div>`).join('')}</div>`).join('')}</div>`:'';
  const grantCard=grants.length?`<div class="card"><div class="ch"><h3>Discounts &amp; Grants</h3></div>${grants.map(g=>`<div class="fgr"><b>${esc(g.Title)}</b><span>${esc(g.Details)}</span></div>`).join('')}</div>`:'';
- $('view').innerHTML=`${hero}<div class="dash"><div class="dmain"><div class="fgrid">${plans.map((p,i)=>planCard(p,rows.filter(x=>x.Plan===p),i)).join('')}</div><div class="scn" style="margin-top:20px">${SICO.info}<div>These amounts are for reference only. Final fee assessment is handled by the School Cashier.</div></div></div><div class="dside">${promoCard}${grantCard}${helpbar()}</div></div>`}
+ $('view').innerHTML=`${hero}<div class="dash"><div class="dmain"><div class="fgrid">${plans.map((p,i)=>planCard(p,rows.filter(x=>x.Plan===p),i)).join('')}</div><div class="scn" style="margin-top:20px">${SICO.info}<div>These amounts are for reference only. Final fee assessment is handled by the School Cashier.</div></div></div><div class="dside">${promoCard}${grantCard}${helpbar()}</div></div>`
+if(S.schEdit)return;                                   // the editor keeps its own toolbar
+ const hero=document.querySelector('#view .shero');if(!hero)return;
+ const k=S.sk,btn=(a,v,l,on,t)=>`<button type="button" class="${on?'on':''}" aria-pressed="${!!on}" data-act="${a}"${v?` data-v="${v}"`:''}${t?` title="${esc(t)}"`:''}>${l}</button>`,
+  bar=document.createElement('div');bar.className='card segbar';
+ bar.innerHTML=`<div class="segs"><div><div class="segl">Program</div><div class="seg" role="group" aria-label="Scholarship program">${btn('schback','','Overview',!k)}${SCHK.map(x=>btn('schk',x,x,k===x,SCHM[x].n)).join('')}</div></div></div>`;
+ hero.after(bar);
+ const back=hero.querySelector('[data-act=schback]');if(back)back.remove();   // the switcher replaces the back button
+ segFocus()};}
 
 const FULL=()=>A()&&['Full','Manager'].includes(S.user.Clearance),SYS=()=>A()&&S.user.Clearance==='Full',ROLEN=c=>c==='Full'?'Administrator':c==='Manager'?'System Manager':c;;
 let IDLE=null,WARN=null,CD=null;
@@ -4626,17 +4634,6 @@ act.fplan=i=>{S.fplan=+i<0?'':(S.fplanList||[])[+i]||'';feeRender()};
 /* =====================================================================
    SCHOLARSHIPS: one program switcher on the overview and on every program page
    ===================================================================== */
-const _schRS=schRender;
-schRender=function(){_schRS();
- if(S.schEdit)return;                                   // the editor keeps its own toolbar
- const hero=document.querySelector('#view .shero');if(!hero)return;
- const k=S.sk,btn=(a,v,l,on,t)=>`<button type="button" class="${on?'on':''}" aria-pressed="${!!on}" data-act="${a}"${v?` data-v="${v}"`:''}${t?` title="${esc(t)}"`:''}>${l}</button>`,
-  bar=document.createElement('div');bar.className='card segbar';
- bar.innerHTML=`<div class="segs"><div><div class="segl">Program</div><div class="seg" role="group" aria-label="Scholarship program">${btn('schback','','Overview',!k)}${SCHK.map(x=>btn('schk',x,x,k===x,SCHM[x].n)).join('')}</div></div></div>`;
- hero.after(bar);
- const back=hero.querySelector('[data-act=schback]');if(back)back.remove();   // the switcher replaces the back button
- segFocus()};
-
 /* ===== Student Home v3.1: bento grid in the admin dashboard colour style =====
    PASTE at the very END of the main script in Index.html (after the Schedule of Fees / Scholarships block,
    before the closing script tag). Do not type the closing tag inside this block.
