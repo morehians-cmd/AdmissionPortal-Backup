@@ -237,6 +237,17 @@ function siteRead_() {
 /** Build the homepage news feed from the Campus Bulletin source of truth.
  * Legacy homepage.news.items is retained for backwards compatibility, but once bulletin
  * posts exist they become the public homepage feed instead of requiring duplicate entry. */
+function siteAboutPreview_() {
+  try {
+    const a = aboutRead_();
+    const heading = (a.vision && a.vision.title) || (a.mission && a.mission.title) || '';
+    const text = (a.mission && a.mission.text) || (a.vision && a.vision.text) || '';
+    return { heading: heading, text: text, linkLabel: 'Learn More', photo: '' };
+  } catch (_) {
+    return null;
+  }
+}
+
 function siteNews_() {
   try {
     const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
@@ -262,6 +273,8 @@ function getPublishedHomepage() {
   try {
     const d = siteRead_();
     if (!d) return null;
+    const liveAbout = siteAboutPreview_();
+    if (liveAbout) d.sections.about = Object.assign({}, d.sections.about || {}, liveAbout);
     const liveNews = siteNews_();
     if (liveNews.length) d.sections.news = Object.assign({}, d.sections.news || {}, { items: liveNews });
     return d;
