@@ -119,6 +119,16 @@ img,svg,video,table{max-width:100%}.card,.step,.box,.id span{min-width:0;overflo
 @media(max-width:520px){.values ul{grid-template-columns:1fr}.values li{border-left:0}.hero .wrap{padding-bottom:96px}.logo{width:36px;height:36px}.id{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.slides{transition:none}html{scroll-behavior:auto}}
 </style>
+<style>
+/* Scholarship programs: one subsection per program */
+.spj{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 24px}.spj button{border:1px solid #d8e3f8;background:#fff;color:var(--navy);border-radius:999px;padding:9px 18px;font:600 14px Poppins,sans-serif;cursor:pointer}.spj button:hover{border-color:var(--blue);color:var(--blue)}
+.spl{display:grid;gap:26px}.seg.sp{scroll-margin-top:90px}
+.sph{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px}.sph .bh{margin:0}.spm{display:flex;gap:8px;flex-wrap:wrap}.spm span{background:#fff;border:1px solid #d8e3f8;border-radius:999px;padding:4px 12px;font-size:13px;color:var(--navy);font-weight:600}
+.spd{font-weight:600;color:var(--blue);margin:0 0 12px}
+.spp{display:flex;gap:18px;justify-content:space-between;align-items:center;flex-wrap:wrap;background:var(--navy);color:#fff;border-radius:14px;padding:20px 24px;margin:16px 0}.spp h4{margin:0 0 6px;color:var(--orange);font-size:18px}.spp p{margin:0 0 6px;color:#fff;font-size:15px;max-width:60ch}.spp .spw{color:#fff}.spa{display:flex;gap:10px;flex-wrap:wrap}
+.spx{border:1px solid #d8e3f8;border-radius:12px;background:#fff;padding:0 18px;margin:0 0 10px}.spx summary{cursor:pointer;font-weight:700;color:var(--navy);padding:14px 0;font-size:16px}.spx[open] summary{border-bottom:1px solid #e6eefc;margin-bottom:12px}.spx .rt{padding-bottom:14px}
+.spx h5{margin:12px 0 6px;color:var(--navy);font-size:15px}.spn{background:#fff8e6;border-left:4px solid var(--orange);border-radius:8px;padding:10px 14px}
+</style>
 </head>
 <body>
 
@@ -310,7 +320,7 @@ function routeHref(to){return to.indexOf('route:')===0?link(to.slice(6)):safeUrl
 var PG={loading:''};
 function pageInfo(r){
  var parts=r.split('/'),n=HOME.nav.filter(function(x){return x.id===parts[0]})[0],sub=null,title='';
- if(r==='contact')title='Contact Information';else if(r==='terms')title='Terms of Service';else if(r==='privacy')title='Privacy Policy';
+ if(r==='terms')title='Terms of Service';else if(r==='privacy')title='Privacy Policy';
  else if(n){if(parts[1]){sub=n.subs.filter(function(s){return subSlug(s)===parts[1]})[0];title=sub?sub[0]:''}else title=n.label}
  return {n:n,sub:sub,title:title,blocks:(HOME.pages&&HOME.pages[r])||[]}}
 function rtFmt(t){return esc(t).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/__([^_]+)__/g,'<u>$1</u>').replace(/\*([^*]+)\*/g,'<em>$1</em>')}
@@ -356,10 +366,9 @@ function renderPage(r){
   var has=i.blocks.length>0,loading=PG.loading===r,
   cards=i.n&&!i.sub?'<div class="navgrid">'+i.n.subs.map(function(s){return '<a class="nc" href="'+link(i.n.id+'/'+subSlug(s))+'"'+tgt()+'>'+(s[2]?'<span class="ni" aria-hidden="true">'+esc(s[2])+'</span>':'')+'<h3>'+esc(s[0])+'</h3>'+(s[1]?'<p>'+esc(s[1])+'</p>':'')+'<span class="go">Open page<i aria-hidden="true">›</i></span></a>'}).join('')+'</div>':'',
   main=r==='privacy'?policyHtml(loading):has?blocksHtml(i.blocks):(loading?'<p>Loading…</p>':''),
-  ci=r==='contact'?'<div class="empty" style="margin-bottom:24px"><h3 style="color:var(--orange);margin-bottom:6px">Moreh Academy</h3><p style="margin:0">'+esc(f.loc)+'<br>'+esc(f.phone)+'<br><a href="mailto:'+esc(f.email)+'" style="color:#fff">'+esc(f.email)+'</a></p></div>':'',
-  body=ci+main+(has&&cards?'<div style="height:24px"></div>':'')+cards;
+  body=main+(r==='admissions/scholarships'?schHtml():'')+(has&&cards?'<div style="height:24px"></div>':'')+cards;
   if(r==='forms/downloadable-forms')body+='<section class="seg" style="margin-top:18px"><h3 class="bh">Parental Consent &amp; Data Privacy Undertaking</h3><div class="sb"><p>Download and print the required two-copy consent form. Print on Letter-size paper; the Student\'s Copy and Admission\'s Copy are arranged on one page.</p><p><a class="btn blue" href="'+link('parental-consent')+'"'+tgt()+'>Open / Print Consent Form</a></p></div></section>';
-  if(!has&&!cards&&!loading&&r!=='contact'&&r!=='privacy')body='<div class="empty"><p style="margin:0">Content coming soon.</p></div>';
+  if(!has&&!cards&&!loading&&r!=='privacy'&&r!=='admissions/scholarships')body='<div class="empty"><p style="margin:0">Content coming soon.</p></div>';
   out=crumb+'<div class="bar"></div><h2>'+esc(i.title)+'</h2><p class="lead">'+esc(i.sub?'':(i.n?i.n.lead:''))+'</p>'+body}
  return '<section class="page"><div class="wrap">'+out+'</div></section>'}
 function renderHome(){
@@ -374,6 +383,42 @@ function renderHome(){
  news:'<section class="sec" id="news-preview"><div class="wrap"><div class="bar"></div><h2>'+esc(nw.title||'News & Announcements')+'</h2>'+(items.length?'<div class="grid">'+items.map(function(x){return '<article class="card"><h3>'+esc(x.title)+'</h3>'+(x.date?'<p style="font-size:13px;opacity:.7">'+esc(x.date)+'</p>':'')+'<p>'+esc(x.summary)+'</p>'+(x.link?'<a class="more" href="'+esc(routeHref(x.link))+'"'+T+'>Read more</a>':'')+'</article>'}).join('')+'</div><p style="margin-top:18px"><a class="btn blue" href="'+link('news/latest-news')+'"'+T+'>View all news</a></p>':'<div class="empty"><strong>No announcements yet.</strong><p style="margin:4px 0 12px">Follow Moreh Academy for future updates.</p><a class="btn" href="'+link('news/latest-news')+'"'+T+'>View all news</a></div>')+'</div></section>'};
  var order=(d.order||[]).filter(function(k){return S[k]});Object.keys(S).forEach(function(k){if(order.indexOf(k)<0)order.push(k)});
  return order.filter(function(k){return (d.hidden||[]).indexOf(k)<0}).map(function(k){return S[k]}).join('')}
+
+
+/* ===== Scholarships: one subsection per program (TLC, ESC, QVR, QVA), loaded from the portal's Scholarships content ===== */
+function schItemsHtml(items){var out=[],list=[];
+ function fl(){if(list.length){out.push('<ul>'+list.join('')+'</ul>');list=[]}}
+ (items||[]).forEach(function(x){x=String(x).trim();if(!x)return;
+  if(/^##\s/.test(x)){fl();out.push('<h5>'+rtFmt(x.slice(3))+'</h5>')}
+  else if(/^__.*__$/.test(x)){fl();out.push('<p class="spn">'+rtFmt(x)+'</p>')}
+  else list.push('<li>'+rtFmt(x)+'</li>')});
+ fl();return out.join('')}
+function fmtDay(d){if(!/^\d{4}-\d{2}-\d{2}$/.test(d||''))return '';var t=new Date(d+'T00:00:00');return isNaN(t)?'':t.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}
+function tlcPanel(w){
+ var st=w&&w.state,line='';
+ if(w){line=st==='open'?'Applications are open'+(w.deadline?' until '+fmtDay(w.deadline):'')+'.':st==='soon'?'Applications open on '+fmtDay(w.openDate)+'.':st==='closed'?'The application period has ended.':'Applications are not being accepted right now.'}
+ return '<div class="spp"><div><h4>TLC Scholarship Application Portal</h4><p>Create an account, fill in the TLC application form online, track your application and see your document checklist, schedule and announcements.</p>'+(line?'<p class="spw"><strong>'+esc(line)+'</strong></p>':'')+'</div>'
+  +'<div class="spa"><a class="btn blue" href="#signin" id="spApply">Apply online</a><a class="btn ghost" href="#create">Create an account</a></div></div>'}
+function schProgram(p,w){
+ var def=p.sections.filter(function(s){return /^definition/i.test(s.title)})[0],rest=p.sections.filter(function(s){return s!==def});
+ return '<section class="seg sp" id="sp-'+esc(p.key.toLowerCase())+'"><div class="sph"><h3 class="bh">'+esc(p.name)+'</h3><div class="spm"><span>'+esc(p.level)+'</span><span>'+esc(p.source)+'</span></div></div>'
+  +'<p class="spd">'+esc(p.desc)+'</p>'
+  +(def?'<div class="rt">'+def.items.map(function(x){return '<p>'+rtFmt(x)+'</p>'}).join('')+'</div>':'')
+  +(p.key==='TLC'?tlcPanel(w):'')
+  +rest.map(function(s,i){return '<details class="spx"'+(i===0?' open':'')+'><summary>'+esc(s.title)+'</summary><div class="rt">'+schItemsHtml(s.items)+'</div></details>'}).join('')
+  +'</section>'}
+function schHtml(){var d=HOME.sch;
+ if(d===false)return '<div class="empty"><p style="margin:0">The scholarship details could not be loaded. Please try again later.</p></div>';
+ if(!d||!d.programs)return '<p>Loading…</p>';
+ return '<div class="spj" role="navigation" aria-label="Scholarship programs">'+d.programs.map(function(p){return '<button type="button" data-sp="'+esc(p.key.toLowerCase())+'">'+esc(p.name)+'</button>'}).join('')+'</div>'
+  +'<div class="spl">'+d.programs.map(function(p){return schProgram(p,d.tlc)}).join('')+'</div>'}
+function loadSch(){if(HOME.sch!==undefined)return;HOME.sch=null;
+ call('getPublicScholarships',[],function(r){HOME.sch=(r&&r.success&&r.data)?r.data:false;if(cur_route()==='admissions/scholarships')render()},function(){HOME.sch=false;if(cur_route()==='admissions/scholarships')render()})}
+/* "Apply online": signed-in visitors go straight to the portal's TLC dashboard; others get the sign-in pop-up first. */
+function applyTlc(){try{sessionStorage.setItem('mrh_go','tlc')}catch(e){}if(getToken())goPortal();else openM('mSignin')}
+document.addEventListener('click',function(e){
+ var b=e.target.closest('[data-sp]');if(b){var el=$('sp-'+b.getAttribute('data-sp'));if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return}
+ var a=e.target.closest('#spApply');if(a){e.preventDefault();e.stopPropagation();applyTlc()}},true);
 
 /* ===== Published / draft content from the backend ===== */
 function applyContent(c){
@@ -398,8 +443,7 @@ function render(){
  var soc='<a href="'+esc(safeUrl(h.footer.fb))+'" target="_blank" rel="noopener" aria-label="Facebook">f</a><a href="'+esc(safeUrl(h.footer.yt))+'" target="_blank" rel="noopener" aria-label="YouTube">▶</a><a href="mailto:'+esc(h.footer.email)+'" aria-label="Email">✉</a>';
  $('soc').innerHTML=soc;$('fSoc').innerHTML=soc;
  $('menu').innerHTML='<li><a href="'+link('home')+'"'+tgt()+'>Home</a></li>'+h.nav.map(function(n){
-  return '<li><button aria-haspopup="true" aria-expanded="false">'+esc(n.label)+'</button><ul class="sub">'+n.subs.map(function(s){return '<li><a href="'+link(n.id+'/'+subSlug(s))+'"'+tgt()+'>'+esc(s[0])+'</a></li>'}).join('')+'</ul></li>'}).join('')
-  +'<li><a href="'+link('contact')+'"'+tgt()+'>Contact Information</a></li>';
+  return '<li><button aria-haspopup="true" aria-expanded="false">'+esc(n.label)+'</button><ul class="sub">'+n.subs.map(function(s){return '<li><a href="'+link(n.id+'/'+subSlug(s))+'"'+tgt()+'>'+esc(s[0])+'</a></li>'}).join('')+'</ul></li>'}).join('');
  $('hTitle').innerHTML=esc(h.hero.title)+'<span>'+esc(h.hero.name)+'</span>';
  $('hSub').textContent=h.hero.subtitle;$('hDesc').textContent=h.hero.desc;
  $('hEnroll').textContent=h.hero.enroll.label;$('hEnroll').href=routeHref(h.hero.enroll.to);
@@ -594,7 +638,7 @@ $('cuGo').onclick=function(){
 
 function loadPolicy(){HOME.policy=null;PG.loading=cur_route();
  call(API.getPolicy,[],function(h){HOME.policy=h||'';PG.loading='';render()},function(){HOME.policy='';PG.loading='';render()})}
-window.addEventListener('hashchange',function(){if(APP_PAGE)return;if(cur_route()==='privacy'){loadPolicy();return}render()});
+window.addEventListener('hashchange',function(){if(APP_PAGE)return;if(cur_route()==='privacy'){loadPolicy();return}if(cur_route()==='admissions/scholarships')loadSch();render()});
 /* ===== Boot: published content from backend, falling back to defaults ===== */
 PG.loading=(cur_route()!=='home')?cur_route():'';render();
 (function(){var r=cur_route();if(r==='home'||r==='privacy')return;
@@ -603,6 +647,7 @@ PG.loading=(cur_route()!=='home')?cur_route():'';render();
   function(m){PG.loading='';render();if(APP_PREVIEW)toast(m,true)})})();
 /* The website's Privacy page reads the policy the portal stores, not a copy of its own. */
 if(cur_route()==='privacy')loadPolicy();
+if(cur_route()==='admissions/scholarships')loadSch();
 /* Arriving from the portal (signed out / expired) or from a Create-account link: open the matching pop-up. */
 if(APP_OPEN==='signin')openM('mSignin');else if(APP_OPEN==='create')openM('mCreate');else if(APP_OPEN==='current')openM('mCurrent');
 /* Sessions are held by the portal; the homepage only signs in and hands over. */

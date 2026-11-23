@@ -1,0 +1,603 @@
+<style>
+/* ===== TLC Scholarship Application Portal =====
+   Drawn with the portal's own tokens (--navy, --blue, --line, --mut, --soft, --card), so day / night mode works.
+   Every class starts with tl- so nothing else in Index.html is affected. */
+.tl-hero{border-radius:18px;padding:26px 28px;margin:0 0 16px;color:#fff;background:linear-gradient(120deg,#0f2a5c 0%,#1d4ed8 100%);display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;align-items:center}
+.tl-hero h2{margin:8px 0 6px;font-size:26px;line-height:1.2;color:#fff}.tl-hero p{margin:0;opacity:.92;font-size:14.5px;line-height:1.55;max-width:60ch}
+.tl-badge{display:inline-block;font-size:12.5px;font-weight:700;background:#ffffff26;border:1px solid #ffffff40;border-radius:99px;padding:3px 12px}
+.tl-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.tl-hero .btn{background:#fff;color:#0f2a5c;border-color:#fff}.tl-hero .btn.alt{background:transparent;color:#fff;border-color:#ffffff80}
+.tl-facts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tl-fact{background:#ffffff1a;border:1px solid #ffffff2e;border-radius:12px;padding:10px 12px;min-width:0}
+.tl-fact span{display:block;font-size:12px;opacity:.85}.tl-fact b{display:block;font-size:14.5px;margin-top:2px;overflow-wrap:anywhere}
+.tl-trk{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.tl-trk li{position:relative;padding-top:30px;font-size:13px;color:var(--mut);line-height:1.35}
+.tl-trk li:before{content:"";position:absolute;left:0;top:11px;right:-8px;height:3px;background:var(--line)}
+.tl-trk li:last-child:before{right:0}
+.tl-trk li i{position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;border:2px solid var(--line);background:var(--card,#fff);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:700;z-index:1}
+.tl-trk li.d:before{background:#16a34a}.tl-trk li.d i{background:#16a34a;border-color:#16a34a;color:#fff}
+.tl-trk li.n i{border-color:var(--blue);color:var(--blue);box-shadow:0 0 0 4px #2563eb2e}.tl-trk li.n{color:var(--navy);font-weight:700}
+.tl-trk li.x i{border-color:#d97706;color:#d97706;box-shadow:0 0 0 4px #d977062e}.tl-trk li.x{color:var(--navy);font-weight:700}
+.tl-trk li.e i{background:#dc2626;border-color:#dc2626;color:#fff}.tl-trk li.e:before{background:#dc2626}
+.tl-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-bottom:16px}
+.tl-grid>.card,.tl-wide{margin:0}.tl-wide{margin-bottom:16px}
+.tl-note{border:1px solid var(--line);border-left:5px solid var(--blue);border-radius:14px;padding:12px 16px;margin:0 0 16px;background:var(--card,#fff);font-size:13.5px;line-height:1.5;color:var(--mut)}
+.tl-note b{color:var(--navy)}.tl-note.warn{border-left-color:#d97706}.tl-note.no{border-left-color:#dc2626}.tl-note.ok{border-left-color:#16a34a}
+.tl-sch{list-style:none;margin:0;padding:0}
+.tl-sch li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;padding:11px 0;border-top:1px solid var(--line)}.tl-sch li:first-child{border-top:0;padding-top:0}
+.tl-sch .dt{width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--mut);margin-top:1px}
+.tl-sch .done .dt{background:#16a34a;border-color:#16a34a;color:#fff}.tl-sch .now .dt{border-color:var(--blue);background:var(--blue);color:#fff}
+.tl-sch b{display:block;color:var(--navy);font-size:14.5px}.tl-sch .w{display:block;font-size:13.5px;margin-top:2px;color:var(--txt)}.tl-sch .w.tba{color:var(--mut);font-style:italic}.tl-sch small{display:block;color:var(--mut);font-size:12.5px;margin-top:2px;line-height:1.4}
+.tl-nt{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.tl-nt li{border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:12px;padding:11px 14px;background:var(--card,#fff)}
+.tl-nt li.Reminder{border-left-color:#d97706}.tl-nt li.Urgent{border-left-color:#dc2626}.tl-nt li.me{border-left-color:#7c3aed}
+.tl-nt b{display:block;color:var(--navy);font-size:14px}.tl-nt p{margin:3px 0 0;font-size:13.5px;line-height:1.5;color:var(--txt);white-space:pre-line}.tl-nt small{display:block;margin-top:5px;color:var(--mut);font-size:12px}
+.tl-nt .pin{font-size:11px;font-weight:700;color:#b45309;margin-left:6px}
+.tl-empty{border:1px dashed var(--line);border-radius:12px;padding:16px;text-align:center;color:var(--mut);font-size:13.5px}
+.tl-bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:6px 0 14px}.tl-bar i{display:block;height:100%;background:#16a34a;border-radius:99px;transition:width .3s}
+.tl-ck{list-style:none;margin:0;padding:0}
+.tl-ck>li{border-top:1px solid var(--line);padding:12px 0}.tl-ck>li:first-child{border-top:0;padding-top:0}
+.tl-ck .r{display:flex;gap:12px;align-items:flex-start}.tl-ck input[type=checkbox]{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--blue)}
+.tl-ck .t{flex:1;min-width:0}.tl-ck .t b{color:var(--navy);font-size:14.5px;display:block}.tl-ck .t em{font-style:normal;color:var(--mut);font-size:12px;font-weight:600;margin-left:6px}
+.tl-ck .t small{display:block;color:var(--mut);font-size:13px;line-height:1.45;margin-top:3px}.tl-ck .t .nt{color:#b3261e;font-weight:600}
+.tl-ben{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.tl-ben li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:10px;font-size:14px;line-height:1.5}.tl-ben li:before{content:"\2713";width:22px;height:22px;border-radius:50%;background:#dcf5e6;color:#17613a;display:grid;place-items:center;font-size:12px;font-weight:800}
+.tl-tabs{display:flex;gap:6px;flex-wrap:wrap;background:var(--soft);border-radius:12px;padding:5px;margin-bottom:16px}
+.tl-tabs button{border:0;background:none;border-radius:9px;padding:8px 14px;font:600 13.5px Inter,sans-serif;color:var(--mut);cursor:pointer}.tl-tabs button.on{background:var(--blue);color:#fff}
+.tl-copy h4{margin:18px 0 8px;color:var(--navy);font-size:15px}.tl-copy h4:first-child{margin-top:0}.tl-copy p{margin:0 0 10px;line-height:1.65;font-size:14.5px;max-width:78ch}
+.tl-copy ul,.tl-copy ol{margin:0 0 10px;padding-left:22px;line-height:1.65;font-size:14.5px;max-width:78ch}.tl-copy li{margin-bottom:5px}
+.tl-2c{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 28px}
+.tl-line{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;color:var(--mut);font-size:13px}
+
+/* ---- form ---- */
+.tl-steps{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;margin:0 0 4px;scrollbar-width:thin}
+.tl-steps button{flex:1 0 auto;min-width:112px;text-align:left;border:1px solid var(--line);background:var(--card,#fff);border-radius:12px;padding:8px 12px;font:inherit;color:var(--mut);cursor:pointer}
+.tl-steps button b{display:block;font-size:13px;color:var(--navy)}.tl-steps button span{display:block;font-size:11.5px;margin-top:1px}
+.tl-steps button.on{border-color:var(--blue);box-shadow:0 0 0 3px #2563eb26}.tl-steps button.ok span{color:#15803d;font-weight:600}.tl-steps button.ok:before{content:"\2713 ";color:#15803d;font-weight:800}
+.tl-sv{font-size:12.5px;color:var(--mut)}.tl-sv.bad{color:#b3261e;font-weight:600}
+.tl-fh{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:6px}
+.tl-fh h3{margin:0;font-size:19px;color:var(--navy)}.tl-fh p{margin:4px 0 0;color:var(--mut);font-size:13.5px}
+.tl-form .g{margin-top:18px}.tl-form .f.wide{grid-column:1/-1}.rq{color:#b3261e}
+.tl-form .f small.hint{color:var(--mut)}
+.tl-rad{display:flex;gap:10px;flex-wrap:wrap}.tl-rad label{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:0;cursor:pointer;font-weight:600;font-size:14px;color:var(--txt);background:var(--card,#fff)}
+.tl-rad label:has(input:checked){border-color:var(--blue);background:var(--soft)}.tl-rad input{accent-color:var(--blue)}
+.tl-cks{display:grid;gap:10px;margin-top:16px}
+.tl-cks label{display:grid;grid-template-columns:22px minmax(0,1fr);gap:12px;align-items:start;border:1px solid var(--line);border-radius:12px;padding:13px 14px;cursor:pointer;font-size:14.5px;line-height:1.5;color:var(--txt);background:var(--card,#fff)}
+.tl-cks label:has(input:checked){border-color:#16a34a;background:#f0fdf4}html[data-theme=dark] .tl-cks label:has(input:checked){background:#16a34a22}
+.tl-cks input{width:20px;height:20px;margin-top:2px;accent-color:#16a34a}
+.tl-row{display:grid;gap:10px;margin-bottom:10px;align-items:center}
+.tl-row.e{grid-template-columns:78px minmax(0,1.3fr) minmax(0,1.3fr) minmax(0,1fr)}.tl-row.s{grid-template-columns:minmax(0,1.6fr) 80px 110px minmax(0,1.6fr)}
+.tl-row input,.tl-row select{width:100%;height:44px;padding:0 12px;border:1px solid #cbd5e1;border-radius:10px;background:var(--card,#fff);font:inherit;color:var(--txt)}
+.tl-row .gl{font-weight:700;color:var(--navy);font-size:14px}.tl-row.h{font-size:12px;font-weight:700;color:var(--mut);margin-bottom:6px}
+.tl-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}
+.tl-pc{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--card,#fff)}.tl-pc h4{margin:0 0 12px;color:var(--navy);font-size:16px}.tl-pc .g{margin-top:14px;grid-template-columns:1fr;gap:14px}
+.tl-ft{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}.tl-ft .l,.tl-ft .rgt{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tl-miss{border:1px solid #f5c26b;background:#fff8e6;color:#7a4b00;border-radius:12px;padding:12px 16px;margin-top:16px;font-size:13.5px;line-height:1.5}html[data-theme=dark] .tl-miss{background:#d977061f;color:#fcd9a0;border-color:#d9770666}
+.tl-miss ul{margin:6px 0 0;padding-left:20px}
+.tl-rv{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
+.tl-rv li{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:11px 14px;background:var(--card,#fff)}
+.tl-rv b{color:var(--navy);font-size:14px;display:block}.tl-rv small{display:block;color:var(--mut);font-size:12.5px;margin-top:2px;line-height:1.45}.tl-rv li.ok b:before{content:"\2713 ";color:#15803d}
+.tl-cert{border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:16px;background:var(--card,#fff)}.tl-cert h4{margin:0 0 8px;color:var(--navy);font-size:15px}
+.tl-cert p{margin:0 0 8px;font-size:13.5px;line-height:1.6}.tl-cert p.en{color:var(--mut);font-size:12.5px}
+.tl-cert .g{margin-top:12px}
+.tl-q{font-size:13px;color:var(--mut);margin:0 0 4px}
+
+/* ---- staff ---- */
+.tl-k{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tl-k button{border:1px solid var(--line);background:var(--card,#fff);border-radius:12px;padding:8px 14px;font:inherit;cursor:pointer;color:var(--mut);text-align:left}.tl-k button b{display:block;font-size:18px;color:var(--navy);line-height:1.1}.tl-k button span{font-size:12px}
+.tl-k button.on{border-color:var(--blue);background:var(--soft)}
+.tl-a tr[data-act]{cursor:pointer}.tl-a td small{display:block;color:var(--mut);font-size:12px;margin-top:2px}
+.tl-m{max-width:880px;width:100%;max-height:92vh;display:flex;flex-direction:column}.tl-m .bd{overflow:auto;padding:22px}.tl-m .ft{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:14px 22px;border-top:1px solid var(--line)}
+.tl-m h3{margin:0 0 4px;color:var(--navy)}.tl-m h5{margin:20px 0 8px;color:var(--navy);font-size:14px}
+.tl-kv{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr);gap:5px 14px;margin:0;font-size:13.5px}.tl-kv dt{color:var(--mut)}.tl-kv dd{margin:0;font-weight:600;color:var(--navy);overflow-wrap:anywhere}
+.tl-m details{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:8px}.tl-m summary{cursor:pointer;font-weight:700;color:var(--navy);font-size:14px}.tl-m details[open] summary{margin-bottom:10px}
+.tl-dr{display:grid;grid-template-columns:minmax(0,1.4fr) 140px minmax(0,1.2fr) auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}.tl-dr:first-of-type{border-top:0}
+.tl-dr select,.tl-dr input{height:38px;border:1px solid #cbd5e1;border-radius:9px;padding:0 10px;font:inherit;background:var(--card,#fff);color:var(--txt);width:100%}
+.tl-dr .btn{padding:7px 14px;font-size:13px}
+.tl-act{display:flex;gap:8px;flex-wrap:wrap}.tl-act .btn{padding:8px 16px;font-size:13.5px}.btn.tl-no{background:#fff;color:#b3261e;border-color:#f1b4ae}
+.tl-ms{display:grid;grid-template-columns:minmax(0,1.5fr) 150px 150px minmax(0,1.5fr) auto;gap:8px;margin-bottom:8px;align-items:center}
+.tl-ms input{height:42px;border:1px solid #cbd5e1;border-radius:10px;padding:0 12px;font:inherit;background:var(--card,#fff);color:var(--txt);width:100%}
+.tl-hist{list-style:none;margin:0;padding:0;font-size:13px}.tl-hist li{padding:7px 0;border-top:1px solid var(--line)}.tl-hist li:first-child{border-top:0}.tl-hist small{color:var(--mut);display:block}
+@media(max-width:900px){.tl-hero,.tl-grid,.tl-2c,.tl-two{grid-template-columns:1fr}.tl-trk{grid-template-columns:1fr;gap:0}.tl-trk li{padding:0 0 16px 36px;min-height:26px}.tl-trk li:before{left:11px;top:24px;bottom:0;right:auto;width:3px;height:auto}.tl-trk li:last-child:before{display:none}
+ .tl-row.e,.tl-row.s{grid-template-columns:1fr 1fr}.tl-row.e .gl{grid-column:1/-1}.tl-row.h{display:none}.tl-row.s>:first-child,.tl-row.s>:last-child{grid-column:1/-1}
+ .tl-dr,.tl-ms{grid-template-columns:1fr}.tl-hero h2{font-size:22px}}
+@media(max-width:560px){.tl-facts{grid-template-columns:1fr}.tl-ft .rgt,.tl-ft .l{width:100%}.tl-ft .btn{flex:1;justify-content:center}}
+@media(prefers-reduced-motion:reduce){.tl-bar i{transition:none}}
+</style>
+
+<script>
+/* ===== TLC Scholarship Application Portal (client) =====
+   Server: Tlc.gs.  Pages: 'tlc' (dashboard) and 'tlf' (application form) for enrollees, 'tla' (applications) for Admission staff.
+   Loaded after the main script, so it wraps menuFor / nav / bnInit exactly like the Enrollee Portal does. */
+
+const TL_ST = {
+  'Draft':          { l: 'Draft',                  c: 'warn', h: 'You have not submitted your application yet.' },
+  'Submitted':      { l: 'Submitted',              c: '',     h: 'Your application was received. The Admission Office will start the review soon.' },
+  'Under Review':   { l: 'Under review',           c: '',     h: 'The Admission Office is checking your application and documents.' },
+  'For Compliance': { l: 'Action needed',          c: 'warn', h: 'The Admission Office needs something from you. Read the note, update your form and submit again.' },
+  'Endorsed':       { l: 'Endorsed to TLC Office', c: '',     h: 'Your application is complete and was sent to the TLC Office for final evaluation.' },
+  'Approved':       { l: 'Approved',               c: 'ok',   h: 'Congratulations! Your TLC Scholarship application was approved.' },
+  'Declined':       { l: 'Not approved',           c: 'no',   h: 'Your application was not approved.' }
+};
+const TL_STEPS = [
+  { t: 'Eligibility',      s: 'Who can apply' },
+  { t: 'About you',        s: 'Personal information' },
+  { t: 'School choices',   s: 'TLC Partner Schools' },
+  { t: 'Elementary',       s: 'Grades 1 to 6' },
+  { t: 'Parents',          s: 'Father and mother' },
+  { t: 'Household',        s: 'Home and siblings' },
+  { t: 'Review & submit',  s: 'Certification' }
+];
+const TL_ELIG = [
+  ['E1', 'I am finishing public elementary school in Taguig or Pateros, and I studied in a public school in Taguig or Pateros for the last three (3) years.'],
+  ['E2', 'I will enroll in Grade 7.'],
+  ['E3', 'I have good moral standing, certified by the principal of my school.'],
+  ['E4', 'I and at least one of my parents have lived in Taguig for not less than three (3) years.'],
+  ['E5', 'My parent is a registered and active voter of Taguig, for the last three (3) years before this application.'],
+  ['E6', 'I am joining the program voluntarily, with my parent\u2019s written consent. My parent promises to guide and support me.']
+];
+const TL_EDU = ['', 'No formal schooling', 'Elementary level', 'Elementary graduate', 'High school level', 'High school graduate', 'College level', 'College graduate', 'Vocational', 'Master\u2019s degree', 'Doctorate'];
+const TL_HOUSING = [['', 'Select\u2026'], ['Family-owned', 'Owned by my family'], ['Relative-owned', 'Owned by a relative'], ['Renting', 'Renting or paying in installments'], ['Others', 'Other']];
+const TL_GUIDE = [
+  ['Check that you qualify', 'Read the eligibility requirements in the TLC Scholarship Information card, then confirm them in step 1 of the form.'],
+  ['Fill in the online form', 'The form has seven short sections. Your answers are saved as a draft, so you can stop and come back any time before you submit.'],
+  ['Submit before the deadline', 'After you submit, you get a reference number here and by email. The form is locked while the Admission Office reviews it.'],
+  ['Print and sign', 'Print the application form. Both you and your parent or guardian must sign it. Wrong or false information can disqualify you.'],
+  ['Prepare your documents', 'Use the Requirements Checklist. Put two (2) sets of the requirements in one long brown expandable envelope and one long brown ordinary envelope.'],
+  ['Bring everything to the Admission Office', 'The staff will mark each document as received or verified in your checklist. Watch your Notifications for updates.'],
+  ['Fix anything we ask for', 'If your status shows \u201CAction needed\u201D, read the note, correct the form or document, and submit again.']
+];
+const tlFmt = s => esc(s).replace(/[*][*](.+?)[*][*]/g, '<b>$1</b>').replace(/__(.+?)__/g, '<i>$1</i>');
+const tlD = d => { d = String(d || '').slice(0, 10); return /^\d{4}-\d{2}-\d{2}$/.test(d) ? fmtD(d) : ''; };
+const tlJ = (s, d) => { try { const v = JSON.parse(s); return v == null ? d : v; } catch (e) { return d; } };
+const tlSy = s => String(s || '').replace('-', '\u2013');
+const tlChip = (st) => { const m = TL_ST[st] || TL_ST.Draft; return `<span class="chip ${m.c}">${esc(m.l)}</span>`; };
+const tlBtn = (label, a, v, alt) => `<button class="btn${alt ? ' alt' : ''}" data-act="${a}"${v != null ? ` data-v="${esc(v)}"` : ''}>${esc(label)}</button>`;
+function tlLoad(cb) { call('tlcPortal', [T()], r => { S.tl = r.data; cb(r.data); }); }
+
+/* ===================== DASHBOARD ===================== */
+function tlcDash() {
+  head('TLC Scholarship', 'Taguig Learners\u2019 Certificate Scholarship Program');
+  tlLoad(tlDashRender);
+}
+function tlStage(st) { return { 'Draft': 0, 'Submitted': 1, 'Under Review': 2, 'For Compliance': 2, 'Endorsed': 3, 'Approved': 4, 'Declined': 4 }[st] || 0; }
+
+function tlOverview(d) {
+  const a = d.app, st = d.status, m = TL_ST[st] || TL_ST.Draft, began = d.exists && (d.progress > 0), locked = !d.editable;
+  let h, sub;
+  if (st === 'Draft') { h = began ? 'Continue your application' : 'Start your TLC Scholarship application'; sub = began ? 'Your form is ' + d.progress + '% complete. Pick up where you left off.' : 'Seven short sections, about 15 to 20 minutes. Everything you type is saved as a draft.'; }
+  else { h = m.l; sub = m.h; }
+  const ctas = (st === 'Draft' || st === 'For Compliance') ? tlBtn(began || st !== 'Draft' ? 'Open application form' : 'Start application', 'nav', 'tlf') : tlBtn('View my application', 'nav', 'tlf') + (st !== 'Draft' ? tlBtn('Print application form', 'tlprint', '', 1) : '');
+  const win = d.state.key === 'open' ? (d.state.daysLeft != null ? (d.state.daysLeft < 0 ? 'Closed' : d.state.daysLeft === 0 ? 'Last day to submit' : d.state.daysLeft + ' day' + (d.state.daysLeft === 1 ? '' : 's') + ' left') : 'Open') : d.state.label;
+  const facts = [['Application status', m.l], ['Submissions', win], ['Reference', a.TlcRef || 'Given on submit'], ['School year', tlSy(d.sy)]]
+    .map(x => `<div class="tl-fact"><span>${esc(x[0])}</span><b>${esc(x[1])}</b></div>`).join('');
+  const hero = `<section class="tl-hero"><div><span class="tl-badge">TLC Scholarship \u00b7 SY ${esc(tlSy(d.sy))}</span><h2>${esc(h)}</h2><p>${esc(sub)}</p><div class="tl-cta">${ctas}</div></div><div class="tl-facts">${facts}</div></section>`;
+  const idx = tlStage(st), end = st === 'Approved' || st === 'Declined';
+  const labels = ['Application form', 'Submitted', 'Under review', 'Endorsed to TLC Office', 'Result'];
+  const trk = `<ol class="tl-trk" aria-label="Application progress">${labels.map((l, i) => {
+    let c = i < idx ? 'd' : i === idx ? (st === 'For Compliance' ? 'x' : 'n') : '';
+    if (end && i === 4) c = st === 'Approved' ? 'd' : 'e';
+    return `<li class="${c}"><i>${c === 'd' ? '\u2713' : c === 'e' ? '!' : i + 1}</i>${esc(i === 4 && end ? m.l : l)}</li>`;
+  }).join('')}</ol>`;
+  let banner = '';
+  if (st === 'For Compliance') banner = `<div class="tl-note warn"><b>Action needed.</b> ${esc(a.ReviewNote || 'Please check your documents and form.')}${a.ReviewedBy ? ' <small>\u2014 ' + esc(a.ReviewedBy) + (a.ReviewedAt ? ', ' + esc(tlD(a.ReviewedAt)) : '') + '</small>' : ''}</div>`;
+  else if (st === 'Declined' && a.ReviewNote) banner = `<div class="tl-note no"><b>Note from the Admission Office.</b> ${esc(a.ReviewNote)}</div>`;
+  else if (st === 'Approved') banner = `<div class="tl-note ok"><b>Next step.</b> Follow the enrollment steps in your Enrollment Application and keep your TLC reference number: ${esc(a.TlcRef)}.</div>`;
+  if (!d.gradeOk) banner += `<div class="tl-note warn"><b>Check your grade level.</b> The TLC Scholarship is for incoming Grade 7 students, and your enrollment form says \u201C${esc(d.student.grade || 'not set')}\u201D. ${tlBtn('Open Enrollment Form', 'nav', 'sp', 1).replace('class="btn alt"', 'class="btn alt" style="padding:6px 14px;margin-left:6px"')}</div>`;
+  if (d.state.key !== 'open') banner += `<div class="tl-note"><b>${esc(d.state.label)}.</b> You can still fill in and save your form now. You will be able to submit it when applications are open.</div>`;
+  const latest = (d.updates[0] && { t: d.updates[0].title, m: d.updates[0].msg, w: d.updates[0].at }) || null;
+  const last = latest ? `<p class="tl-q" style="margin-top:14px"><b>Latest update:</b> ${esc(latest.t)}${latest.m ? ' \u2014 ' + esc(latest.m) : ''} <span style="opacity:.8">(${esc(tlD(latest.w))})</span></p>` : '';
+  return hero + banner + `<div class="card tl-wide"><div class="ch"><h3>Application overview</h3>${tlChip(st)}</div>${trk}${last}</div>`;
+}
+
+function tlSchedule(d) {
+  const li = d.schedule.map(r => {
+    const a = tlD(r.start), b = tlD(r.end), w = a && b && a !== b ? a + ' \u2013 ' + b : (a || b);
+    return `<li class="${r.state}"><span class="dt">${r.state === 'done' ? '\u2713' : r.state === 'now' ? '\u25cf' : ''}</span><div><b>${esc(r.title)}${r.state === 'now' ? ' <span class="chip">Ongoing</span>' : ''}</b><span class="w${w ? '' : ' tba'}">${esc(w || 'Date to be announced')}</span>${r.note ? `<small>${esc(r.note)}</small>` : ''}</div></li>`;
+  }).join('');
+  return `<div class="card"><div class="ch"><h3>Application schedule</h3></div><ul class="tl-sch">${li}</ul></div>`;
+}
+
+function tlNotifs(d) {
+  const mine = d.updates.map(u => ({ k: 'me', t: u.title, m: u.msg, at: u.at, who: 'About your application', pin: 0 }));
+  const all = d.notices.map(n => ({ k: n.type, t: n.title, m: n.msg, at: n.at, who: 'Admission Office' + (n.by ? ' \u00b7 ' + n.by : ''), pin: n.pinned }));
+  const items = all.concat(mine).sort((x, y) => (y.pin - x.pin) || String(y.at).localeCompare(String(x.at))).slice(0, 10);
+  const body = items.length ? `<ul class="tl-nt">${items.map(n => `<li class="${esc(n.k)}"><b>${esc(n.t)}${n.pin ? '<span class="pin">PINNED</span>' : ''}</b><p>${esc(n.m)}</p><small>${esc(n.who)} \u00b7 ${esc(tlD(n.at))}</small></li>`).join('')}</ul>` : '<div class="tl-empty">No notifications yet. Announcements and updates about your application will show here.</div>';
+  return `<div class="card"><div class="ch"><h3>Notifications</h3>${items.length ? `<span class="chip">${items.length}</span>` : ''}</div>${body}</div>`;
+}
+
+function tlChecklist(d) {
+  const req = d.docs.filter(x => !x.o), got = req.filter(x => x.s === 'Received' || x.s === 'Verified').length, pct = req.length ? Math.round(got / req.length * 100) : 0;
+  const li = d.docs.map(x => {
+    let chip;
+    if (x.s === 'Verified') chip = '<span class="chip ok">Verified</span>'; else if (x.s === 'Received') chip = '<span class="chip ok">Received</span>';
+    else if (x.s === 'Resubmit') chip = '<span class="chip no">Bring again</span>'; else if (x.prepared) chip = '<span class="chip warn">Ready to bring</span>'; else chip = '<span class="chip">Not submitted</span>';
+    const done = x.s === 'Received' || x.s === 'Verified';
+    return `<li><div class="r"><input type="checkbox" data-act="tlprep" data-v="${x.k}" ${x.prepared || done ? 'checked' : ''} ${done ? 'disabled' : ''} aria-label="I have this ready: ${esc(x.t)}"><div class="t"><b>${esc(x.t)}${x.o ? '<em>Optional</em>' : ''}</b><small>${esc(x.h)}</small>${x.n ? `<small class="nt">Note from the Admission Office: ${esc(x.n)}</small>` : ''}${x.d && x.s ? `<small>${esc(x.s)} on ${esc(tlD(x.d))}</small>` : ''}</div>${chip}</div></li>`;
+  }).join('');
+  return `<div class="card"><div class="ch"><h3>Requirements checklist</h3><span class="chip ${pct === 100 ? 'ok' : ''}">${got} of ${req.length} received</span></div>
+   <div class="tl-bar" role="img" aria-label="${got} of ${req.length} required documents received"><i style="width:${pct}%"></i></div>
+   <p class="tl-q">Tick a box when a document is ready. The Admission Office updates the status when it receives and checks it.</p><ul class="tl-ck">${li}</ul>
+   <div class="tl-note" style="margin:14px 0 0"><b>Envelope.</b> Submit 2 sets of the requirements in 1 long brown expandable envelope and 1 long brown ordinary envelope.<br><b>Where.</b> ${esc(d.contact)}</div></div>`;
+}
+
+function tlBenefits(d) {
+  const i = d.info, src = i.funding ? i.funding.items.join(' ') : '';
+  return `<div class="card"><div class="ch"><h3>Scholarship benefits</h3></div><p class="tl-q">${esc(i.benefitsTitle || '')}</p><ul class="tl-ben">${(i.benefits || []).map(b => `<li><span>${tlFmt(b)}</span></li>`).join('')}</ul>${src ? `<p class="tl-q" style="margin-top:14px">Source of funding: ${esc(src)}</p>` : ''}</div>`;
+}
+
+function tlInfoCard(d) {
+  const i = d.info, tab = S.tlTab || 'about', list = it => `<ul>${it.map(x => `<li>${tlFmt(x)}</li>`).join('')}</ul>`;
+  let body = '';
+  if (tab === 'about') body = `<h4>What is the TLC Scholarship?</h4>${i.about ? i.about.items.map(p => `<p>${tlFmt(p)}</p>`).join('') : '<p>The Taguig Learners\u2019 Certificate (TLC) Scholarship Program of the Taguig City Government helps graduates of public elementary schools in Taguig continue their high school education.</p>'}${i.funding ? `<h4>${esc(i.funding.title)}</h4>${i.funding.items.map(p => `<p>${tlFmt(p)}</p>`).join('')}` : ''}`;
+  else if (tab === 'elig') body = i.eligibility.length ? `<div class="tl-2c">${i.eligibility.map(s => `<div><h4>${esc(s.title)}</h4>${list(s.items)}</div>`).join('')}</div>` : '<p>Ask the Admission Office for the eligibility requirements.</p>';
+  else body = `<h4>How to apply</h4><ol>${TL_GUIDE.map(g => `<li><b>${esc(g[0])}.</b> ${esc(g[1])}</li>`).join('')}</ol>${i.enrollDocs ? `<h4>${esc(i.enrollDocs.title)}</h4><p class="tl-q">After you are approved, you will also need:</p>${list(i.enrollDocs.items)}` : ''}`;
+  return `<div class="card tl-wide"><div class="ch"><h3>TLC Scholarship information</h3></div><div class="tl-tabs" role="tablist">${[['about', 'About the program'], ['elig', 'Who can apply'], ['how', 'Application guidelines']].map(t => `<button role="tab" aria-selected="${tab === t[0]}" class="${tab === t[0] ? 'on' : ''}" data-act="tltab" data-v="${t[0]}">${t[1]}</button>`).join('')}</div><div class="tl-copy">${body}</div></div>`;
+}
+function tlDashRender(d) {
+  $('view').innerHTML = tlOverview(d) + `<div class="tl-grid">${tlSchedule(d)}${tlNotifs(d)}</div><div class="tl-grid">${tlChecklist(d)}${tlBenefits(d)}</div>${tlInfoCard(d)}`;
+}
+act.tltab = v => { S.tlTab = v; if (S.tl) tlDashRender(S.tl); };
+act.tlprep = v => {
+  const on = !!(event && event.target && event.target.checked);
+  call('tlcDocPrepared', [T(), v, on], r => { if (S.tl) { S.tl.docs = r.data; tlDashRender(S.tl); } });
+};
+
+/* ===================== APPLICATION FORM ===================== */
+function tlcForm() {
+  head('TLC Application Form', 'Taguig Learners\u2019 Certificate Scholarship \u00b7 incoming Grade 7');
+  tlLoad(d => {
+    const first = d.stepDone.findIndex(x => !x), keep = S.tf && S.tf.step != null && S.tf.stay;
+    S.tf = { app: JSON.parse(JSON.stringify(d.app)), step: keep ? S.tf.step : (d.exists && first > 0 && d.status === 'Draft' ? first : 0), edit: !!d.editable, dirty: false, saving: false, tried: {}, miss: d.miss, done: d.stepDone, prog: d.progress, warn: d.warnings, t: null };
+    tlFormRender(); tlPingStart();
+  });
+}
+const tlA = () => S.tf.app;
+function tlPingStart() { if (window.__tlPing) return; window.__tlPing = setInterval(() => { if (S.navId === 'tlf' && S.token) { try { google.script.run.withSuccessHandler(() => { }).withFailureHandler(() => { }).ping(S.token); } catch (e) { } } }, 240000); }
+window.addEventListener('beforeunload', e => { if (S.tf && S.tf.dirty && S.navId === 'tlf') { e.preventDefault(); e.returnValue = ''; } });
+
+/* field builders: keys are bound with data-tk and read by the delegated listeners below */
+const tlDis = () => S.tf.edit ? '' : ' disabled';
+function tlF(k, label, o) {
+  o = o || {}; const v = tlA()[k] || '';
+  const tp = o.type ? ` type="${o.type}"` : (o.up ? ' type="text"' : '');
+  return `<div class="f${o.wide ? ' wide' : ''}"><label for="tl_${k}">${label}${o.req ? ' <span class="rq" aria-hidden="true">*</span>' : ''}</label><input id="tl_${k}" data-tk="${k}"${tp} value="${esc(v)}" maxlength="${o.max || 100}"${o.ph ? ` placeholder="${esc(o.ph)}"` : ''}${o.im ? ` inputmode="${o.im}"` : ''}${o.list ? ` list="${o.list}"` : ''}${o.ro ? ' readonly' : ''}${o.ac ? ` autocomplete="${o.ac}"` : ''}${tlDis()}>${o.hint ? `<small class="hint">${o.hint}</small>` : ''}</div>`;
+}
+function tlS(k, label, opts, o) {
+  o = o || {}; const v = tlA()[k] || '';
+  return `<div class="f${o.wide ? ' wide' : ''}"><label for="tl_${k}">${label}${o.req ? ' <span class="rq" aria-hidden="true">*</span>' : ''}</label><select id="tl_${k}" data-tk="${k}"${tlDis()}>${opts.map(x => { const a = Array.isArray(x) ? x : [x, x || 'Select\u2026']; return `<option value="${esc(a[0])}"${a[0] === v ? ' selected' : ''}>${esc(a[1])}</option>`; }).join('')}</select></div>`;
+}
+function tlR(k, label, opts, o) {
+  o = o || {}; const v = tlA()[k] || '';
+  return `<div class="f${o.wide ? ' wide' : ''}"><label id="tll_${k}">${label}${o.req ? ' <span class="rq" aria-hidden="true">*</span>' : ''}</label><div class="tl-rad" role="radiogroup" aria-labelledby="tll_${k}">${opts.map(x => `<label><input type="radio" name="tl_${k}" data-tk="${k}" value="${esc(x[0])}"${x[0] === v ? ' checked' : ''}${tlDis()}> ${esc(x[1])}</label>`).join('')}</div></div>`;
+}
+const tlMoney = (k, label, o) => tlF(k, label, Object.assign({ im: 'decimal', ph: 'e.g. 1500', max: 20 }, o || {}));
+
+function tlStep0() {
+  const have = String(tlA().Eligibility || '').split(',');
+  return `<p class="tl-q" style="margin-top:14px">Tick each statement that is true for you. You can apply only if all six are true.</p><div class="tl-cks">${TL_ELIG.map(e => `<label><input type="checkbox" data-te="${e[0]}"${have.indexOf(e[0]) >= 0 ? ' checked' : ''}${tlDis()}><span>${esc(e[1])}</span></label>`).join('')}</div>
+   <div class="tl-note" style="margin-top:16px"><b>Not sure?</b> Ask the Admission Office before you start. ${esc(S.tl.contact)}</div>`;
+}
+function tlStep1() {
+  const a = tlA(), age = a.Birthdate && /^\d{4}-\d{2}-\d{2}$/.test(a.Birthdate) ? Math.floor((Date.now() - new Date(a.Birthdate).getTime()) / 31557600000) : '';
+  return `<div class="g">
+   ${tlF('Surname', 'Surname (Apelyido)', { req: 1, up: 1, max: 60, ac: 'family-name' })}${tlF('FirstName', 'First name (Unang Pangalan)', { req: 1, up: 1, max: 60, ac: 'given-name' })}
+   ${tlF('MiddleName', 'Middle name (Gitnang Pangalan)', { up: 1, max: 60 })}${tlF('Suffix', 'Suffix', { up: 1, max: 10, ph: 'JR., III' })}
+   ${tlF('LRN', 'Learner Reference Number (LRN)', { ro: 1, hint: 'Taken from your enrollment record.' })}
+   ${tlF('Birthdate', 'Date of birth (Petsa ng Kapanganakan)', { req: 1, type: 'date', hint: age !== '' && age >= 0 ? 'Age: ' + age : '' })}${tlF('BirthPlace', 'Place of birth (Lugar ng Kapanganakan)', { req: 1 })}
+   ${tlS('Sex', 'Sex (Kasarian)', ['', 'Male', 'Female'], { req: 1 })}${tlF('Nationality', 'Nationality (Nasyonalidad)', { req: 1, max: 40 })}${tlF('Religion', 'Religion (Relihiyon)', { req: 1, max: 60 })}
+   ${tlF('Address', 'Complete address (Kumpletong Address)', { req: 1, wide: 1, max: 200, ph: 'House / unit no., street, subdivision', ac: 'street-address' })}
+   ${tlF('Barangay', 'Barangay', { req: 1, max: 80 })}${tlF('City', 'City / municipality', { req: 1, max: 80 })}
+   ${tlF('ResidencyYears', 'Years living in Taguig (Bilang ng taon ng paninirahan)', { req: 1, im: 'numeric', max: 3, hint: 'At least 3 years is required.' })}
+   ${tlF('Mobile', 'Mobile number', { req: 1, im: 'numeric', max: 11, ph: '09XXXXXXXXX', hint: '11 digits' })}${tlF('Telephone', 'Telephone number (Telepono Blg.)', { max: 20 })}
+   ${tlF('Email', 'Email address', { req: 1, type: 'email', max: 100, ac: 'email' })}
+   ${tlR('HasCase', 'Have you been involved in any case or complaint at your school? (Nasangkot ka ba sa kahit anong kaso/reklamo sa iyong paaralan?)', [['Opo', 'Yes (Opo)'], ['Hindi po', 'No (Hindi po)']], { req: 1, wide: 1 })}
+   ${a.HasCase === 'Opo' ? tlF('CaseDetails', 'If yes, tell us why (Kung ang sagot ay \u201COpo\u201D, bakit?)', { req: 1, wide: 1, max: 400 }) : ''}</div>`;
+}
+function tlStep2() {
+  const pl = (S.tl.partners || []);
+  return `<datalist id="tl_pl">${pl.map(p => `<option value="${esc(p)}">`).join('')}</datalist><p class="tl-q" style="margin-top:14px">List three (3) TLC Partner Schools you want to enter, in order of preference. Moreh Academy is a TLC Partner School.</p>
+   <div class="g" style="grid-template-columns:1fr;max-width:620px">${tlF('Choice1', '1st choice (Pangunahing napupusuan)', { req: 1, list: 'tl_pl', ph: 'School name' })}${tlF('Choice2', '2nd choice (Pangalawang napupusuan)', { list: 'tl_pl', ph: 'School name' })}${tlF('Choice3', '3rd choice (Pangatlong napupusuan)', { list: 'tl_pl', ph: 'School name' })}</div>`;
+}
+function tlStep3() {
+  const el = tlJ(tlA().ElemJSON, []);
+  const rows = [0, 1, 2, 3, 4, 5].map(i => { const r = el[i] || {}; const f = (k, ph, l) => `<input data-tj="ElemJSON" data-ti="${i}" data-tf="${k}" value="${esc(r[k] || '')}" placeholder="${ph}" maxlength="100" aria-label="Grade ${i + 1} ${l}"${tlDis()}>`; return `<div class="tl-row e"><div class="gl">Grade ${i + 1}</div>${f('school', 'School name', 'school name')}${f('location', 'Barangay, city', 'location')}${f('award', 'Award / honor', 'award')}</div>`; }).join('');
+  return `<p class="tl-q" style="margin-top:14px">Tell us where you studied. Grades 4 to 6 are required (the last three years). Fill in Grades 1 to 3 if you can.</p>
+   <div class="tl-row e h"><div>Grade</div><div>School name</div><div>Location: barangay, city</div><div>Award or honor received</div></div>${rows}`;
+}
+function tlParent(p, title) {
+  const dead = tlA()[p + 'Status'] === 'Deceased';
+  return `<div class="tl-pc"><h4>${title}</h4>${tlR(p + 'Status', 'Is your ' + title.toLowerCase() + ' alive or deceased?', [['Alive', 'Alive (Buhay)'], ['Deceased', 'Deceased (Patay)']], { req: 1 })}
+   <div class="g">${tlF(p + 'Name', 'Full name' + (dead ? ' (optional)' : ''), { up: 1, req: !dead, max: 80 })}${dead ? '' : tlF(p + 'Address', 'Address (Tirahan)', { req: 1, max: 200 }) + tlF(p + 'Contact', 'Contact number', { req: 1, im: 'numeric', max: 11, hint: '11 digits' }) + tlF(p + 'Occupation', 'Job / occupation (Trabaho)', { req: 1, max: 80, hint: 'Write N/A if none.' }) + tlF(p + 'Workplace', 'Place of work (Lugar ng trabaho)', { req: 1, max: 100, hint: 'Write N/A if none.' }) + tlS(p + 'Education', 'Highest education (Pinakamataas na antas ng pag-aaral)', TL_EDU, { req: 1 }) + tlMoney(p + 'Income', 'Monthly income in \u20B1 (Buwanang kita)', { req: 1, hint: 'Write 0 if none.' })}</div></div>`;
+}
+function tlStep4() { return `<div class="tl-two">${tlParent('Father', 'Father')}${tlParent('Mother', 'Mother')}</div>`; }
+function tlStep5() {
+  const a = tlA(), sb = tlJ(a.SiblingsJSON, []);
+  const rows = [0, 1, 2, 3, 4, 5].map(i => { const r = sb[i] || {}; const f = (k, ph, l, w) => `<input data-tj="SiblingsJSON" data-ti="${i}" data-tf="${k}" value="${esc(r[k] || '')}" placeholder="${ph}" maxlength="${w}" aria-label="Sibling ${i + 1} ${l}"${tlDis()}>`; return `<div class="tl-row s">${f('name', 'Full name', 'name', 80)}${f('age', 'Age', 'age', 3).replace('<input', '<input inputmode="numeric"')}<select data-tj="SiblingsJSON" data-ti="${i}" data-tf="civil" aria-label="Sibling ${i + 1} civil status"${tlDis()}>${[['', 'Status'], ['S', 'Single'], ['M', 'Married']].map(o => `<option value="${o[0]}"${o[0] === (r.civil || '') ? ' selected' : ''}>${o[1]}</option>`).join('')}</select>${f('school', 'Grade and school, or highest education', 'school or education', 100)}</div>`; }).join('');
+  return `<div class="g">
+   ${tlS('Housing', 'Where do you live? (Tirahan)', TL_HOUSING, { req: 1 })}${a.Housing === 'Others' ? tlF('HousingOther', 'Please describe', { req: 1, max: 100 }) : ''}
+   ${tlMoney('ElectricBill', 'Electric bill last month in \u20B1', { req: 1, hint: 'Write 0 if none.' })}${tlMoney('WaterBill', 'Water bill last month in \u20B1', { req: 1, hint: 'Write 0 if none.' })}
+   ${a.Housing === 'Renting' ? tlMoney('MonthlyRent', 'Monthly rent or payment in \u20B1', { req: 1 }) : ''}
+   ${tlF('FamilySize', 'Number of family members, including you', { req: 1, im: 'numeric', max: 3 })}
+   ${tlR('TlcRelative', 'Does a relative of yours already receive the TLC Scholarship? (May kapatid ka ba na kasalukuyang TLC Beneficiary?)', [['Yes', 'Yes (Meron po)'], ['No', 'No (Wala po)']], { req: 1, wide: 1 })}
+   ${a.TlcRelative === 'Yes' ? tlF('TlcRelativeDetail', 'Name and relationship (optional)', { wide: 1, max: 150 }) : ''}</div>
+   <h4 style="margin:24px 0 4px;color:var(--navy)">Your brothers and sisters</h4><p class="tl-q">Oldest to youngest. Leave empty if you have none.</p>
+   <div class="tl-row s h"><div>Name</div><div>Age</div><div>Status</div><div>Grade and school, or highest education</div></div>${rows}`;
+}
+function tlStep6() {
+  const a = tlA(), f = S.tf, miss = f.miss || [], ok = f.done || [];
+  const rv = TL_STEPS.slice(0, 6).map((s, i) => `<li class="${ok[i] ? 'ok' : ''}"><div><b>${esc(s.t)}</b>${ok[i] ? '<small>Complete</small>' : `<small>Still needed: ${esc(miss[i].slice(0, 3).join(', '))}${miss[i].length > 3 ? ' and ' + (miss[i].length - 3) + ' more' : ''}</small>`}</div><button class="btn alt" style="padding:6px 14px;font-size:13px" data-act="tlgo" data-v="${i}">${ok[i] ? 'Review' : 'Complete'}</button></li>`).join('');
+  const w = (f.warn || []).map(x => `<div class="tl-note warn" style="margin:12px 0 0">${esc(x)}</div>`).join('');
+  const nm = [a.FirstName, a.MiddleName, a.Surname, a.Suffix].filter(Boolean).join(' ');
+  return `<ul class="tl-rv">${rv}</ul>${w}
+   <div class="tl-cert"><h4>Applicant\u2019s certification</h4><p>Ako po ay nagnanais na mapabilang sa TLC Scholarship Program. Ang mga kasagutan po na nakasaad sa dokumentong ito ay <b>totoo at tama</b> sa abot ng aking kaalaman. <b>Anumang kasinungalingan o maling impormasyon na nailagay ko dito ay maaaring maging dahilan ng aking pagkakadiskwalipika.</b> Kung ako ay matanggap, nangangako po akong mag-aaral nang mabuti, magsisikap nang mabuti na makatapos, at susunod sa polisiya ng TLC Scholarship Program at ng eskwelahang aking papasukan.</p>
+    <p class="en">In English: I want to join the TLC Scholarship Program. My answers are true and correct to the best of my knowledge. False or wrong information can disqualify me. If I am accepted, I promise to study well, work hard to finish, and follow the policies of the program and of my school.</p>
+    <div class="tl-cks" style="margin-top:8px"><label><input type="checkbox" data-ta="AppAgree"${a.AppAgree === '1' ? ' checked' : ''}${tlDis()}><span>I agree with the certification above.</span></label></div>
+    <div class="g">${tlF('AppSignName', 'Type your full name as your signature', { req: 1, up: 1, max: 100, ph: nm.toUpperCase() })}</div></div>
+   <div class="tl-cert"><h4>Parent or guardian\u2019s consent</h4><p>Ang aking anak ay boluntaryong sasali sa programang ito at aking sinasang-ayunan. Ako ay susunod sa anumang polisiya at alituntunin ng TLC Scholarship Program at ng TLC Partner School na kanyang papasukan. Nauunawaan ko na maaaring may mga makatuwirang gastusin at bayarin na hindi saklaw ng programa, at handa akong saluhin ang mga ito bilang responsableng magulang. Ang lahat ng kasagutan sa dokumentong ito ay <b>totoo at tama</b>, at ang mga kalakip na dokumento ay tapat na reproduksyon ng mga orihinal. Nalalaman ko na ang anumang kasinungalingan o pandaraya ay maaaring maging dahilan ng diskwalipikasyon ng aking anak.</p>
+    <p class="en">In English: My child joins voluntarily and I agree. I will follow the rules of the program and the partner school. I understand that some reasonable expenses are not covered, and I am ready to pay them as a responsible parent. All answers are true and correct, the attached documents are faithful copies of the originals, and I know that lies or fraud can disqualify my child.</p>
+    <div class="tl-act" style="margin-bottom:6px">${tlBtn('Use father\u2019s name', 'tlpar', 'Father', 1)}${tlBtn('Use mother\u2019s name', 'tlpar', 'Mother', 1)}</div>
+    <div class="g">${tlF('ParentName', 'Parent or guardian full name', { req: 1, up: 1, max: 100 })}${tlF('ParentRelation', 'Relationship to the applicant', { req: 1, up: 1, max: 40, ph: 'MOTHER, FATHER, GUARDIAN' })}</div>
+    <div class="tl-cks" style="margin-top:12px"><label><input type="checkbox" data-ta="ParentAgree"${a.ParentAgree === '1' ? ' checked' : ''}${tlDis()}><span>I agree with the consent above.</span></label></div>
+    <div class="g">${tlF('ParentSignName', 'Parent or guardian: type full name as signature', { req: 1, up: 1, max: 100 })}</div></div>`;
+}
+const TL_BUILD = [tlStep0, tlStep1, tlStep2, tlStep3, tlStep4, tlStep5, tlStep6];
+
+function tlFormRender() {
+  const f = S.tf, d = S.tl, s = f.step, last = s === 6, a = tlA();
+  let top = '';
+  if (!f.edit) top += `<div class="tl-note ${d.status === 'Declined' ? 'no' : ''}"><b>Your application is ${esc((TL_ST[d.status] || {}).l || d.status)}.</b> It is locked while it is being processed. You can read your answers below${d.status === 'Draft' ? '' : ' or print the form'}.</div>`;
+  else if (d.status === 'For Compliance') top += `<div class="tl-note warn"><b>Action needed.</b> ${esc(a.ReviewNote || 'Please update your form.')} Update the form, then submit again on the last step.</div>`;
+  if (f.edit && d.state.key !== 'open') top += `<div class="tl-note"><b>${esc(d.state.label)}.</b> You can fill in and save your draft now. Submitting opens when applications are open.</div>`;
+  if (f.edit && !d.gradeOk) top += `<div class="tl-note warn"><b>Your grade level is ${esc(d.student.grade || 'not set')}.</b> The TLC Scholarship is for incoming Grade 7. Set it in your Enrollment Form before you submit.</div>`;
+  const chips = `<nav class="tl-steps" aria-label="Form sections">${TL_STEPS.map((t, i) => `<button class="${i === s ? 'on' : ''}${f.done[i] ? ' ok' : ''}" data-act="tlgo" data-v="${i}"${i === s ? ' aria-current="step"' : ''}><b>${i + 1}. ${esc(t.t)}</b><span>${f.done[i] ? 'Complete' : esc(t.s)}</span></button>`).join('')}</nav>`;
+  const bar = `<div class="tl-bar" role="img" aria-label="${f.prog}% of the form is complete"><i id="tlbar" style="width:${f.prog}%"></i></div>`;
+  let missBox = '';
+  if (f.tried[s] && !f.done[s] && !last) missBox = `<div class="tl-miss" role="status"><b>Still needed on this step:</b><ul>${(f.miss[s] || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul>You can continue and come back, but you need all of them before you submit.</div>`;
+  const nav = `<div class="tl-ft"><div class="l">${s > 0 ? tlBtn('Back', 'tlback', '', 1) : ''}${f.edit ? tlBtn('Save draft', 'tlsave', '', 1) : ''}<span id="tlsv" class="tl-sv" aria-live="polite"></span></div><div class="rgt">${!f.edit && d.status !== 'Draft' ? tlBtn('Print application form', 'tlprint', '', 1) : ''}${last ? (f.edit ? `<button class="btn" data-act="tlsubmit">Submit application</button>` : '') : tlBtn('Save and continue', 'tlnext')}</div></div>`;
+  $('view').innerHTML = top + chips + bar + `<div class="card tl-form"><div class="tl-fh"><div><h3>Step ${s + 1} of ${TL_STEPS.length}: ${esc(TL_STEPS[s].t)}</h3><p>${esc(['Make sure you qualify before you start.', 'Your personal details. Fields with * are required.', 'Where do you want to study?', 'Your elementary school record.', 'Information about your parents.', 'Your home and your brothers and sisters.', 'Check, certify and submit.'][s])}</p></div><span class="chip">${f.prog}% complete</span></div>${TL_BUILD[s]()}${missBox}${nav}</div>`;
+  tlStat();
+  if (!f.noScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
+  f.noScroll = false;
+}
+function tlPaintSteps() {
+  const f = S.tf; if (!f || S.navId !== 'tlf') return;
+  document.querySelectorAll('.tl-steps button').forEach((b, i) => { b.classList.toggle('ok', !!f.done[i]); const sp = b.querySelector('span'); if (sp) sp.textContent = f.done[i] ? 'Complete' : TL_STEPS[i].s; });
+  const bar = $('tlbar'); if (bar) bar.style.width = f.prog + '%';
+}
+function tlStat(msg, bad) { const e = $('tlsv'); if (!e || !S.tf) return; e.className = 'tl-sv' + (bad ? ' bad' : ''); e.textContent = msg || (S.tf.saving ? 'Saving\u2026' : S.tf.dirty ? 'Unsaved changes' : S.tf.edit ? 'All changes saved' : ''); }
+
+/* ---- data binding ---- */
+function tlTouch() { const f = S.tf; if (!f || !f.edit) return; f.dirty = true; tlStat('Unsaved changes'); clearTimeout(f.t); f.t = setTimeout(() => tlAuto(), 2500); }
+function tlAuto(cb) {
+  const f = S.tf; if (!f || !f.edit) return;
+  if (f.saving) { f.again = true; return; }
+  if (!f.dirty) { if (cb) cb(); return; }
+  f.saving = true; f.dirty = false; tlStat('Saving\u2026');
+  google.script.run.withSuccessHandler(r => {
+    f.saving = false;
+    if (r && r.success) { tlMeta(r.data); tlStat('Draft saved'); if (!f.dirty && !f.again && cb) cb(); }
+    else { f.dirty = true; tlStat('Could not save. ' + ((r && r.error) || ''), true); if (r && /Session expired/.test(r.error || '')) setTimeout(() => location.reload(), 1500); return; }
+    if (f.again || f.dirty) { f.again = false; tlAuto(cb); }
+  }).withFailureHandler(e => { f.saving = false; f.dirty = true; tlStat('Could not save. Check your connection.', true); }).tlcSave(T(), JSON.parse(JSON.stringify(f.app)));
+}
+function tlMeta(v) {
+  const f = S.tf; f.miss = v.miss; f.done = v.stepDone; f.prog = v.progress; f.warn = v.warnings;
+  if (S.tl) { S.tl.exists = true; S.tl.progress = v.progress; S.tl.stepDone = v.stepDone; S.tl.miss = v.miss; S.tl.warnings = v.warnings; S.tl.docs = v.docs; S.tl.app.Status = v.app.Status; S.tl.app.TlcRef = v.app.TlcRef; }
+  tlPaintSteps();
+  const chip = document.querySelector('.tl-fh .chip'); if (chip) chip.textContent = v.progress + '% complete';
+  if (S.tf.step === 6) { const keep = document.activeElement && document.activeElement.id; /* review list may have changed */ const l = document.querySelector('.tl-rv'); if (l) { const h = document.createElement('div'); h.innerHTML = tlStep6(); const nl = h.querySelector('.tl-rv'); if (nl) l.innerHTML = nl.innerHTML; } if (keep && $(keep)) $(keep).focus(); }
+}
+function tlSetKey(k, v) { tlA()[k] = v; tlTouch(); }
+function tlSetJ(k, i, field, v) { const arr = tlJ(tlA()[k], []); while (arr.length <= i) arr.push({}); arr[i][field] = v; tlA()[k] = JSON.stringify(arr); tlTouch(); }
+const TL_RERENDER = ['HasCase', 'Housing', 'FatherStatus', 'MotherStatus', 'TlcRelative'];
+document.addEventListener('input', e => {
+  const t = e.target; if (!S.tf || S.navId !== 'tlf' || !t.dataset) return;
+  if (t.dataset.tk && t.type !== 'radio') tlSetKey(t.dataset.tk, t.value);
+  else if (t.dataset.tj) tlSetJ(t.dataset.tj, +t.dataset.ti, t.dataset.tf, t.value);
+});
+document.addEventListener('change', e => {
+  const t = e.target; if (!S.tf || S.navId !== 'tlf' || !t.dataset) return;
+  if (t.dataset.te) { const set = String(tlA().Eligibility || '').split(',').filter(Boolean).filter(x => x !== t.dataset.te); if (t.checked) set.push(t.dataset.te); tlSetKey('Eligibility', set.join(',')); }
+  else if (t.dataset.ta) tlSetKey(t.dataset.ta, t.checked ? '1' : '');
+  else if (t.dataset.tk) { tlSetKey(t.dataset.tk, t.value); if (TL_RERENDER.indexOf(t.dataset.tk) >= 0) { tlKeepRender(); } }
+});
+function tlKeepRender() { const y = window.scrollY, f = S.tf; f.noScroll = true; const el = document.activeElement; tlFormRender(); window.scrollTo(0, y); }
+
+act.tlgo = v => { const f = S.tf; if (!f) return; if (f.step !== +v) { tlAuto(); f.tried[f.step] = true; f.step = +v; f.stay = true; tlFormRender(); } };
+act.tlback = () => { const f = S.tf; if (f.step > 0) act.tlgo(f.step - 1); };
+act.tlnext = () => { const f = S.tf; f.tried[f.step] = true; tlAuto(); f.step = Math.min(6, f.step + 1); f.stay = true; tlFormRender(); };
+act.tlsave = () => { const f = S.tf; clearTimeout(f.t); f.dirty = true; tlAuto(() => toast('Draft saved.')); };
+act.tlpar = v => { const a = tlA(); if (!a[v + 'Name']) return toast('Enter your ' + v.toLowerCase() + '\u2019s name in step 5 first.', 'warn'); a.ParentName = a[v + 'Name']; a.ParentRelation = v.toUpperCase(); a.ParentSignName = a.ParentSignName || a[v + 'Name']; tlTouch(); tlKeepRender(); };
+act.tlsubmit = () => {
+  const f = S.tf; clearTimeout(f.t);
+  const m = document.createElement('div'); m.className = 'mod'; m.id = 'tlcm';
+  m.innerHTML = `<div style="max-width:470px"><div class="bd"><h3 style="color:var(--navy);margin:0 0 8px">Submit your application?</h3><p style="color:var(--mut);margin:0 0 6px;line-height:1.55">After you submit, the form is locked while the Admission Office reviews it. You will get a reference number, and you can print the form to sign.</p><p style="margin:0;font-size:13px;color:var(--mut)">Wrong or false information can disqualify you.</p></div><div class="ft"><button class="btn alt" data-act="tlcx">Not yet</button><button class="btn" data-act="tlcok">Yes, submit</button></div></div>`;
+  document.body.appendChild(m);
+};
+act.tlcx = () => { const m = $('tlcm'); if (m) m.remove(); };
+act.tlcok = () => {
+  act.tlcx(); const f = S.tf;
+  call('tlcSubmit', [T(), JSON.parse(JSON.stringify(f.app))], r => { f.dirty = false; S.tl = null; toast(r.message); nav('tlc'); });
+};
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { act.tlcx(); const m = $('tlam'); if (m) m.remove(); } });
+
+/* ===================== PRINT ===================== */
+act.tlprint = () => { const a = (S.tf && S.tf.app) || (S.tl && S.tl.app); if (!a) return; printHTML(tlPrintHTML(a), true, 'TLC-Application-' + (a.TlcRef || a.LRN || '')); };
+function tlPrintHTML(a) {
+  const el = tlJ(a.ElemJSON, []), sb = tlJ(a.SiblingsJSON, []), v = x => esc(x || '') || '&nbsp;';
+  const per = p => `<td>${v(a[p + 'Name'])}</td>`;
+  const rows = (arr, n, fn) => Array.from({ length: n }, (_, i) => fn(arr[i] || {}, i)).join('');
+  const hous = { 'Family-owned': 'Pagmamay-ari ng Pamilya', 'Relative-owned': 'Pagmamay-ari ng kamag-anak', 'Renting': 'Nangungupahan / hinuhulugan', 'Others': 'Iba pa: ' + (a.HousingOther || '') }[a.Housing] || '';
+  const css = `<style>.tp,.tp *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}.tp{width:210mm;height:296mm;padding:11mm 13mm;font:9.6pt/1.35 Arial,sans-serif;color:#111;position:relative;overflow:hidden;page-break-after:always}.tp:last-child{page-break-after:auto}
+.tp h1{font-size:17pt;margin:0}.tp h2{font-size:10.5pt;text-align:center;margin:10px 0 5px;letter-spacing:.3px}.tp .sm{font-size:8.5pt;color:#444}.tp table{width:100%;border-collapse:collapse}.tp td,.tp th{border:1px solid #333;padding:3px 6px;vertical-align:top}.tp th{background:#eee;font-size:8.6pt}
+.tp .ln{border:0;border-bottom:1px solid #333;padding:2px 4px;font-weight:700}.tp .nb td{border:0;padding:2px 4px}.tp .bx{width:36mm;height:36mm;border:1px solid #333;position:absolute;right:13mm;top:11mm;display:flex;align-items:center;justify-content:center;text-align:center;font-style:italic;font-size:8.5pt}
+.tp .sig{margin-top:22px;text-align:center;width:62mm;margin-left:auto;border-top:1px solid #111;font-size:8.5pt;padding-top:2px}.tp p{margin:6px 0;text-align:justify}.tp .ft{position:absolute;left:0;right:0;bottom:7mm;text-align:center;font-size:8pt;font-style:italic}</style>`;
+  const dob = a.Birthdate ? tlD(a.Birthdate) : '';
+  const p1 = `<div class="tp"><div class="bx">Recent<br>2x2<br>ID picture</div><div class="sm" style="margin-bottom:4px">TLC Form for Incoming Grade 7 \u00b7 Ref. ${esc(a.TlcRef || 'draft')}</div><div class="sm"><b>Taguig Learners\u2019 Certificate (TLC) Scholarship Program</b></div><h1>STUDENT APPLICATION FORM</h1><div class="sm"><i>(for incoming Grade 7 students only)</i></div>
+   <div style="margin:22px 0 0;width:70mm" class="ln">${esc(tlD(a.SubmittedAt) || '')}&nbsp;</div><div class="sm" style="width:70mm;text-align:center">Petsa</div>
+   <h2>PERSONAL NA IMPORMASYON NG APLIKANTENG MAG-AARAL</h2>
+   <table class="nb"><tr><td width="22%">Buong Pangalan:</td><td class="ln">${v([a.Surname, a.FirstName, a.MiddleName, a.Suffix].filter(Boolean).join(', '))}</td></tr><tr><td>Kumpletong Address:</td><td class="ln">${v([a.Address, a.Barangay, a.City].filter(Boolean).join(', '))}</td></tr></table>
+   <table class="nb"><tr><td>Taon ng Paninirahan sa Taguig:</td><td class="ln">${v(a.ResidencyYears)}</td><td>Mobile No.:</td><td class="ln">${v(a.Mobile)}</td><td>Telepono Blg.:</td><td class="ln">${v(a.Telephone)}</td></tr>
+   <tr><td>Petsa ng Kapanganakan:</td><td class="ln">${v(dob)}</td><td>Lugar:</td><td class="ln" colspan="3">${v(a.BirthPlace)}</td></tr>
+   <tr><td>Kasarian:</td><td class="ln">${v(a.Sex)}</td><td>Nasyonalidad:</td><td class="ln">${v(a.Nationality)}</td><td>Relihiyon:</td><td class="ln">${v(a.Religion)}</td></tr>
+   <tr><td>E-mail Address:</td><td class="ln" colspan="5">${v(a.Email)}</td></tr><tr><td>LRN:</td><td class="ln" colspan="5">${v(a.LRN)}</td></tr></table>
+   <table class="nb"><tr><td>Nasangkot ka ba sa kahit anong kaso/reklamo sa iyong paaralan?</td><td class="ln" width="20%">${v(a.HasCase)}</td></tr><tr><td>Kung ang sagot ay \u201COpo\u201D, magbigay ng pahayag kung bakit:</td><td class="ln">${v(a.CaseDetails)}</td></tr></table>
+   <h2>PANGALAN NG TLC PARTNER SCHOOL NA IYONG NAIS PASUKAN</h2>
+   <table class="nb"><tr><td width="30%">Pangunahing napupusuan (1st):</td><td class="ln">${v(a.Choice1)}</td></tr><tr><td>Pangalawang napupusuan (2nd):</td><td class="ln">${v(a.Choice2)}</td></tr><tr><td>Pangatlong napupusuan (3rd):</td><td class="ln">${v(a.Choice3)}</td></tr></table>
+   <h2>IMPORMASYON NG IYONG EDUKASYON SA ELEMENTARYA</h2>
+   <table><tr><th>Baitang</th><th>Pangalan ng Paaralan</th><th>Lokasyon ng Paaralan: Barangay, Bayan/Lungsod</th><th>Natanggap na Award / Karangalan / Marka</th></tr>${rows(el, 6, (r, i) => `<tr><td><i>Grade ${i + 1}</i></td><td>${v(r.school)}</td><td>${v(r.location)}</td><td>${v(r.award)}</td></tr>`)}</table>
+   <div class="ft">\u201CInvesting in Education is Investing in the City\u2019s Foundation\u201D</div></div>`;
+  const p2 = `<div class="tp"><div class="sm" style="text-align:right">TLC Form for Incoming Grade 7</div><h2 style="margin-top:0">IMPORMASYON NG IYONG PAMILYA</h2>
+   <table><tr><th></th><th>Ama (${a.FatherStatus === 'Deceased' ? 'Patay' : a.FatherStatus ? 'Buhay' : ''})</th><th>Ina (${a.MotherStatus === 'Deceased' ? 'Patay' : a.MotherStatus ? 'Buhay' : ''})</th></tr>
+   ${[['Pangalan', 'Name'], ['Tirahan', 'Address'], ['Contact No.', 'Contact'], ['Trabaho/Pinagkakakitaan', 'Occupation'], ['Lugar ng Trabaho', 'Workplace'], ['Pinakamataas na antas ng pag-aaral', 'Education'], ['Buwanang kita', 'Income']].map(r => `<tr><td><i>${r[0]}</i></td><td>${v(a['Father' + r[1]])}</td><td>${v(a['Mother' + r[1]])}</td></tr>`).join('')}</table>
+   <table class="nb" style="margin-top:8px"><tr><td>Tirahan: <b>${esc(hous)}</b></td></tr><tr><td>Bill sa kuryente noong nakaraang buwan: <b>\u20B1${esc(a.ElectricBill || '')}</b> &nbsp; Bill sa tubig: <b>\u20B1${esc(a.WaterBill || '')}</b>${a.Housing === 'Renting' ? ' &nbsp; Buwanang bayad: <b>\u20B1' + esc(a.MonthlyRent || '') + '</b>' : ''}</td></tr>
+   <tr><td>Bilang ng mga anak sa pamilya (kasama ang aplikante): <b>${esc(a.FamilySize || '')}</b></td></tr><tr><td>May kapatid ka ba na kasalukuyang TLC Beneficiary? <b>${a.TlcRelative === 'Yes' ? 'Meron po' : a.TlcRelative === 'No' ? 'Wala po' : ''}</b> ${esc(a.TlcRelativeDetail || '')}</td></tr></table>
+   <p class="sm" style="margin-top:10px"><i>Punan ng impormasyon ang nasa ibaba patungkol sa iyong mga kapatid (mula sa pinakamatanda hanggang sa pinakabata)</i></p>
+   <table><tr><th>Pangalan</th><th width="9%">Edad</th><th width="16%">Walang Asawa (S) / May Asawa (M)</th><th>Baitang/Taon at Pangalan ng Paaralan, o Pinakamataas na antas ng pag-aaral</th></tr>${rows(sb, 6, r => `<tr><td>${v(r.name)}</td><td>${v(r.age)}</td><td>${v(r.civil)}</td><td>${v(r.school)}</td></tr>`)}</table>
+   <h2 style="text-align:left;margin-top:12px">Pagsang-ayon/Patotoo ng Aplikante:</h2><p>Ako po ay nagnanais na mapabilang sa TLC Scholarship Program. Ang mga kasagutan po na nakasaad sa dokumentong ito ay <b>totoo at tama</b> sa abot ng aking kaalaman. <b>Anumang kasinungalingan o maling impormasyon na nailagay ko dito ay maaaring maging dahilan ng aking pagkakadiskwalipika.</b> Kung ako ay matanggap, nangangako po akong mag-aaral nang mabuti, magsisikap nang mabuti na makatapos, at susunod sa polisiya ng TLC Scholarship Program at ng eskwelahang aking papasukan.</p>
+   <div class="sig"><div style="height:16px;font-weight:700">${esc(a.AppSignName || '')}</div>Pangalan at Lagda ng Aplikante</div>
+   <h2 style="text-align:left;margin-top:10px">Pagsang-ayon/Patotoo ng Magulang:</h2><p>Ako si <b>${esc(a.ParentName || '__________________')}</b>, magulang ni <b>${esc([a.FirstName, a.Surname].filter(Boolean).join(' '))}</b>, ay nagpapatunay na ang kanyang paglahok sa programang ito ay boluntaryo at kanyang kagustuhan na akin naming sinasang-ayunan. Sa kanyang paglahok sa programang ito, ang inyong pamunuan ay makakaasa ng aming <b>paggalang at pagsunod sa anumang polisiya at mga alituntunin ng TLC Scholarship Program at ng TLC Partner School na kanyang papasukan</b>. Aking nauunawaan na maaaring may mga makatuwirang gastusin at bayarin na hindi saklaw ng TLC Scholarship Program. Kaya naman, ako ay handang makipagtulungan na saluhin ang mga kaukulang gastusin at bayaring iyon at gawin ang aking parte bilang responsableng magulang.</p>
+   <p>Ako ay nakatitiyak na ang lahat ng mga kasagutan na nakasaad sa dokumentong ito ay totoo at tama sa abot ng aking kaalaman, at ang kalakip na mga dokumento ay matapat na reproduksyon ng mga orihinal na kopya. Akin ding nalalaman at kinikilala na ang <b>anumang akto ng kasinungalingan o pandaraya ay maaaring maging dahilan ng diskwalipikasyon</b> ng aking anak mula sa programang ito.</p>
+   <div class="sig"><div style="height:16px;font-weight:700">${esc(a.ParentSignName || '')}</div>Pangalan at Lagda ng Magulang</div>
+   <div class="ft">\u201CInvesting in Education is Investing in the City\u2019s Foundation\u201D</div></div>`;
+  return css + p1 + p2;
+}
+
+/* ===================== STAFF: TLC APPLICATIONS ===================== */
+function tlcAdminPage() {
+  head('TLC Applications', 'Review TLC Scholarship applications, check documents and post updates');
+  S.ta = S.ta || { tab: 'apps', f: 'All', q: '' };
+  call('tlcAdminBootstrap', [T()], r => { S.ta.d = r.data; tlaRender(); });
+}
+function tlaRender() {
+  const t = S.ta, d = t.d, tabs = [['apps', 'Applications'], ['cfg', 'Schedule & settings'], ['news', 'Announcements']];
+  const state = `<span class="chip ${d.state.key === 'open' ? 'ok' : 'warn'}">Submissions: ${esc(d.state.label)}</span>`;
+  $('view').innerHTML = `<div class="tl-tabs" role="tablist">${tabs.map(x => `<button role="tab" class="${t.tab === x[0] ? 'on' : ''}" data-act="tlatab" data-v="${x[0]}">${x[1]}</button>`).join('')}<span style="margin-left:auto;align-self:center;padding-right:8px">${state}</span></div><div id="tlabody"></div>`;
+  ({ apps: tlaApps, cfg: tlaCfg, news: tlaNews })[t.tab]();
+}
+act.tlatab = v => { S.ta.tab = v; tlaRender(); };
+
+function tlaApps() {
+  const t = S.ta, d = t.d, q = (t.q || '').toLowerCase();
+  const rows = d.rows.filter(r => (t.f === 'All' || r.Status === t.f) && (!q || (r.Name + ' ' + r.LRN + ' ' + r.TlcRef + ' ' + r.Barangay).toLowerCase().indexOf(q) >= 0));
+  const k = ['All'].concat(d.statuses).map(s => `<button class="${t.f === s ? 'on' : ''}" data-act="tlafil" data-v="${s}"><b>${d.counts[s] || 0}</b><span>${esc(s === 'All' ? 'All applications' : (TL_ST[s] || {}).l || s)}</span></button>`).join('');
+  const tb = rows.length ? `<div class="tw"><table class="at tl-a"><thead><tr><th>Reference</th><th>Applicant</th><th>School choices</th><th>Documents</th><th>Status</th><th>Submitted</th></tr></thead><tbody>${rows.map(r => `<tr data-act="tlaopen" data-v="${esc(r.StudentID)}" tabindex="0"><td>${esc(r.TlcRef || '\u2014')}</td><td><b>${esc(tc(r.Name))}</b><small>${esc(r.LRN)} \u00b7 ${esc(r.Barangay || '')}</small></td><td>${esc([r.Choice1, r.Choice2, r.Choice3].filter(Boolean).join(', '))}</td><td>${r.DocsDone} of ${r.DocsTotal}</td><td>${tlChip(r.Status)}</td><td>${esc(tlD(r.SubmittedAt) || '\u2014')}</td></tr>`).join('')}</tbody></table></div>` : '<div class="tl-empty">No applications match.</div>';
+  $('tlabody').innerHTML = `<div class="tl-k">${k}</div><div class="card"><div class="sb"><input id="tlq" value="${esc(t.q || '')}" placeholder="Search name, LRN, reference or barangay" onkeydown="if(event.key==='Enter')act.tlasearch()"><button class="btn" data-act="tlasearch">${I.search} Search</button><button class="btn alt" data-act="tlaexp">Export CSV</button></div></div><div class="card">${tb}</div>`;
+}
+act.tlafil = v => { S.ta.f = v; tlaApps(); };
+act.tlasearch = () => { S.ta.q = ($('tlq') || {}).value || ''; tlaApps(); };
+act.tlaexp = () => call('tlcAdminExport', [T()], r => { const b = new Blob(['\ufeff' + r.data.csv], { type: 'text/csv;charset=utf-8' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = r.data.name; document.body.appendChild(a); a.click(); a.remove(); });
+document.addEventListener('keydown', e => { const r = e.target.closest && e.target.closest('.tl-a tr[data-act]'); if (r && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); act.tlaopen(r.dataset.v); } });
+
+act.tlaopen = id => call('tlcAdminGet', [T(), id], r => tlaModal(r.data));
+function tlaModal(x) {
+  const a = x.app, el = tlJ(a.ElemJSON, []), sb = tlJ(a.SiblingsJSON, []), kv = rows => `<dl class="tl-kv">${rows.filter(r => r[1] !== '' && r[1] != null).map(r => `<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join('')}</dl>`;
+  const par = p => kv([['Status', a[p + 'Status']], ['Name', a[p + 'Name']], ['Address', a[p + 'Address']], ['Contact', a[p + 'Contact']], ['Occupation', a[p + 'Occupation']], ['Workplace', a[p + 'Workplace']], ['Education', a[p + 'Education']], ['Monthly income', a[p + 'Income']]]);
+  const det = (t, body, open) => `<details${open ? ' open' : ''}><summary>${t}</summary>${body}</details>`;
+  const docs = x.docs.map(dc => `<div class="tl-dr"><div><b>${esc(dc.t)}</b>${dc.o ? ' <span class="chip">Optional</span>' : ''}${dc.prepared && !dc.s ? '<br><small style="color:var(--mut)">Applicant ticked: ready to bring</small>' : ''}${dc.d && dc.s ? `<br><small style="color:var(--mut)">${esc(dc.s)} ${esc(tlD(dc.d))}</small>` : ''}</div>
+     <select id="tld_${dc.k}" aria-label="Status of ${esc(dc.t)}">${[['', 'Not received'], ['Received', 'Received'], ['Verified', 'Verified'], ['Resubmit', 'Bring again']].map(o => `<option value="${o[0]}"${o[0] === dc.s ? ' selected' : ''}>${o[1]}</option>`).join('')}</select>
+     <input id="tln_${dc.k}" value="${esc(dc.n)}" placeholder="Note (required for Bring again)" maxlength="200"><button class="btn alt" data-act="tlasdoc" data-v="${x.app.StudentID}|${dc.k}">Save</button></div>`).join('');
+  const btns = (x.allowed || []).map(s => `<button class="btn${s === 'Declined' ? ' tl-no' : ''}" data-act="tlastat" data-v="${esc(a.StudentID)}|${esc(s)}">${esc({ 'Under Review': 'Start / restart review', 'For Compliance': 'Return for compliance', 'Endorsed': 'Endorse to TLC Office', 'Approved': 'Approve', 'Declined': 'Not approved' }[s] || s)}</button>`).join('') || '<span style="color:var(--mut);font-size:13px">No status change available.</span>';
+  const hist = (x.history || []).length ? `<ul class="tl-hist">${x.history.map(h => `<li><b>${esc(h.ev)}</b>${h.d ? ' \u2014 ' + esc(h.d) : ''}<small>${esc(h.by)} \u00b7 ${esc(h.at)}</small></li>`).join('')}</ul>` : '<p class="tl-q">No history yet.</p>';
+  const old = $('tlam'); if (old) old.remove();
+  const m = document.createElement('div'); m.className = 'mod'; m.id = 'tlam';
+  m.innerHTML = `<div class="tl-m"><div class="bd"><div class="tl-fh"><div><h3>${esc(tc(tlName(a)))}</h3><p>${esc(a.TlcRef || 'Not submitted')} \u00b7 LRN ${esc(a.LRN)} \u00b7 ${esc(x.student.grade || '')} \u00b7 ${esc(x.student.enrollStatus || '')}</p></div>${tlChip(x.status)}</div>
+   ${(x.warnings || []).map(w => `<div class="tl-note warn" style="margin:10px 0 0">${esc(w)}</div>`).join('')}${a.ReviewNote ? `<div class="tl-note" style="margin:10px 0 0"><b>Last note${a.ReviewedBy ? ' by ' + esc(a.ReviewedBy) : ''}:</b> ${esc(a.ReviewNote)}</div>` : ''}
+   <h5>Status</h5><div class="tl-act">${btns}</div>
+   <h5>Documents (${x.docsDone} of ${x.docsTotal} required received)</h5>${docs}
+   <h5>Application</h5>
+   ${det('Applicant', kv([['Birth date', a.Birthdate], ['Place of birth', a.BirthPlace], ['Sex', a.Sex], ['Nationality', a.Nationality], ['Religion', a.Religion], ['Address', [a.Address, a.Barangay, a.City].filter(Boolean).join(', ')], ['Years in Taguig', a.ResidencyYears], ['Mobile', a.Mobile], ['Telephone', a.Telephone], ['Email', a.Email], ['Case / complaint', a.HasCase + (a.CaseDetails ? ': ' + a.CaseDetails : '')]]), 1)}
+   ${det('School choices', kv([['1st', a.Choice1], ['2nd', a.Choice2], ['3rd', a.Choice3]]))}
+   ${det('Elementary education', kv(el.map((r, i) => ['Grade ' + (i + 1), [r.school, r.location, r.award].filter(Boolean).join(' \u00b7 ')])))}
+   ${det('Father', par('Father'))}${det('Mother', par('Mother'))}
+   ${det('Household and siblings', kv([['Housing', a.Housing + (a.HousingOther ? ': ' + a.HousingOther : '')], ['Electric bill', a.ElectricBill], ['Water bill', a.WaterBill], ['Rent', a.MonthlyRent], ['Family members', a.FamilySize], ['TLC beneficiary in family', a.TlcRelative + (a.TlcRelativeDetail ? ': ' + a.TlcRelativeDetail : '')]].concat(sb.map((r, i) => ['Sibling ' + (i + 1), [r.name, r.age ? r.age + ' yrs' : '', r.civil, r.school].filter(Boolean).join(' \u00b7 ')]))))}
+   ${det('Certification', kv([['Applicant', a.AppSignName + (a.AppAgree === '1' ? ' (agreed)' : '')], ['Parent / guardian', a.ParentName + (a.ParentRelation ? ' (' + a.ParentRelation + ')' : '')], ['Parent signature', a.ParentSignName + (a.ParentAgree === '1' ? ' (agreed)' : '')], ['Submitted', a.SubmittedAt]]))}
+   <h5>History</h5>${hist}</div><div class="ft"><button class="btn alt" data-act="tlaprint" data-v="${esc(a.StudentID)}">Print application</button><button class="btn alt" data-act="tlaclose">Close</button></div></div>`;
+  document.body.appendChild(m); S.tam = x;
+}
+const tlName = a => [a.Surname + ',', a.FirstName, a.MiddleName ? a.MiddleName[0] + '.' : '', a.Suffix].filter(Boolean).join(' ');
+act.tlaclose = () => { const m = $('tlam'); if (m) m.remove(); };
+act.tlaprint = () => { if (S.tam) { act.tlaclose(); printHTML(tlPrintHTML(S.tam.app), true, 'TLC-Application-' + (S.tam.app.TlcRef || S.tam.app.LRN)); } };
+act.tlasdoc = v => {
+  const p = v.split('|'), st = $('tld_' + p[1]).value, n = $('tln_' + p[1]).value.trim();
+  call('tlcAdminDoc', [T(), p[0], p[1], st, n], r => { toast('Document status saved.'); call('tlcAdminGet', [T(), p[0]], g => { tlaModal(g.data); }); tlaReload(); });
+};
+function tlaReload() { google.script.run.withSuccessHandler(r => { if (r && r.success && S.ta) { S.ta.d = r.data; if (S.navId === 'tla' && S.ta.tab === 'apps') tlaApps(); } }).tlcAdminBootstrap(S.token); }
+act.tlastat = v => {
+  const p = v.split('|'), id = p[0], st = p[1], need = st === 'For Compliance' || st === 'Declined';
+  const m = document.createElement('div'); m.className = 'mod'; m.id = 'tlsm';
+  m.innerHTML = `<div style="max-width:470px"><div class="bd"><h3 style="color:var(--navy);margin:0 0 8px">${esc({ 'For Compliance': 'Return for compliance', 'Declined': 'Not approved', 'Approved': 'Approve application', 'Endorsed': 'Endorse to the TLC Office', 'Under Review': 'Review application' }[st] || st)}</h3><div class="f"><label for="tlns">Note to the applicant${need ? ' (required)' : ' (optional)'}</label><textarea id="tlns" maxlength="300" style="text-transform:none" placeholder="${st === 'For Compliance' ? 'What is missing or wrong?' : 'Message the applicant will see'}"></textarea></div><p class="tl-q" style="margin-top:10px">The applicant sees this in the portal and gets an email.</p></div><div class="ft"><button class="btn alt" data-act="tlsx">Cancel</button><button class="btn" data-act="tlsok" data-v="${esc(id)}|${esc(st)}">Save status</button></div></div>`;
+  document.body.appendChild(m);
+};
+act.tlsx = () => { const m = $('tlsm'); if (m) m.remove(); };
+act.tlsok = v => {
+  const p = v.split('|'), n = ($('tlns') || {}).value || '';
+  if ((p[1] === 'For Compliance' || p[1] === 'Declined') && !n.trim()) return toast('Enter a note for the applicant.', false);
+  call('tlcAdminStatus', [T(), p[0], p[1], n.trim()], r => { act.tlsx(); toast(r.message); call('tlcAdminGet', [T(), p[0]], g => tlaModal(g.data)); tlaReload(); });
+};
+
+/* ---- settings ---- */
+function tlaCfg() {
+  const d = S.ta.d, c = S.ta.cfg || (S.ta.cfg = JSON.parse(JSON.stringify(d.cfg))), ro = d.canEdit ? '' : ' disabled';
+  const ms = c.milestones.map((m, i) => `<div class="tl-ms"><input data-tm="${i}" data-tf="title" value="${esc(m.title)}" placeholder="Step" maxlength="100"${ro}><input type="date" data-tm="${i}" data-tf="start" value="${esc(m.start)}" aria-label="Start date"${ro}><input type="date" data-tm="${i}" data-tf="end" value="${esc(m.end)}" aria-label="End date"${ro}><input data-tm="${i}" data-tf="note" value="${esc(m.note)}" placeholder="Short note for applicants" maxlength="200"${ro}>${d.canEdit ? `<button class="btn alt" data-act="tlmdel" data-v="${i}" aria-label="Remove step">Remove</button>` : ''}</div>`).join('');
+  $('tlabody').innerHTML = `${d.canEdit ? '' : '<div class="tl-note">Only the administrator or System Manager can change these settings.</div>'}<div class="card"><div class="ch"><h3>Application window</h3></div><div class="g">
+   <div class="f"><label for="tlc_acc">Accepting submissions</label><select id="tlc_acc" data-tc="accepting"${ro}><option value="1"${c.accepting !== '0' ? ' selected' : ''}>Yes</option><option value="0"${c.accepting === '0' ? ' selected' : ''}>No, pause submissions</option></select></div>
+   <div class="f"><label for="tlc_open">Opening date</label><input type="date" id="tlc_open" data-tc="openDate" value="${esc(c.openDate)}"${ro}></div><div class="f"><label for="tlc_dl">Submission deadline</label><input type="date" id="tlc_dl" data-tc="deadline" value="${esc(c.deadline)}"${ro}></div></div>
+   <p class="tl-q" style="margin-top:12px">Applicants can always fill in and save a draft. These settings control only when they can submit. Leave a date empty for no limit.</p></div>
+   <div class="card"><div class="ch"><h3>Other schedule items</h3>${d.canEdit ? '<button class="btn alt" data-act="tlmadd">Add step</button>' : ''}</div><p class="tl-q">Shown on the applicants\u2019 dashboard after the opening date and deadline. Empty dates show as \u201CDate to be announced\u201D.</p><div class="tl-row s h tl-ms" style="grid-template-columns:minmax(0,1.5fr) 150px 150px minmax(0,1.5fr) auto"><div>Step</div><div>Start</div><div>End</div><div>Note</div><div></div></div>${ms || '<div class="tl-empty">No other steps.</div>'}</div>
+   <div class="card"><div class="ch"><h3>Partner schools and contact</h3></div><div class="g"><div class="f wide"><label for="tlc_pl">TLC Partner Schools (one per line, suggested in the form)</label><textarea id="tlc_pl" data-tc="partners" style="text-transform:none;min-height:120px"${ro}>${esc((c.partners || []).join('\n'))}</textarea></div><div class="f wide"><label for="tlc_ct">Where to submit documents</label><textarea id="tlc_ct" data-tc="contact" style="text-transform:none"${ro}>${esc(c.contact)}</textarea></div></div></div>
+   ${d.canEdit ? '<div class="act" style="position:static"><button class="btn" data-act="tlcsave">Save settings</button></div>' : ''}`;
+}
+document.addEventListener('input', e => {
+  const t = e.target; if (!S.ta || !S.ta.cfg || !t.dataset) return;
+  if (t.dataset.tc) { const k = t.dataset.tc; S.ta.cfg[k] = k === 'partners' ? t.value.split('\n') : t.value; }
+  else if (t.dataset.tm != null && t.dataset.tf) S.ta.cfg.milestones[+t.dataset.tm][t.dataset.tf] = t.value;
+});
+act.tlmadd = () => { S.ta.cfg.milestones.push({ title: '', start: '', end: '', note: '' }); tlaCfg(); };
+act.tlmdel = v => { S.ta.cfg.milestones.splice(+v, 1); tlaCfg(); };
+act.tlcsave = () => {
+  const c = JSON.parse(JSON.stringify(S.ta.cfg)); c.partners = (c.partners || []).map(s => s.trim()).filter(Boolean);
+  call('tlcAdminSaveSettings', [T(), c], r => { S.ta.d.cfg = r.data; S.ta.cfg = JSON.parse(JSON.stringify(r.data)); toast(r.message); tlaReload(); tlaCfg(); });
+};
+
+/* ---- announcements ---- */
+function tlaNews() {
+  const d = S.ta.d, ro = d.canEdit;
+  const list = d.notices.length ? `<ul class="tl-nt">${d.notices.map(n => `<li class="${esc(n.type)}"><b>${esc(n.title)}${n.pinned ? '<span class="pin">PINNED</span>' : ''}</b><p>${esc(n.msg)}</p><small>${esc(n.type)} \u00b7 posted ${esc(tlD(n.at))} by ${esc(n.by)}${n.until ? ' \u00b7 shows until ' + esc(tlD(n.until)) : ''}${ro ? ` \u00b7 <a href="javascript:void(0)" data-act="tlndel" data-v="${esc(n.id)}">Remove</a>` : ''}</small></li>`).join('')}</ul>` : '<div class="tl-empty">No announcements yet.</div>';
+  $('tlabody').innerHTML = `${ro ? `<div class="card"><div class="ch"><h3>Post an announcement</h3></div><div class="g"><div class="f"><label for="tln_t">Title</label><input id="tln_t" maxlength="120" style="text-transform:none"></div><div class="f"><label for="tln_y">Type</label><select id="tln_y"><option>Info</option><option>Reminder</option><option>Urgent</option></select></div><div class="f"><label for="tln_u">Show until (optional)</label><input type="date" id="tln_u"></div><div class="f wide"><label for="tln_m">Message</label><textarea id="tln_m" maxlength="800" style="text-transform:none"></textarea></div><div class="f"><label class="tl-ck2" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="tln_p" style="width:auto;height:auto"> Pin to the top</label></div></div><div class="act" style="position:static;padding-bottom:0"><button class="btn" data-act="tlnpost">Post to applicants</button></div></div>` : '<div class="tl-note">Only the administrator or System Manager can post announcements.</div>'}<div class="card"><div class="ch"><h3>Announcements shown to applicants</h3></div>${list}</div>`;
+}
+act.tlnpost = () => call('tlcAdminNoticeSave', [T(), { title: $('tln_t').value, type: $('tln_y').value, until: $('tln_u').value, msg: $('tln_m').value, pinned: $('tln_p').checked }], r => { S.ta.d.notices = r.data; toast(r.message); tlaNews(); });
+act.tlndel = v => { if (!confirm('Remove this announcement?')) return; call('tlcAdminNoticeDelete', [T(), v], r => { S.ta.d.notices = r.data; toast(r.message); tlaNews(); }); };
+
+/* ===================== WIRING: menu, bottom bar, nav ===================== */
+const _menuTl = menuFor;
+menuFor = function () {
+  const m = _menuTl();
+  if (ENR()) return m.concat([{ g: 'TLC Scholarship', i: I.sch, items: [['tlc', 'TLC Dashboard', I.home], ['tlf', 'TLC Application Form', I.adm]] }]);
+  if (A() && !(typeof OFC === 'function' && OFC()) && !(typeof ACD === 'function' && ACD()))
+    return m.map(e => !Array.isArray(e) && e.g === 'Operations & Management' ? Object.assign({}, e, { items: e.items.concat([['tla', 'TLC Applications', I.sch]]) }) : e);
+  return m;
+};
+const _homeTl = home;
+home = function () {   // the homepage's "Apply online" button leaves a one-time flag, so applicants land on the TLC dashboard
+  if (ENR()) { let g = ''; try { g = sessionStorage.getItem('mrh_go') || ''; if (g) sessionStorage.removeItem('mrh_go'); } catch (e) { } if (g === 'tlc') return nav('tlc'); }
+  return _homeTl();
+};
+const _bnTl = bnInit;
+bnInit = function () { _bnTl(); if (ENR()) $('bnav').insertAdjacentHTML('beforeend', `<button data-act="nav" data-v="tlc" data-ids="tlc,tlf">${I.sch}<span>TLC</span></button>`); };
+const _navTl = nav;
+nav = function (id) {
+  const mine = (ENR() && (id === 'tlc' || id === 'tlf')) || (A() && id === 'tla' && !(typeof OFC === 'function' && OFC()) && !(typeof ACD === 'function' && ACD()));
+  if (S.navId === 'tlf' && id !== 'tlf' && S.tf && S.tf.dirty) tlAuto();
+  if (mine && id === 'tlf' && S.navId === 'tlf' && S.tf) { $('side').classList.remove('open'); return tlFormRender(); }   // already on the form: keep unsaved answers
+  if (!mine) return _navTl(id);
+  $('dd').classList.add('hidden'); $('np').classList.add('hidden'); $('side').classList.remove('open'); S.navId = id;
+  document.querySelectorAll('#nav .nav').forEach(b => b.classList.toggle('on', b.dataset.v === id));
+  const hit = document.querySelector('#nav .sub[data-v="' + id + '"]'), hg = hit && hit.closest('.ng');
+  if (hg) document.querySelectorAll('#nav .ng').forEach(x => { x.classList.toggle('open', x === hg); x.querySelector('.ngh').classList.toggle('has', x === hg); });
+  bnMark(id);
+  if (id !== 'tlf' && S.tf) S.tf.stay = false;
+  return ({ tlc: tlcDash, tlf: tlcForm, tla: tlcAdminPage })[id]();
+};
+</script>

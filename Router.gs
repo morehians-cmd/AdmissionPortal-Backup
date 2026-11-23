@@ -37,7 +37,7 @@ function doGet(e) {
 }
 
 /** Template partials only. Fixed whitelist — never an arbitrary file name. */
-const INCLUDE_ALLOWED_ = ['PipelineView'];
+const INCLUDE_ALLOWED_ = ['PipelineView', 'TlcPortal'];
 function include(f) {
   if (INCLUDE_ALLOWED_.indexOf(String(f)) < 0) throw new Error('Unknown template partial.');
   return HtmlService.createHtmlOutputFromFile(String(f)).getContent();

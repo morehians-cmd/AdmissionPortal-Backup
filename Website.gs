@@ -61,7 +61,7 @@ const PUB_GALLERY_PAGE = 'facilities', PUB_GALLERY_MAX = 5, PUB_EVENTS_MAX = 3;
 
 /* ---------- inner-page catalogue ---------- */
 /* Mirrors Homepage.html's DEFAULT_HOME.nav: same labels, same order, same slugs (route ids).
- * noRoot groups have no page of their own (Contact, Terms and Privacy are reached from the footer). */
+ * noRoot groups have no page of their own (Terms and Privacy are reached from the footer). */
 const PAGE_MENU_ = [
   { id: 'about', label: 'About Us', subs: [
     ['vision-mission-and-core-values', 'Vision, Mission & Core Values'],
@@ -95,7 +95,6 @@ const PAGE_MENU_ = [
   /* No 'privacy' here on purpose: the website's Privacy page shows the Data Privacy Policy the
      portal already stores (getPublishedPolicy), so there is only ever one copy of it. */
   { id: 'other', label: 'Other pages', noRoot: true, subs: [
-    ['contact', 'Contact Information'],
     ['terms', 'Terms of Service']] }
 ];
 
