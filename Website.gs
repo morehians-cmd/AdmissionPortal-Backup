@@ -122,7 +122,7 @@ const SITE_SEED_ = {
     hero: {
       title: 'Welcome to', name: 'Moreh Academy',
       subtitle: 'School of Righteousness and Excellence.',
-      desc: 'Welcome to Moreh Academy. School of Righteousness and Excellence.',
+      desc: 'Kindergarten to Grade 12 and college programs in Taguig City. Create an account to apply online, or message us with your questions.',
       intervalMs: 6500,
       enroll: { label: 'Enroll Now!', to: '#create' },
       discover: { label: 'Discover Moreh Academy', to: 'route:about' },
@@ -203,7 +203,7 @@ const SITE_SEED_ = {
       phone: 'Admissions: 0961 876 6886',
       email: 'registrar@morehacademy.com',
       fb: 'https://facebook.com/ilovemoreh',
-      yt: 'https://youtube.com/'
+      yt: ''
     },
     display: { order: ['admission', 'about', 'programs', 'news'], hidden: [] }
   }
