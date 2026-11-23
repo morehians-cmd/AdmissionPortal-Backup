@@ -28,7 +28,7 @@
  *   sections.about     { heading,text,linkLabel,photo }
  *   sections.programs  { title,items:[{name,desc,on}] }
  *   sections.news      { title,items:[{title,date,summary,link}] }
- *   sections.footer    { loc,phone,email,fb,yt }
+ *   sections.footer    { loc,phone,email,fb,yt, centers:[{name,addr}], contacts:[{label,phone}], emails:[string] }
  *   sections.nav       { menus:[{ label,lead, subs:[{label,lead,icon}] }] }   (structure is fixed)
  *   sections.display   { order:[key], hidden:[key] }
  *
@@ -122,7 +122,7 @@ const SITE_SEED_ = {
     hero: {
       title: 'Welcome to', name: 'Moreh Academy',
       subtitle: 'School of Righteousness and Excellence.',
-      desc: 'Kindergarten to Grade 12 and college programs in Taguig City. Create an account to apply online, or message us with your questions.',
+      desc: 'Welcome to Moreh Academy. School of Righteousness and Excellence.',
       intervalMs: 6500,
       enroll: { label: 'Enroll Now!', to: '#create' },
       discover: { label: 'Discover Moreh Academy', to: 'route:about' },
@@ -203,7 +203,18 @@ const SITE_SEED_ = {
       phone: 'Admissions: 0961 876 6886',
       email: 'registrar@morehacademy.com',
       fb: 'https://facebook.com/ilovemoreh',
-      yt: ''
+      yt: 'https://youtube.com/',
+      centers: [
+        { name: 'Learning Center 1', addr: 'Ricahuerta St. corner A. Bonifacio Avenue, Upper Bicutan, Taguig City' },
+        { name: 'Learning Center 2', addr: 'Ricahuerta St., Upper Bicutan, Taguig City' },
+        { name: 'Learning Center 3', addr: 'Reyes St. corner Makintar St., Central Bicutan, Taguig City' }
+      ],
+      contacts: [
+        { label: 'Learning Center 1', phone: '0970 860 9433' },
+        { label: 'Learning Center 3', phone: '0961 876 6886' },
+        { label: 'College', phone: '0927 341 0437' }
+      ],
+      emails: ['registrar@morehacademy.com', 'morehians@gmail.com', 'morehcollegestaguig@gmail.com']
     },
     display: { order: ['admission', 'about', 'programs', 'news'], hidden: [] }
   }
@@ -220,6 +231,11 @@ const wsImg_ = v => /^https?:\/\//i.test(String(v == null ? '' : v).trim()) ? St
 const wsArr_ = (a, n) => Array.isArray(a) ? a.slice(0, n) : [];
 /* An absent field keeps its built-in text, so content saved before a card existed still opens. */
 const wsPick_ = (v, d, n) => v == null ? d : wsS_(v, n);
+
+function wsFtList_(v, seed, map, keep) {
+  const out = wsArr_(v, 6).map(map).filter(keep);
+  return out.length ? out : seed;
+}
 
 function siteClean_(d) {
   d = d || {};
@@ -278,7 +294,11 @@ function siteClean_(d) {
     },
     footer: {
       loc: wsS_(ft.loc, 200), phone: wsS_(ft.phone, 120),
-      email: wsS_(ft.email, 120), fb: wsLink_(ft.fb), yt: wsLink_(ft.yt)
+      email: wsS_(ft.email, 120), fb: wsLink_(ft.fb), yt: wsLink_(ft.yt),
+      /* Lists: an empty or absent list keeps the built-in text, so content saved before these fields existed still opens. */
+      centers: wsFtList_(ft.centers, SITE_SEED_.sections.footer.centers, x => ({ name: wsS_(x && x.name, 80), addr: wsS_(x && x.addr, 200) }), x => x.name || x.addr),
+      contacts: wsFtList_(ft.contacts, SITE_SEED_.sections.footer.contacts, x => ({ label: wsS_(x && x.label, 80), phone: wsS_(x && x.phone, 60) }), x => x.label || x.phone),
+      emails: wsFtList_(ft.emails, SITE_SEED_.sections.footer.emails, x => wsS_(x, 120), x => x)
     },
     display: {
       order: order,
